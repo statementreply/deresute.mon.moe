@@ -4,6 +4,9 @@ import (
     "crypto/cipher"
     "fmt"
     "rijndael_wrapper"
+    "apiclient"
+    "time"
+    "math/rand"
 )
 
 func main() {
@@ -16,6 +19,11 @@ func main() {
     //dst := make([]byte, 12)
     fmt.Println(decrypt_cbc(data, iv, key))
     fmt.Println(encrypt_cbc(data, iv, key))
+
+    rand.Seed(time.Now().Unix())
+    fus := apiclient.Lolfuscate("1212930123")
+    fmt.Println(fus)
+    fmt.Println(apiclient.Unlolfuscate(fus))
 }
 
 func decrypt_cbc(s, iv, key []byte) []byte {
