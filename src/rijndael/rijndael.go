@@ -35,6 +35,8 @@ func NewCipher(key *[32]byte) *Cipher {
 	return c
 }
 
+
+
 func (c *Cipher) Encrypt(dst, src *[32]byte) {
 	var state [4*blockWords]byte
 	copy(state[:], src[:])
