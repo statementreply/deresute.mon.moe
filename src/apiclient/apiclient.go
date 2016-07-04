@@ -99,14 +99,14 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 }
 
 func (client *ApiClient) Call(path string, args map[string]interface{}) map[string]interface{} {
+    // Prepare request body
     vid_iv := fmt.Sprintf("%016d%016d", rand.Int63n(1e16), rand.Int63n(1e16))
     // FIXME
     //vid_iv = "36615326790296635494734625599255"
     fmt.Println("derand-vid_iv", vid_iv)
 
-
     args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
-    
+
     fmt.Println("derand-args", args)
     mp, _ := msgpack.Marshal(args)
     fmt.Println("derand-plainmp", string(mp))
@@ -116,11 +116,11 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     key_tmp := make([]byte, 64)
     _, _ = crand.Read(key_tmp)
     key := []byte(base64.StdEncoding.EncodeToString(key_tmp))
+    // trim to 32 bytes
     key = key[:32]
     // FIXME debug no-rand
     //key = []byte("NWQzZDk0M2UzYjJlMzRmYTg4ZTliODNi")
     msg_iv := []byte(strings.Replace(client.udid, "-", "", -1))
-
 
 
     // FIXME take from py
@@ -131,7 +131,9 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     body_tmp := Encrypt_cbc([]byte(plain), msg_iv, key)
     body := base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
     fmt.Println("derand-body", body)
+    // Request body finished
 
+    // Prepare request header
     var sid string
     if client.sid != "" {
         sid = client.sid
@@ -167,11 +169,11 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
         "Accept-Encoding": "identity",
         "Connection": "close",
     }
-    fmt.Println("derand-UDID", headers["UDID"])
-    fmt.Println("derand_user_id", headers["User_Id"])
+    //fmt.Println("derand-UDID", headers["UDID"])
+    //fmt.Println("derand_user_id", headers["User_Id"])
+    // Request header ready
 
-    //yy, _ := yaml.Marshal(&headers)
-    //fmt.Printf("%v\n", string(yy))
+    // Prepare Request struct
     // FIXME body is ReadCloser
     req, _ := http.NewRequest("POST", BASE + path, ioutil.NopCloser(strings.NewReader(body)))
     fmt.Println("req-body", req.Body)
@@ -187,20 +189,24 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     req.Write(os.Stdout)
     fmt.Println("==============end")
 
+    // set body again
     req.Body = ioutil.NopCloser(strings.NewReader(body))
     //fmt.Println("==============begin")
     //req.Write(os.Stdout)
     //fmt.Println("==============end")
 
+    // Do request
     hclient := &http.Client{};
     // FIXME
     //return map[string]interface{}{"1":2}
     resp, _ := hclient.Do(req)
+
+    // Processing response
     resp_body, _ := ioutil.ReadAll(resp.Body)
-    //var reply []byte
     reply := make([]byte, base64.StdEncoding.DecodedLen(len(resp_body)))
     fmt.Println("resp_body ", string(resp_body))
     n, _ := base64.StdEncoding.Decode(reply, resp_body)
+
     // trim NULs
     reply = reply[:n]
 
@@ -208,10 +214,17 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     fmt.Println("plain2", string(plain2))
     mp2 := make([]byte, base64.StdEncoding.DecodedLen(len(plain2)))
     base64.StdEncoding.Decode(mp2, plain2)
-    //var content map[string]interface{}
-    var content interface{}
+    //var content interface{}
+    var content map[string]interface{}
     msgpack.Unmarshal(mp2, &content, nil)
-
     fmt.Println("content", content)
+    data_headers, ok := content["data_headers"]
+    if ok {
+        new_sid, ok := (data_headers.(map[interface{}]interface{}))["sid"]
+        if ok && (new_sid != "") {
+            fmt.Println("get new sid", new_sid)
+            client.sid = new_sid.(string)
+        }
+    }
     return args
 }
