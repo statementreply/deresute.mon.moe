@@ -7,6 +7,10 @@ import (
     "apiclient"
     "time"
     "math/rand"
+    "encoding/hex"
+    "crypto/md5"
+    "gopkg.in/yaml.v2"
+    "io/ioutil"
 )
 
 func main() {
@@ -24,6 +28,31 @@ func main() {
     fus := apiclient.Lolfuscate("1212930123")
     fmt.Println(fus)
     fmt.Println(apiclient.Unlolfuscate(fus))
+
+    SECRET_FILE := "secret.yaml"
+    secret, _ := ioutil.ReadFile(SECRET_FILE)
+    //var secret_dict map[string]interface{}
+    var secret_dict map[string]interface{}
+    yaml.Unmarshal(secret, &secret_dict)
+    fmt.Println(secret_dict)
+
+    fmt.Printf("%T\n", secret_dict["udid"].(string))
+    fmt.Printf("%T\n", secret_dict["res_ver"].(string))
+    fmt.Printf("%T\n", []byte(secret_dict["VIEWER_ID_KEY"].(string)))
+    //fmt.Printf("%v\n", []byte(secret_dict["VIEWER_ID_KEY"].([]interface{})))
+    fmt.Printf("%T\n", secret_dict["SID_KEY"].(string))
+
+    //client := apiclient.NewApiClient(1, 2, "3", "4", []byte("5"), []byte("6"))
+    client := apiclient.NewApiClient(int32(secret_dict["user"].(int)), int32(secret_dict["viewer_id"].(int)),
+         secret_dict["udid"].(string), secret_dict["res_ver"].(string), []byte(secret_dict["VIEWER_ID_KEY"].(string)), []byte(secret_dict["SID_KEY"].(string)))
+    fmt.Println(client)
+    return
+    sum_tmp := md5.Sum([]byte("All your APIs are belong to us"))
+
+    client.Call("/load/check",  map[string]interface{}{"campaign_data":"",
+    "campaign_user": 171780,
+    "campaign_sign": hex.EncodeToString(sum_tmp[:]),
+    "app_type": 0,})
 }
 
 func decrypt_cbc(s, iv, key []byte) []byte {
