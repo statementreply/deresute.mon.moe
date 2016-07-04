@@ -105,9 +105,11 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 
 
     args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
-    fmt.Println("args ", args)
+    
+    fmt.Println("derand-args", args)
     mp, _ := msgpack.Marshal(args)
-    fmt.Println("mp ", string(mp))
+    fmt.Println("derand-plainmp", string(mp))
+    fmt.Printf("derand-plainmp %#v\n", string(mp))
     plain := base64.StdEncoding.EncodeToString(mp)
     //var key_tmp [64]byte
     key_tmp := make([]byte, 64)
@@ -191,7 +193,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 
     hclient := &http.Client{};
     // FIXME
-    //return map[string]interface{}{"1":2}
+    return map[string]interface{}{"1":2}
     resp, _ := hclient.Do(req)
     resp_body, _ := ioutil.ReadAll(resp.Body)
     //var reply []byte
