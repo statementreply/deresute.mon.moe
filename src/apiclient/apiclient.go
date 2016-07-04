@@ -14,7 +14,8 @@ import (
     "strings"
     "net/http"
     "io/ioutil"
-    "gopkg.in/yaml.v2"
+    _ "gopkg.in/yaml.v2"
+    "os"
 )
 
 const BASE = "http://game.starlight-stage.jp"
@@ -98,6 +99,10 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 
 func (client *ApiClient) Call(path string, args map[string]interface{}) map[string]interface{} {
     vid_iv := fmt.Sprintf("%016d%016d", rand.Int63n(1e16), rand.Int63n(1e16))
+    // FIXME
+    vid_iv = "36615326790296635494734625599255"
+    fmt.Println("derand-vid_iv", vid_iv)
+
 
     args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
     fmt.Println("args ", args)
@@ -109,13 +114,20 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     _, _ = crand.Read(key_tmp)
     key := []byte(base64.StdEncoding.EncodeToString(key_tmp))
     key = key[:32]
+    // FIXME debug no-rand
+    key = []byte("NWQzZDk0M2UzYjJlMzRmYTg4ZTliODNi")
     msg_iv := []byte(strings.Replace(client.udid, "-", "", -1))
-    fmt.Println("plain", plain)
-    fmt.Println("key", string(key))
-    fmt.Println("iv", string(msg_iv))
+
+
+
+    // FIXME take from py
+    plain = "ha1jYW1wYWlnbl9kYXRhoK1jYW1wYWlnbl91c2VyzgACnwStY2FtcGFpZ25fc2lnbtoAIGZiOWQ0NDAwNTM4ZjZjYTdjMWJhYjM4ZjI3NGFmYWMxqGFwcF90eXBlAKl2aWV3ZXJfaWTaAEwxMzI0NjU0ODc1NDYwMDcyMDAzMTY2MTYwNDExNzQwMlhDSTRBYUIvdDNOcEpNZm01SE9uUjZQUXF3RTNiMmJuZ1Nrb0pxYVpHNlk9"
+    fmt.Println("derand-plain", plain)
+    fmt.Println("derand-key", string(key))
+    fmt.Println("derand-msg_iv", string(msg_iv))
     body_tmp := Encrypt_cbc([]byte(plain), msg_iv, key)
     body := base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
-    fmt.Println("body \n", body)
+    fmt.Println("derand-body", body)
 
     var sid string
     if client.sid != "" {
@@ -126,12 +138,17 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     param_tmp := sha1.Sum([]byte(client.udid + client.viewer_id_str + path + plain))
     sid_tmp := md5.Sum([]byte(sid + string(client.SID_KEY)))
     device_id_tmp := md5.Sum([]byte("Totally a real Android"))
+    // FIXME
+    derand_udid := "002490A277m351;359<170=977o992?304C7347007p711@069n161k5297556>159k794p242B2057110C527?863m883B7917968n276=410?146>617:473l601k186C206n283o831<443l047314234117577444514891562641236"
+    derand_user_id := "000959=146>669=637@383;693A401:364>652>921140939897578176817523287703420"
     headers := map[string]string{
         "PARAM": hex.EncodeToString(param_tmp[:]),
         "KEYCHAIN": "",
-        "User_Id": Lolfuscate(fmt.Sprintf("%d", client.user)),
+        //"User_Id": Lolfuscate(fmt.Sprintf("%d", client.user)),
+        "User_Id": derand_user_id,
         "CARRIER": "google",
-        "UDID": Lolfuscate(client.udid),
+        //"UDID": Lolfuscate(client.udid),
+        "UDID": derand_udid,
         "App_Ver": "2.0.3",
         "Res_Ver": client.res_ver,
         "Ip_Address": "127.0.0.1",
@@ -147,18 +164,33 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
         "Accept-Encoding": "identity",
         "Connection": "close",
     }
+    fmt.Println("derand-UDID", headers["UDID"])
+    fmt.Println("derand_user_id", headers["User_Id"])
 
-    fmt.Println(BASE + path)
-    yy, _ := yaml.Marshal(&headers)
-    fmt.Printf("%v\n", string(yy))
-    req, _ := http.NewRequest("POST", BASE + path, strings.NewReader(body))
+    //yy, _ := yaml.Marshal(&headers)
+    //fmt.Printf("%v\n", string(yy))
+    // FIXME body is ReadCloser
+    req, _ := http.NewRequest("POST", BASE + path, ioutil.NopCloser(strings.NewReader(body)))
+    fmt.Println("req-body", req.Body)
+
+
     for k := range headers {
         req.Header.Set(http.CanonicalHeaderKey(k), headers[k])
-        fmt.Println(http.CanonicalHeaderKey(k), headers[k])
+        //fmt.Println(http.CanonicalHeaderKey(k), headers[k])
     }
     req.Close = true
+
+    fmt.Println("==============begin")
+    req.Write(os.Stdout)
+    fmt.Println("==============end")
+
+    req.Body = ioutil.NopCloser(strings.NewReader(body))
+    //fmt.Println("==============begin")
+    //req.Write(os.Stdout)
+    //fmt.Println("==============end")
+
     hclient := &http.Client{};
-    fmt.Printf("%v\n", req)
+    // FIXME
     //return map[string]interface{}{"1":2}
     resp, _ := hclient.Do(req)
     resp_body, _ := ioutil.ReadAll(resp.Body)
