@@ -7,6 +7,7 @@ import (
     "apiclient"
     "gopkg.in/vmihailenco/msgpack.v2"
     "strings"
+    "gopkg.in/yaml.v2"
 )
 
 func main() {
@@ -38,11 +39,12 @@ func main() {
     mp := make([]byte, base64.StdEncoding.DecodedLen(len(plain2)))
     n, _ = base64.StdEncoding.Decode(mp, plain2)
     mp = mp[:n]
-    fmt.Println("mp", mp)
+    //fmt.Println("mp", mp)
     //var content map[string]interface{}
     var content interface{}
     msgpack.Unmarshal(mp, &content)
 
-    fmt.Println("content", content)
+    yy, _ := yaml.Marshal(content)
+    fmt.Println("content", string(yy))
 
 }
