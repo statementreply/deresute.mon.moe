@@ -1,3 +1,3 @@
 run:
 	source ./go_env.sh; \
-	    go run testr.go
+	    go run main2.go
