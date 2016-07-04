@@ -2,6 +2,7 @@ package apiclient
 import (
     "rijndael_wrapper"
     "crypto/md5"
+    "crypto/sha1"
     "crypto/cipher"
     "math/rand"
     crand "crypto/rand"
@@ -13,6 +14,7 @@ import (
     "strings"
     "net/http"
     "io/ioutil"
+    "gopkg.in/yaml.v2"
 )
 
 const BASE = "http://game.starlight-stage.jp"
@@ -121,37 +123,43 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     } else {
         sid = client.viewer_id_str + client.udid
     }
-    param_tmp := md5.Sum([]byte(client.udid + client.viewer_id_str + path + plain))
+    param_tmp := sha1.Sum([]byte(client.udid + client.viewer_id_str + path + plain))
     sid_tmp := md5.Sum([]byte(sid + string(client.SID_KEY)))
     device_id_tmp := md5.Sum([]byte("Totally a real Android"))
     headers := map[string]string{
         "PARAM": hex.EncodeToString(param_tmp[:]),
         "KEYCHAIN": "",
-        "USER_ID": Lolfuscate(fmt.Sprintf("%d", client.user)),
+        "User_Id": Lolfuscate(fmt.Sprintf("%d", client.user)),
         "CARRIER": "google",
         "UDID": Lolfuscate(client.udid),
-        "APP_VER": "2.0.3",
-        "RES_VER": client.res_ver,
-        "IP_ADDRESS": "127.0.0.1",
-        "DEVICE_NAME": "Nexus 42",
+        "App_Ver": "2.0.3",
+        "Res_Ver": client.res_ver,
+        "Ip_Address": "127.0.0.1",
+        "Device_Name": "Nexus 42",
         "X-Unity-Version": "5.1.2f1",
         "SID": hex.EncodeToString(sid_tmp[:]),
-        "GRAPHICS_DEVICE_NAME": "3dfx Voodoo2 (TM)",
-        "DEVICE_ID": hex.EncodeToString(device_id_tmp[:]),
-        "PLATFORM_OS_VERSION": "Android OS 13.3.7 / API-42 (XYZZ1Y/74726f6c6c)",
+        "Graphics_Device_Name": "3dfx Voodoo2 (TM)",
+        "Device_Id": hex.EncodeToString(device_id_tmp[:]),
+        "Platform_Os_Version": "Android OS 13.3.7 / API-42 (XYZZ1Y/74726f6c6c)",
         "DEVICE": "2",
         "Content-Type": "application/x-www-form-urlencoded", // lies
         "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 13.3.7; Nexus 42 Build/XYZZ1Y)",
+        "Accept-Encoding": "identity",
+        "Connection": "close",
     }
 
     fmt.Println(BASE + path)
-    fmt.Println(headers)
-    //return map[string]interface{}{"1":2}
+    yy, _ := yaml.Marshal(&headers)
+    fmt.Printf("%v\n", string(yy))
     req, _ := http.NewRequest("POST", BASE + path, strings.NewReader(body))
     for k := range headers {
-        req.Header.Set(k, string(headers[k]))
+        req.Header.Set(http.CanonicalHeaderKey(k), headers[k])
+        fmt.Println(http.CanonicalHeaderKey(k), headers[k])
     }
+    req.Close = true
     hclient := &http.Client{};
+    fmt.Printf("%v\n", req)
+    //return map[string]interface{}{"1":2}
     resp, _ := hclient.Do(req)
     resp_body, _ := ioutil.ReadAll(resp.Body)
     //var reply []byte

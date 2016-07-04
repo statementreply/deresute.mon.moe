@@ -32,11 +32,12 @@ func main() {
     msg_iv = strings.Replace(msg_iv, "-", "", -1)
     fmt.Println("msg_iv ", msg_iv)
     fmt.Println("len", len(msg_iv))
-    fmt.Println("key", string(reply[len(reply)-32-1:]))
+    fmt.Println("key", string(reply[len(reply)-32:]))
     plain2 := apiclient.Decrypt_cbc(reply[:len(reply)-32], []byte(msg_iv), reply[len(reply)-32:])
     fmt.Println("plain2", string(plain2))
     mp := make([]byte, base64.StdEncoding.DecodedLen(len(plain2)))
-    base64.StdEncoding.Decode(mp, plain2)
+    n, _ = base64.StdEncoding.Decode(mp, plain2)
+    mp = mp[:n]
     fmt.Println("mp", mp)
     //var content map[string]interface{}
     var content interface{}
