@@ -36,17 +36,8 @@ func main() {
     yaml.Unmarshal(secret, &secret_dict)
     fmt.Println(secret_dict)
 
-    fmt.Printf("%T\n", secret_dict["udid"].(string))
-    fmt.Printf("%T\n", secret_dict["res_ver"].(string))
-    fmt.Printf("%T\n", []byte(secret_dict["VIEWER_ID_KEY"].(string)))
-    //fmt.Printf("%v\n", []byte(secret_dict["VIEWER_ID_KEY"].([]interface{})))
-    fmt.Printf("%T\n", secret_dict["SID_KEY"].(string))
-
-    //client := apiclient.NewApiClient(1, 2, "3", "4", []byte("5"), []byte("6"))
     client := apiclient.NewApiClient(int32(secret_dict["user"].(int)), int32(secret_dict["viewer_id"].(int)),
          secret_dict["udid"].(string), secret_dict["res_ver"].(string), []byte(secret_dict["VIEWER_ID_KEY"].(string)), []byte(secret_dict["SID_KEY"].(string)))
-    fmt.Println(client)
-    return
     sum_tmp := md5.Sum([]byte("All your APIs are belong to us"))
 
     client.Call("/load/check",  map[string]interface{}{"campaign_data":"",
