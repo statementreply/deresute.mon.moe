@@ -21,6 +21,9 @@ func main() {
     }
     fmt.Println(body)
     resp_body := body
+    // remove extra tabs
+    resp_body = []byte(strings.Replace(string(resp_body), "\t", "", -1))
+    resp_body = []byte(strings.Replace(string(resp_body), " ", "", -1))
 
     //var reply []byte
     reply := make([]byte, base64.StdEncoding.DecodedLen(len(resp_body)))
