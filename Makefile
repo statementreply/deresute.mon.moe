@@ -1,3 +1,5 @@
+all: websimple
+	./websimple
 run: build
 	./main2
 
