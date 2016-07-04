@@ -157,12 +157,17 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     //var reply []byte
     reply := make([]byte, base64.StdEncoding.DecodedLen(len(resp_body)))
     fmt.Println("resp_body ", string(resp_body))
-    base64.StdEncoding.Decode(reply, resp_body)
+    n, _ := base64.StdEncoding.Decode(reply, resp_body)
+    // trim NULs
+    reply = reply[:n]
+
     plain2 := Decrypt_cbc(reply[:len(reply)-32], msg_iv, reply[len(reply)-32:])
     fmt.Println("plain2", string(plain2))
+    mp2 := make([]byte, base64.StdEncoding.DecodedLen(len(plain2)))
+    base64.StdEncoding.Decode(mp2, plain2)
     //var content map[string]interface{}
     var content interface{}
-    msgpack.Unmarshal(plain2, &content)
+    msgpack.Unmarshal(mp2, &content)
 
     fmt.Println("content", content)
     return args
