@@ -30,12 +30,14 @@ type RankServer struct {
 
 func (r *RankServer) updateTimestamp() {
     dir, err := os.Open(RANK_CACHE_DIR)
+    defer dir.Close()
     if err != nil {
         log.Fatal(err)
     }
 
     fi, _ := dir.Readdir(0)
     r.list_timestamp = make([]string, 0, len(fi))
+    // sub: dir name 1467555420
     for _, sub := range fi {
         if sub.IsDir() {
             r.list_timestamp = append(r.list_timestamp, sub.Name())
@@ -51,32 +53,36 @@ func (r *RankServer) latestTimestamp() string {
 }
 
 func (r *RankServer) checkData(timestamp string) {
-    dir, err := os.Open(RANK_CACHE_DIR)
-    if err != nil {
-        log.Fatal(err)
-    }
+    //dir, err := os.Open(RANK_CACHE_DIR)
+    //if err != nil {
+    //    log.Fatal(err)
+    //}
 
-    fi, _ := dir.Readdir(0)
-    all_timestamp := make([]string, 0, len(fi))
-    // sub: dir name 1467555420
-    for _, sub := range fi {
-        if sub.IsDir() {
-            timestamp := sub.Name()
+    //fi, _ := dir.Readdir(0)
+    //all_timestamp := make([]string, 0, len(fi))
+    r.updateTimestamp()
+    //for _, sub := range fi {
+        //if sub.IsDir() {
+            //timestamp := sub.Name()
             //log.Print(timestamp)
-            r.data[timestamp] = make([]map[int]int, 2)
-            r.data[timestamp][0] = make(map[int]int)
-            r.data[timestamp][1] = make(map[int]int)
+            //r.data[timestamp] = make([]map[int]int, 2)
+            //r.data[timestamp][0] = make(map[int]int)
+            //r.data[timestamp][1] = make(map[int]int)
 
             //subdirPath := RANK_CACHE_DIR + sub.Name() + "/"
-            all_timestamp = append(all_timestamp, timestamp)
-        }
-    }
+            //all_timestamp = append(all_timestamp, timestamp)
+        //}
+    //}
 
-    sort.Strings(all_timestamp)
-    latest := all_timestamp[len(all_timestamp)-1]
+    //sort.Strings(all_timestamp)
+    //latest := all_timestamp[len(all_timestamp)-1]
+    latest := r.latestTimestamp()
     if timestamp != "" {
         latest = timestamp
     }
+    r.data[latest] = make([]map[int]int, 2)
+    r.data[latest][0] = make(map[int]int)
+    r.data[latest][1] = make(map[int]int)
     subdirPath := RANK_CACHE_DIR + latest + "/"
 
     subdir, _ := os.Open(subdirPath)
@@ -100,7 +106,6 @@ func (r *RankServer) checkData(timestamp string) {
             r.data[latest][rankingType][rank] = 0
         }
     }
-    dir.Close()
 }
 
 // deprecated
