@@ -53,29 +53,7 @@ func (r *RankServer) latestTimestamp() string {
 }
 
 func (r *RankServer) checkData(timestamp string) {
-    //dir, err := os.Open(RANK_CACHE_DIR)
-    //if err != nil {
-    //    log.Fatal(err)
-    //}
-
-    //fi, _ := dir.Readdir(0)
-    //all_timestamp := make([]string, 0, len(fi))
     r.updateTimestamp()
-    //for _, sub := range fi {
-        //if sub.IsDir() {
-            //timestamp := sub.Name()
-            //log.Print(timestamp)
-            //r.data[timestamp] = make([]map[int]int, 2)
-            //r.data[timestamp][0] = make(map[int]int)
-            //r.data[timestamp][1] = make(map[int]int)
-
-            //subdirPath := RANK_CACHE_DIR + sub.Name() + "/"
-            //all_timestamp = append(all_timestamp, timestamp)
-        //}
-    //}
-
-    //sort.Strings(all_timestamp)
-    //latest := all_timestamp[len(all_timestamp)-1]
     latest := r.latestTimestamp()
     if timestamp != "" {
         latest = timestamp
