@@ -28,7 +28,7 @@ func (r *RankServer) checkData(timestamp string) {
     if err != nil {
         log.Fatal(err)
     }
-    log.Print(dir)
+    //log.Print(dir)
 
     fi, _ := dir.Readdir(0)
     all_timestamp := make([]string, 0, len(fi))
@@ -36,7 +36,7 @@ func (r *RankServer) checkData(timestamp string) {
     for _, sub := range fi {
         if sub.IsDir() {
             timestamp := sub.Name()
-            log.Print(timestamp)
+            //log.Print(timestamp)
             r.data[timestamp] = make([]map[int]int, 2)
             r.data[timestamp][0] = make(map[int]int)
             r.data[timestamp][1] = make(map[int]int)
@@ -156,6 +156,7 @@ func (r *RankServer) showData(timestamp string) string {
 
 func (r *RankServer) preload( w http.ResponseWriter, req *http.Request ) {
     req.ParseForm()
+    log.Printf("%T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
     fmt.Fprint(w, "<!DOCTYPE html>")
     fmt.Fprint(w, "<html>")
     fmt.Fprint(w, "<body>")
@@ -178,7 +179,7 @@ func (r *RankServer) qHandler( w http.ResponseWriter, req *http.Request ) {
         r.checkData("")
         fmt.Fprint( w, r.latestData() )
     } else {
-        log.Print("showData", timestamp[0])
+        //log.Print("showData", timestamp[0])
         r.checkData(timestamp[0])
         fmt.Fprint( w, r.showData(timestamp[0]) )
     }
@@ -214,7 +215,7 @@ func (r *RankServer) logHandler( w http.ResponseWriter, req *http.Request ) {
     if err != nil {
         log.Fatal(err)
     }
-    log.Print(dir)
+    //log.Print(dir)
 
     fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "最新ボーダー")
     fi, _ := dir.Readdir(0)
