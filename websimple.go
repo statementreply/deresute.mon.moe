@@ -54,7 +54,7 @@ func (r *RankServer) checkData(timestamp string) {
     subdirPath := RANK_CACHE_DIR + latest + "/"
 
     subdir, _ := os.Open(subdirPath)
-    log.Print(subdir)
+    //log.Print(subdir)
     key, _ := subdir.Readdir(0)
     for _, pt := range key {
         rankingType := r.RankingType(pt.Name())
@@ -133,19 +133,14 @@ func (r *RankServer) latestData() string {
     for k, _ := range(r.data) {
         all_timestamp = append(all_timestamp, k)
     }
-    log.Print(all_timestamp)
+    //log.Print(all_timestamp)
     sort.Strings(all_timestamp)
-    log.Print(all_timestamp)
+    //log.Print(all_timestamp)
+
     latest := all_timestamp[len(all_timestamp)-1]
 
     yy, _ := yaml.Marshal(r.data[latest])
-    ltime, _ := strconv.Atoi(latest)
-    jst, _ := time.LoadLocation("Asia/Tokyo")
-    t := time.Unix(int64(ltime), 0).In(jst)
-    st := t.Format(time.UnixDate)
-    log.Print("tz:", jst)
-    log.Print(t)
-    log.Print(st)
+    st := r.formatTimestamp(latest)
     return latest + "\n" + st + "\n" + string(yy)
 }
 
@@ -155,13 +150,7 @@ func (r *RankServer) showData(timestamp string) string {
         return ""
     }
     yy, _ := yaml.Marshal(item)
-    ltime, _ := strconv.Atoi(timestamp)
-    jst, _ := time.LoadLocation("Asia/Tokyo")
-    log.Print("tz:", jst)
-    t := time.Unix(int64(ltime), 0).In(jst)
-    log.Print(t)
-    st := t.Format(time.UnixDate)
-    log.Print(st)
+    st := r.formatTimestamp(timestamp)
     return timestamp + "\n" + st + "\n" + string(yy)
 }
 
@@ -176,7 +165,7 @@ func (r *RankServer) postload( w http.ResponseWriter, req *http.Request ) {
     fmt.Fprint(w, "</html>")
 }
 
-func (r *RankServer) handler( w http.ResponseWriter, req *http.Request ) {
+func (r *RankServer) qHandler( w http.ResponseWriter, req *http.Request ) {
     r.preload(w, req)
     defer r.postload(w, req)
     fmt.Fprint(w, "<pre>")
@@ -199,7 +188,7 @@ func (r *RankServer) formatTimestamp (timestamp string) string {
     itime, _ := strconv.Atoi(timestamp)
     jst, _ := time.LoadLocation("Asia/Tokyo")
     t := time.Unix(int64(itime), 0).In(jst)
-    st := t.Format(time.UnixDate)
+    st := t.Format(time.RFC3339)
     return st
 }
 
@@ -246,7 +235,7 @@ func MakeRankServer() *RankServer {
     r := &RankServer{}
     r.data = make(map[string][]map[int]int)
     http.HandleFunc("/", r.homeHandler)
-    http.HandleFunc("/q", r.handler)
+    http.HandleFunc("/q", r.qHandler)
     http.HandleFunc("/log", r.logHandler)
     return r
 }
