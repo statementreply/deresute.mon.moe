@@ -22,6 +22,23 @@ var RANK_CACHE_DIR string = BASE + "/data/rank/"
 type RankServer struct {
     //data map[string]map[string]string
     data map[string][]map[int]int
+    list_timestamp []string
+}
+
+func (r *RankServer) updateTimestamp() {
+    dir, err := os.Open(RANK_CACHE_DIR)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    fi, _ := dir.Readdir(0)
+    r.list_timestamp = make([]string, 0, len(fi))
+    for _, sub := range fi {
+        if sub.IsDir() {
+            r.list_timestamp = append(r.list_timestamp, sub.Name())
+        }
+    }
+    sort.Strings(r.list_timestamp)
 }
 
 func (r *RankServer) checkData(timestamp string) {
@@ -29,7 +46,6 @@ func (r *RankServer) checkData(timestamp string) {
     if err != nil {
         log.Fatal(err)
     }
-    //log.Print(dir)
 
     fi, _ := dir.Readdir(0)
     all_timestamp := make([]string, 0, len(fi))
@@ -315,14 +331,14 @@ func (r *RankServer) logHandler( w http.ResponseWriter, req *http.Request ) {
 
     fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "最新ボーダー")
     fi, _ := dir.Readdir(0)
-    list_timestamp := make([]string, 0, len(fi))
+    r.list_timestamp = make([]string, 0, len(fi))
     for _, sub := range fi {
         if sub.IsDir() {
-            list_timestamp = append(list_timestamp, sub.Name())
+            r.list_timestamp = append(r.list_timestamp, sub.Name())
         }
     }
-    sort.Strings(list_timestamp)
-    for _, timestamp := range list_timestamp {
+    sort.Strings(r.list_timestamp)
+    for _, timestamp := range r.list_timestamp {
         fmt.Fprintf(w, "<a href=\"q?t=%s\">%s</a><br>\n", timestamp, r.formatTimestamp(timestamp))
     }
 }
