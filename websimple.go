@@ -12,6 +12,7 @@ import (
     "sort"
     "time"
     "strconv"
+    "encoding/json"
 )
 
 
@@ -128,7 +129,7 @@ func (r *RankServer) dumpData() string {
     return string(yy)
 }
 
-func (r *RankServer) latestData() string {
+func (r *RankServer) latestTimestamp() string {
     all_timestamp := make([]string, 0, len(r.data))
     for k, _ := range(r.data) {
         all_timestamp = append(all_timestamp, k)
@@ -138,10 +139,16 @@ func (r *RankServer) latestData() string {
     //log.Print(all_timestamp)
 
     latest := all_timestamp[len(all_timestamp)-1]
+    return latest
+}
 
-    yy, _ := yaml.Marshal(r.data[latest])
-    st := r.formatTimestamp(latest)
-    return latest + "\n" + st + "\n" + string(yy)
+func (r *RankServer) latestData() string {
+    timestamp := r.latestTimestamp()
+    return r.showData(timestamp)
+
+    //yy, _ := yaml.Marshal(r.data[timestamp])
+    //st := r.formatTimestamp(timestamp)
+    //return timestamp + "\n" + st + "\n" + string(yy)
 }
 
 func (r *RankServer) showData(timestamp string) string {
@@ -154,13 +161,75 @@ func (r *RankServer) showData(timestamp string) string {
     return timestamp + "\n" + st + "\n" + string(yy)
 }
 
-func (r *RankServer) preload( w http.ResponseWriter, req *http.Request ) {
+func (r *RankServer) jsonData(timestamp string) string {
+    //log.Print("jsonData", timestamp)
+    item, ok := r.data[timestamp]
+    if ! ok {
+        return ""
+    }
+    //log.Print("jsonData", item)
+    s_item := make([]map[string]int, 2)
+    //j_item := make([][]map[string][]map[string][string], 2)
+    for ind, sub := range item {
+        s_item[ind] = make(map[string]int)
+        //j_item[ind] = make([]map[
+        for k, v := range sub {
+            s_item[ind][strconv.Itoa(k)] = v
+        }
+    }
+    // type 1
+    text, err := json.Marshal(s_item[0])
+    if err != nil {
+        log.Fatal(err)
+    }
+    //log.Print("jsonData", string(text))
+    return string(text)
+}
+
+func (r *RankServer) init_req( w http.ResponseWriter, req *http.Request ) {
     req.ParseForm()
     log.Printf("%T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
+}
+
+func (r *RankServer) preload( w http.ResponseWriter, req *http.Request ) {
+    r.init_req(w, req)
     fmt.Fprint(w, "<!DOCTYPE html>")
     fmt.Fprint(w, "<html>")
     fmt.Fprint(w, "<body>")
 }
+
+func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
+    r.init_req(w, req)
+    fmt.Fprint(w, "<!DOCTYPE html>")
+    fmt.Fprint(w, "<head>")
+    fmt.Fprint(w, `
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {packages: ['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      // Define the chart to be drawn.
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Element');
+      data.addColumn('number', 'Percentage');
+      data.addRows([
+        ['Nitrogen', 0.78],
+        ['Oxygen', 0.21],
+        ['Other', 0.01]
+      ]);
+
+      // Instantiate and draw the chart.
+      var chart = new google.visualization.LineChart(document.getElementById('myPieChart'));
+      chart.draw(data, null);
+    }
+
+    </script>`)
+    fmt.Fprint(w, "</head>")
+    fmt.Fprint(w, "<html>")
+    fmt.Fprint(w, "<body>")
+}
+
 func (r *RankServer) postload( w http.ResponseWriter, req *http.Request ) {
     fmt.Fprint(w, "</body>")
     fmt.Fprint(w, "</html>")
@@ -232,12 +301,25 @@ func (r *RankServer) logHandler( w http.ResponseWriter, req *http.Request ) {
 }
 
 
+func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
+    r.preload_c(w, req)
+    r.checkData("")
+    defer r.postload(w, req)
+    fmt.Fprint(w, `
+<!-- Identify where the chart should be drawn. -->
+<div id="myPieChart"/>
+    `)
+    fmt.Fprint(w, "json", r.jsonData(r.latestTimestamp()))
+}
+
+
 func MakeRankServer() *RankServer {
     r := &RankServer{}
     r.data = make(map[string][]map[int]int)
     http.HandleFunc("/", r.homeHandler)
     http.HandleFunc("/q", r.qHandler)
     http.HandleFunc("/log", r.logHandler)
+    http.HandleFunc("/chart", r.chartHandler)
     return r
 }
 
