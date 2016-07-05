@@ -30,22 +30,22 @@ func (r *RankServer) checkData() {
     log.Print(dir)
 
     fi, _ := dir.Readdir(0)
-    keys := make([]string, 0, len(fi))
+    all_timestamp := make([]string, 0, len(fi))
+    // sub: dir name 1467555420
     for _, sub := range fi {
         if sub.IsDir() {
-            log.Print(sub.Name())
-            //log.Print("here")
-            r.data[sub.Name()] = make(map[string]string)
-            //log.Print("herex")
+            timestamp := sub.Name()
+            log.Print(timestamp)
+            r.data[timestamp] = make(map[string]string)
 
             //subdirPath := RANK_CACHE_DIR + sub.Name() + "/"
-            keys = append(keys, sub.Name())
+            all_timestamp = append(all_timestamp, timestamp)
 
         }
     }
 
-    sort.Strings(keys)
-    latest := keys[len(keys)-1]
+    sort.Strings(all_timestamp)
+    latest := all_timestamp[len(all_timestamp)-1]
     subdirPath := RANK_CACHE_DIR + latest + "/"
 
     subdir, _ := os.Open(subdirPath)
@@ -90,14 +90,14 @@ func (r *RankServer) dumpData() string {
 }
 
 func (r *RankServer) latestData() string {
-    keys := make([]string, 0, len(r.data))
+    all_timestamp := make([]string, 0, len(r.data))
     for k, _ := range(r.data) {
-        keys = append(keys, k)
+        all_timestamp = append(all_timestamp, k)
     }
-    log.Print(keys)
-    sort.Strings(keys)
-    log.Print(keys)
-    latest := keys[len(keys)-1]
+    log.Print(all_timestamp)
+    sort.Strings(all_timestamp)
+    log.Print(all_timestamp)
+    latest := all_timestamp[len(all_timestamp)-1]
 
     yy, _ := yaml.Marshal(r.data[latest])
     ltime, _ := strconv.Atoi(latest)
