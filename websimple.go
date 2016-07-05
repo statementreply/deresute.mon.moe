@@ -6,7 +6,7 @@ import (
     "os"
     "path"
     "log"
-    _ "io/ioutil"
+    "io/ioutil"
     "gopkg.in/yaml.v2"
     "regexp"
     "sort"
@@ -19,7 +19,8 @@ var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
 
 type RankServer struct {
-    data map[string]map[string]string
+    //data map[string]map[string]string
+    data map[string][]map[int]int
 }
 
 func (r *RankServer) checkData() {
@@ -36,7 +37,9 @@ func (r *RankServer) checkData() {
         if sub.IsDir() {
             timestamp := sub.Name()
             log.Print(timestamp)
-            r.data[timestamp] = make(map[string]string)
+            r.data[timestamp] = make([]map[int]int, 2)
+            r.data[timestamp][0] = make(map[int]int)
+            r.data[timestamp][1] = make(map[int]int)
 
             //subdirPath := RANK_CACHE_DIR + sub.Name() + "/"
             all_timestamp = append(all_timestamp, timestamp)
@@ -52,10 +55,22 @@ func (r *RankServer) checkData() {
     log.Print(subdir)
     key, _ := subdir.Readdir(0)
     for _, pt := range key {
+        rankingType := r.RankingType(pt.Name())
         fileName := subdirPath + pt.Name()
         //log.Print(fileName)
-        content := r.ReadFile(fileName)
-        r.data[latest][pt.Name()] = string(content)
+        content, _ := ioutil.ReadFile(fileName)
+
+        var local_rank_list []map[string]interface{}
+        yaml.Unmarshal(content, &local_rank_list)
+
+        if len(local_rank_list) > 0 {
+            rank := local_rank_list[0]["rank"].(int)
+            score := local_rank_list[0]["score"].(int)
+            r.data[latest][rankingType][rank] = score
+        } else {
+            rank := r.FilenameToRank(pt.Name())
+            r.data[latest][rankingType][rank] = 0
+        }
     }
     dir.Close()
 }
@@ -80,6 +95,27 @@ func (r *RankServer) ReadFile(fileName string) string {
     return content
 }
 
+func (r *RankServer) RankingType(fileName string) int {
+    filter, _ := regexp.Compile("r01\\.\\d+$")
+    if filter.MatchString(fileName) {
+        // event pt
+        return 0 // r01.xxxxxx
+    } else {
+        // high score
+        return 1 // r02.xxxxxx
+    }
+}
+
+func (r *RankServer) FilenameToRank(fileName string) int {
+    //log.Print("fileName", fileName)
+    filter, _ := regexp.Compile("r\\d{2}\\.(\\d+)$")
+    submatch := filter.FindStringSubmatch(fileName)
+    n, _ := strconv.Atoi(submatch[1])
+    //log.Print("fileName", fileName, "n", n, "submatch", submatch)
+    return (n - 1) * 10 + 1
+}
+
+
 func (r *RankServer) run() {
     http.ListenAndServe(":4001", nil)
 }
@@ -102,7 +138,7 @@ func (r *RankServer) latestData() string {
     yy, _ := yaml.Marshal(r.data[latest])
     ltime, _ := strconv.Atoi(latest)
     jst, _ := time.LoadLocation("Asia/Tokyo")
-    fmt.Println("tz:", jst)
+    log.Print("tz:", jst)
     t := time.Unix(int64(ltime), 0).In(jst)
     log.Print(t)
     st := t.Format(time.UnixDate)
@@ -116,10 +152,9 @@ func (r *RankServer) handler( w http.ResponseWriter, _ *http.Request ) {
     fmt.Fprint( w, r.latestData() )
 }
 
-
 func main() {
     r := &RankServer{}
-    r.data = make(map[string]map[string]string)
+    r.data = make(map[string][]map[int]int)
     http.HandleFunc("/", r.handler)
     r.run()
 }
