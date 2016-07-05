@@ -169,16 +169,35 @@ func (r *RankServer) jsonData(timestamp string) string {
     }
     //log.Print("jsonData", item)
     s_item := make([]map[string]int, 2)
-    //j_item := make([][]map[string][]map[string][string], 2)
+    j_item := make([][]map[string][]map[string]int, 2)
     for ind, sub := range item {
+        // ind = 0, 1
         s_item[ind] = make(map[string]int)
-        //j_item[ind] = make([]map[
+        j_item[ind] = make([]map[string][]map[string]int, 0, len(sub))
+        keys := make([]int, 0, len(sub))
+        // need sort according to k
         for k, v := range sub {
             s_item[ind][strconv.Itoa(k)] = v
+            keys = append(keys, k)
+        }
+        sort.Ints(keys)
+        for _, k := range keys {
+            v := sub[k]
+            vv := make(map[string][]map[string]int)
+            vv["c"] = make([]map[string]int, 2)
+            vv["c"][0] = make(map[string]int)
+            vv["c"][1] = make(map[string]int)
+            vv["c"][0]["v"] = k
+            vv["c"][1]["v"] = v
+            j_item[ind] = append(j_item[ind], vv)
         }
     }
+    j_data_col := make([]interface{}, 2)
+    j_data_col[0] = map[string]string{"id": "rank", "label": "ranke", "type": "number"}
+    j_data_col[1] = map[string]string{"id": "score", "label": "score", "type": "number"}
+    j_data := map[string]interface{}{"cols": j_data_col, "rows": j_item[0]}
     // type 1
-    text, err := json.Marshal(s_item[0])
+    text, err := json.Marshal(j_data)
     if err != nil {
         log.Fatal(err)
     }
@@ -206,25 +225,32 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
       google.charts.load('current', {packages: ['corechart']});
-      google.charts.setOnLoadCallback(drawChart);
+      google.charts.setOnLoadCallback(drawChart);`)
 
+    fmt.Fprint(w, `
     function drawChart() {
       // Define the chart to be drawn.
-      var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Element');
-      data.addColumn('number', 'Percentage');
-      data.addRows([
-        ['Nitrogen', 0.78],
-        ['Oxygen', 0.21],
-        ['Other', 0.01]
-      ]);
+      //var data = new google.visualization.DataTable();`)
+    fmt.Fprint(w, "\nvar data = new google.visualization.DataTable(", r.jsonData(r.latestTimestamp()), ")")
 
+    fmt.Fprint(w, `
+      //data.addColumn('string', 'Element');
+      //data.addColumn('number', 'Percentage');
+      //data.addRows([
+      //  ['Nitrogen', 0.78],
+      //  ['Oxygen', 0.21],
+      //  ['Other', 0.01]
+      //]);
+    `)
+
+    fmt.Fprint(w, `
       // Instantiate and draw the chart.
       var chart = new google.visualization.LineChart(document.getElementById('myPieChart'));
       chart.draw(data, null);
     }
+    `)
 
-    </script>`)
+    fmt.Fprint(w, `</script>`)
     fmt.Fprint(w, "</head>")
     fmt.Fprint(w, "<html>")
     fmt.Fprint(w, "<body>")
@@ -302,14 +328,13 @@ func (r *RankServer) logHandler( w http.ResponseWriter, req *http.Request ) {
 
 
 func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
-    r.preload_c(w, req)
     r.checkData("")
+    r.preload_c(w, req)
     defer r.postload(w, req)
     fmt.Fprint(w, `
 <!-- Identify where the chart should be drawn. -->
 <div id="myPieChart"/>
     `)
-    fmt.Fprint(w, "json", r.jsonData(r.latestTimestamp()))
 }
 
 
