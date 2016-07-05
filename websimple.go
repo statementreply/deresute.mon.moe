@@ -34,9 +34,9 @@ func (r *RankServer) checkData() {
     for _, sub := range fi {
         if sub.IsDir() {
             log.Print(sub.Name())
-            log.Print("here")
+            //log.Print("here")
             r.data[sub.Name()] = make(map[string]string)
-            log.Print("herex")
+            //log.Print("herex")
 
             //subdirPath := RANK_CACHE_DIR + sub.Name() + "/"
             keys = append(keys, sub.Name())
@@ -101,7 +101,9 @@ func (r *RankServer) latestData() string {
 
     yy, _ := yaml.Marshal(r.data[latest])
     ltime, _ := strconv.Atoi(latest)
-    t := time.Unix(int64(ltime), 0)
+    jst, _ := time.LoadLocation("Asia/Tokyo")
+    fmt.Println("tz:", jst)
+    t := time.Unix(int64(ltime), 0).In(jst)
     log.Print(t)
     st := t.Format(time.UnixDate)
     log.Print(st)
