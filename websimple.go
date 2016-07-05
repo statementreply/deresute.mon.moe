@@ -22,6 +22,9 @@ var RANK_CACHE_DIR string = BASE + "/data/rank/"
 type RankServer struct {
     //data map[string]map[string]string
     data map[string][]map[int]int
+    // {"1467555420": 
+    //    [{10: 2034} ,{30: 203021} ]
+    //  }
     list_timestamp []string
 }
 
@@ -39,6 +42,12 @@ func (r *RankServer) updateTimestamp() {
         }
     }
     sort.Strings(r.list_timestamp)
+}
+
+func (r *RankServer) latestTimestamp() string {
+    r.updateTimestamp()
+    latest := r.list_timestamp[len(r.list_timestamp)-1]
+    return latest
 }
 
 func (r *RankServer) checkData(timestamp string) {
@@ -145,18 +154,6 @@ func (r *RankServer) dumpData() string {
     return string(yy)
 }
 
-func (r *RankServer) latestTimestamp() string {
-    all_timestamp := make([]string, 0, len(r.data))
-    for k, _ := range(r.data) {
-        all_timestamp = append(all_timestamp, k)
-    }
-    //log.Print(all_timestamp)
-    sort.Strings(all_timestamp)
-    //log.Print(all_timestamp)
-
-    latest := all_timestamp[len(all_timestamp)-1]
-    return latest
-}
 
 func (r *RankServer) latestData() string {
     timestamp := r.latestTimestamp()
