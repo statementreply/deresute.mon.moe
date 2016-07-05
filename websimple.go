@@ -55,13 +55,13 @@ func (r *RankServer) latestTimestamp() string {
 func (r *RankServer) checkData(timestamp string) {
     r.updateTimestamp()
     latest := r.latestTimestamp()
-    if timestamp != "" {
-        latest = timestamp
+    if timestamp == "" {
+        timestamp = latest
     }
-    r.data[latest] = make([]map[int]int, 2)
-    r.data[latest][0] = make(map[int]int)
-    r.data[latest][1] = make(map[int]int)
-    subdirPath := RANK_CACHE_DIR + latest + "/"
+    r.data[timestamp] = make([]map[int]int, 2)
+    r.data[timestamp][0] = make(map[int]int)
+    r.data[timestamp][1] = make(map[int]int)
+    subdirPath := RANK_CACHE_DIR + timestamp + "/"
 
     subdir, _ := os.Open(subdirPath)
     //log.Print(subdir)
@@ -78,10 +78,10 @@ func (r *RankServer) checkData(timestamp string) {
         if len(local_rank_list) > 0 {
             rank := local_rank_list[0]["rank"].(int)
             score := local_rank_list[0]["score"].(int)
-            r.data[latest][rankingType][rank] = score
+            r.data[timestamp][rankingType][rank] = score
         } else {
             rank := r.FilenameToRank(pt.Name())
-            r.data[latest][rankingType][rank] = 0
+            r.data[timestamp][rankingType][rank] = 0
         }
     }
 }
