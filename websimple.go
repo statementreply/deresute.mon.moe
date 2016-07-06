@@ -33,6 +33,20 @@ type RankServer struct {
     list_timestamp []string
 }
 
+func MakeRankServer() *RankServer {
+    r := &RankServer{}
+    r.data = make(map[string][]map[int]int)
+    r.speed = make(map[string][]map[int]float32)
+    //r.data_cache = make(map[string][]map[int]bool)
+    //r.list_timestamp doesn't need initialization
+    http.HandleFunc("/", r.homeHandler)
+    http.HandleFunc("/q", r.qHandler)
+    http.HandleFunc("/log", r.logHandler)
+    http.HandleFunc("/chart", r.chartHandler)
+    http.HandleFunc("/qchart", r.qchartHandler)
+    return r
+}
+
 func (r *RankServer) updateTimestamp() {
     dir, err := os.Open(RANK_CACHE_DIR)
     defer dir.Close()
@@ -601,20 +615,6 @@ func (r *RankServer) qchartHandler( w http.ResponseWriter, req *http.Request ) {
 <tr><td><div id="mySpeedChart" style="border: 1px solid #ccc"/></td></tr>
     </table>
     `)
-}
-
-func MakeRankServer() *RankServer {
-    r := &RankServer{}
-    r.data = make(map[string][]map[int]int)
-    r.speed = make(map[string][]map[int]float32)
-    //r.data_cache = make(map[string][]map[int]bool)
-    //r.list_timestamp doesn't need initialization
-    http.HandleFunc("/", r.homeHandler)
-    http.HandleFunc("/q", r.qHandler)
-    http.HandleFunc("/log", r.logHandler)
-    http.HandleFunc("/chart", r.chartHandler)
-    http.HandleFunc("/qchart", r.qchartHandler)
-    return r
 }
 
 func main() {
