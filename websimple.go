@@ -438,6 +438,8 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
     fmt.Fprint(w, "\nvar data = new google.visualization.DataTable(", r.jsonData(r.latestTimestamp()), ")")
     fmt.Fprint(w, "\nvar data_r = new google.visualization.DataTable(", r.rankData_list_2(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
     fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
+    fmt.Fprint(w, "\nvar data_speed_12 = new google.visualization.DataTable(", r.speedData_list(0, []int{60001, 120001,}), ")")
+    fmt.Fprint(w, "\nvar data_speed_2 = new google.visualization.DataTable(", r.speedData_list(0, []int{2001, 10001, 20001,}), ")")
 
 
     fmt.Fprint(w, `
@@ -462,9 +464,13 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
     var chart = new google.visualization.LineChart(document.getElementById('myLineChart'));
     var chart_a = new google.visualization.AnnotationChart(document.getElementById('myAnnotationChart'));
     var chart_speed = new google.visualization.AnnotationChart(document.getElementById('mySpeedChart'));
+    var chart_speed_12 = new google.visualization.LineChart(document.getElementById('mySpeedChart12'));
+    var chart_speed_2 = new google.visualization.LineChart(document.getElementById('mySpeedChart2'));
     chart.draw(data_r, options);
     chart_a.draw(data_r, options_a);
     chart_speed.draw(data_speed, options_speed);
+    chart_speed_12.draw(data_speed_12, options_a);
+    chart_speed_2.draw(data_speed_2, options_a);
     }
     `)
 
@@ -543,11 +549,11 @@ func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
     fmt.Fprint(w, `
 <!-- Identify where the chart should be drawn. -->
     <table class="columns">
-      <tr>
-        <td><div id="myLineChart" style="border: 1px solid #ccc"/></td>
-</tr>
+<tr><td><div id="myLineChart" style="border: 1px solid #ccc"/></td></tr>
 <tr><td><div id="myAnnotationChart"/></td></tr>
-<tr><td>時速<div id="mySpeedChart"/></td></tr>
+<tr><td>時速<div id="mySpeedChart12"/></td></tr>
+<tr><td><div id="mySpeedChart2"/></td></tr>
+<tr><td><div id="mySpeedChart"/></td></tr>
     </table>
     `)
 }
