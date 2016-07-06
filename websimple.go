@@ -22,6 +22,7 @@ var RANK_CACHE_DIR string = BASE + "/data/rank/"
 // 15min update interval
 // *4 for hour
 var INTERVAL int = 15 * 60 * 4
+var LOG_FILE = "rankserver.log"
 
 type RankServer struct {
     //data map[string]map[string]string
@@ -34,6 +35,7 @@ type RankServer struct {
     list_timestamp []string
     // lock for write ops
     mux sync.Mutex
+    logger *log.Logger
 }
 
 func MakeRankServer() *RankServer {
@@ -42,6 +44,11 @@ func MakeRankServer() *RankServer {
     r.speed = make(map[string][]map[int]float32)
     //r.data_cache = make(map[string][]map[int]bool)
     //r.list_timestamp doesn't need initialization
+    fh, err := os.OpenFile(LOG_FILE, os.O_RDWR | os.O_APPEND | os.O_CREATE, 0644)
+    if err != nil {
+        log.Fatal("cant open log file")
+    }
+    r.logger = log.New(fh, "", log.LstdFlags)
     http.HandleFunc("/", r.homeHandler)
     http.HandleFunc("/q", r.qHandler)
     http.HandleFunc("/log", r.logHandler)
@@ -420,7 +427,7 @@ func (r *RankServer) rankData_list(rankingType int, list_rank []int) string {
 
 func (r *RankServer) init_req( w http.ResponseWriter, req *http.Request ) {
     req.ParseForm()
-    log.Printf("%T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
+    r.logger.Printf("%T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
 }
 
 func (r *RankServer) preload( w http.ResponseWriter, req *http.Request ) {
