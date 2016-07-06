@@ -19,7 +19,8 @@ import (
 var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
 // 15min update interval
-var INTERVAL int = 15 * 60
+// *4 for hour
+var INTERVAL int = 15 * 60 * 4
 
 type RankServer struct {
     //data map[string]map[string]string
@@ -430,7 +431,6 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
       google.charts.load('current', {packages: ['corechart', 'annotationchart']});
       google.charts.setOnLoadCallback(drawLineChart);
       `)
-
     fmt.Fprint(w, `
     function drawLineChart() {
       // Define the chart to be drawn.
@@ -440,8 +440,6 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
     fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
     fmt.Fprint(w, "\nvar data_speed_12 = new google.visualization.DataTable(", r.speedData_list(0, []int{60001, 120001,}), ")")
     fmt.Fprint(w, "\nvar data_speed_2 = new google.visualization.DataTable(", r.speedData_list(0, []int{2001, 10001, 20001,}), ")")
-
-
     fmt.Fprint(w, `
       var options = {
         //title: 'Rate the Day on a Scale of 1 to 10',
@@ -473,13 +471,52 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
     chart_speed_2.draw(data_speed_2, options);
     }
     `)
-
     fmt.Fprint(w, `</script>`)
     fmt.Fprint(w, "</head>")
     fmt.Fprint(w, "<html>")
     fmt.Fprint(w, "<body>")
 }
 
+func (r *RankServer) preload_qchart( w http.ResponseWriter, req *http.Request, list_rank []int ) {
+    r.init_req(w, req)
+    fmt.Fprint(w, "<!DOCTYPE html>")
+    fmt.Fprint(w, "<head>")
+    fmt.Fprint(w, `
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {packages: ['corechart']});
+      google.charts.setOnLoadCallback(drawLineChart);
+      `)
+    fmt.Fprint(w, `
+    function drawLineChart() {`)
+    fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_2(0, list_rank), ")")
+    fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list(0, list_rank), ")")
+    fmt.Fprint(w, `
+      var options = {
+        width: 900,
+        height: 500,
+        hAxis: {
+            format: 'MM/dd HH:mm',
+            gridlines: {count: 12}
+        },
+        vAxis: {
+            //gridlines: {color: 'none'},
+            minValue: 0
+        },
+        interpolateNulls: true,
+        explorer: {},
+    };
+    var chart = new google.visualization.LineChart(document.getElementById('myLineChart'));
+    var chart_speed = new google.visualization.LineChart(document.getElementById('mySpeedChart'));
+    chart.draw(data_rank, options);
+    chart_speed.draw(data_speed, options);
+    }
+    `)
+    fmt.Fprint(w, `</script>`)
+    fmt.Fprint(w, "</head>")
+    fmt.Fprint(w, "<html>")
+    fmt.Fprint(w, "<body>")
+}
 func (r *RankServer) postload( w http.ResponseWriter, req *http.Request ) {
     fmt.Fprint(w, "</body>")
     fmt.Fprint(w, "</html>")
@@ -558,6 +595,33 @@ func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
     `)
 }
 
+func (r *RankServer) qchartHandler( w http.ResponseWriter, req *http.Request ) {
+    r.checkData("")
+    req.ParseForm()
+    list_rank_str, ok := req.Form["rank"]
+    //list_rank = []int
+    var list_rank []int
+    if ok {
+        list_rank = make([]int, 0, len(list_rank_str))
+        for _, v := range list_rank_str {
+            n, _ := strconv.Atoi(v)
+            list_rank = append(list_rank, n)
+        }
+    } else {
+        list_rank = []int{60001, 120001}
+    }
+    r.preload_qchart(w, req, list_rank)
+    defer r.postload(w, req)
+    fmt.Fprint(w, `
+    uses javascript library from <code>https://www.gstatic.com/charts/loader.js</code><br>`)
+    fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "ホームページ")
+    fmt.Fprint(w, `
+    <table class="columns">
+<tr><td><div id="myLineChart" style="border: 1px solid #ccc"/></td></tr>
+<tr><td><div id="mySpeedChart" style="border: 1px solid #ccc"/></td></tr>
+    </table>
+    `)
+}
 
 func MakeRankServer() *RankServer {
     r := &RankServer{}
@@ -569,6 +633,7 @@ func MakeRankServer() *RankServer {
     http.HandleFunc("/q", r.qHandler)
     http.HandleFunc("/log", r.logHandler)
     http.HandleFunc("/chart", r.chartHandler)
+    http.HandleFunc("/qchart", r.qchartHandler)
     return r
 }
 
