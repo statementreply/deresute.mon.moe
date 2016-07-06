@@ -329,30 +329,22 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
     fmt.Fprint(w, `
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-      google.charts.load('current', {packages: ['corechart']});
-      google.charts.setOnLoadCallback(drawChart);`)
+      google.charts.load('current', {packages: ['corechart', 'annotationchart']});
+      google.charts.setOnLoadCallback(drawLineChart);
+      `)
 
     fmt.Fprint(w, `
-    function drawChart() {
+    function drawLineChart() {
       // Define the chart to be drawn.
       //var data = new google.visualization.DataTable();`)
     fmt.Fprint(w, "\nvar data = new google.visualization.DataTable(", r.jsonData(r.latestTimestamp()), ")")
     fmt.Fprint(w, "\nvar data_r = new google.visualization.DataTable(", r.rankData_list(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
 
-    fmt.Fprint(w, `
-      //data.addColumn('string', 'Element');
-      //data.addColumn('number', 'Percentage');
-      //data.addRows([
-      //  ['Nitrogen', 0.78],
-      //  ['Oxygen', 0.21],
-      //  ['Other', 0.01]
-      //]);
-    `)
 
     fmt.Fprint(w, `
       var options = {
         //title: 'Rate the Day on a Scale of 1 to 10',
-        //width: 900,
+        width: 900,
         height: 500,
         hAxis: {
             format: 'MM/dd HH:mm',
@@ -365,9 +357,12 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
         interpolateNulls: true,
         explorer: {},
     };
+    var options_a = {width: 900, height: 500,};
     // Instantiate and draw the chart.
-    var chart = new google.visualization.LineChart(document.getElementById('myPieChart'));
+    var chart = new google.visualization.LineChart(document.getElementById('myLineChart'));
+    var chart_a = new google.visualization.AnnotationChart(document.getElementById('myAnnotationChart'));
     chart.draw(data_r, options);
+    chart_a.draw(data_r, options_a);
     }
     `)
 
@@ -445,7 +440,14 @@ func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
     fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "ホームページ")
     fmt.Fprint(w, `
 <!-- Identify where the chart should be drawn. -->
-<div id="myPieChart"/>
+    <table class="columns">
+      <tr>
+        <td><div id="myLineChart" style="border: 1px solid #ccc"/></td>
+</tr>
+<tr>
+        <td><div id="myAnnotationChart" style="border: 1px solid #ccc"/></td>
+      </tr>
+    </table>
     `)
 }
 
