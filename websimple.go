@@ -78,7 +78,16 @@ func (r *RankServer) checkData(timestamp string) {
     }
 }
 
-func (r *RankServer) updateCache(timestamp string, rankingType int, rank int, fileName string) {
+func (r *RankServer) getFilename(timestamp string, rankingType, rank int) string {
+    subdirPath := RANK_CACHE_DIR + timestamp + "/"
+    a := rankingType + 1
+    b := int((rank - 1) / 10) + 1
+    fileName := subdirPath + fmt.Sprintf("r%02d.%06d", a, b)
+
+    return fileName
+}
+
+func (r *RankServer) updateCache(timestamp string, rankingType int, rank int, fileName string) int {
     _, ok := r.data[timestamp]
     //_, ok2 := r.data_cache[timestamp]
     if ! ok {
@@ -90,16 +99,20 @@ func (r *RankServer) updateCache(timestamp string, rankingType int, rank int, fi
         //r.data_cache[timestamp][1] = make(map[int]bool)
     } else {
         //log.Print(timestamp, "x", rankingType, "x", rank, r.data_cache)
-        _, ok := r.data[timestamp][rankingType][rank]
+        score, ok := r.data[timestamp][rankingType][rank]
         //os.Exit(1)
         if ok {
             // do nothing
-            return
+            return score
         }
     }
 
     //log.Print(fileName)
-    content, _ := ioutil.ReadFile(fileName)
+    content, err := ioutil.ReadFile(fileName)
+    if err != nil {
+        // file doesn't exist?
+        return -1
+    }
 
     var local_rank_list []map[string]interface{}
     yaml.Unmarshal(content, &local_rank_list)
@@ -114,7 +127,7 @@ func (r *RankServer) updateCache(timestamp string, rankingType int, rank int, fi
     }
     //}
     //r.data_cache[timestamp][rankingType][rank] = true
-    return
+    return r.data[timestamp][rankingType][rank]
 }
 
 // deprecated
@@ -228,6 +241,38 @@ func (r *RankServer) jsonData(timestamp string) string {
     return string(text)
 }
 
+func (r *RankServer) rankData(rankingType int, rank int) string {
+    r.updateTimestamp()
+    j_item := make([]map[string][]map[string]int, 0, len(r.list_timestamp))
+    j_data_col := make([]interface{}, 2)
+    j_data_col[0] = map[string]string{"id": "timestamp", "label": "timestamp", "type": "number"}
+    j_data_col[1] = map[string]string{"id": "score", "label": "score", "type": "number"}
+    for _, timestamp := range r.list_timestamp {
+        timestamp_i, _ := strconv.Atoi(timestamp)
+        fileName := r.getFilename(timestamp, rankingType, rank)
+        score := r.updateCache(timestamp, rankingType, rank, fileName)
+        log.Print("timestamp ", timestamp, " score ", score)
+        vv := map[string][]map[string]int{
+            "c": []map[string]int{
+                map[string]int{"v":timestamp_i},
+                map[string]int{"v":score},
+            },
+        }
+        if score >= 0 {
+            j_item = append(j_item, vv)
+        }
+    }
+    j_data := map[string]interface{}{"cols": j_data_col, "rows": j_item}
+    log.Print(j_data)
+
+    text, err := json.Marshal(j_data)
+    if err != nil {
+        log.Fatal(err)
+    }
+    return string(text)
+
+}
+
 func (r *RankServer) init_req( w http.ResponseWriter, req *http.Request ) {
     req.ParseForm()
     log.Printf("%T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
@@ -255,6 +300,7 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
       // Define the chart to be drawn.
       //var data = new google.visualization.DataTable();`)
     fmt.Fprint(w, "\nvar data = new google.visualization.DataTable(", r.jsonData(r.latestTimestamp()), ")")
+    fmt.Fprint(w, "\nvar data_r = new google.visualization.DataTable(", r.rankData(0, 120001), ")")
 
     fmt.Fprint(w, `
       //data.addColumn('string', 'Element');
@@ -269,7 +315,7 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
     fmt.Fprint(w, `
       // Instantiate and draw the chart.
       var chart = new google.visualization.LineChart(document.getElementById('myPieChart'));
-      chart.draw(data, null);
+      chart.draw(data_r, null);
     }
     `)
 
