@@ -550,9 +550,9 @@ func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
 <!-- Identify where the chart should be drawn. -->
     <table class="columns">
 <tr><td><div id="myLineChart" style="border: 1px solid #ccc"/></td></tr>
-<tr><td><div id="myAnnotationChart"/></td></tr>
-<tr><td>時速<div id="mySpeedChart12"/></td></tr>
-<tr><td><div id="mySpeedChart2"/></td></tr>
+<tr><td><div id="myAnnotationChart" /></td></tr>
+<tr><td>時速<div id="mySpeedChart12" style="border: 1px solid #ccc"/></td></tr>
+<tr><td><div id="mySpeedChart2" style="border: 1px solid #ccc"/></td></tr>
 <tr><td><div id="mySpeedChart"/></td></tr>
     </table>
     `)
