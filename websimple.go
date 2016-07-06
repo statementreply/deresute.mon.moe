@@ -22,7 +22,7 @@ var RANK_CACHE_DIR string = BASE + "/data/rank/"
 type RankServer struct {
     //data map[string]map[string]string
     data map[string][]map[int]int
-    //data_cache map[string][]map[int]bool
+    data_cache map[string][]map[int]bool
     // {"1467555420": 
     //    [{10: 2034} ,{30: 203021} ]
     //  }
@@ -59,9 +59,9 @@ func (r *RankServer) checkData(timestamp string) {
     if timestamp == "" {
         timestamp = latest
     }
-    r.data[timestamp] = make([]map[int]int, 2)
-    r.data[timestamp][0] = make(map[int]int)
-    r.data[timestamp][1] = make(map[int]int)
+    //r.data[timestamp] = make([]map[int]int, 2)
+    //r.data[timestamp][0] = make(map[int]int)
+    //r.data[timestamp][1] = make(map[int]int)
     subdirPath := RANK_CACHE_DIR + timestamp + "/"
 
     subdir, _ := os.Open(subdirPath)
@@ -71,20 +71,50 @@ func (r *RankServer) checkData(timestamp string) {
         rankingType := r.RankingType(pt.Name())
         fileName := subdirPath + pt.Name()
         //log.Print(fileName)
-        content, _ := ioutil.ReadFile(fileName)
+        //content, _ := ioutil.ReadFile(fileName)
 
-        var local_rank_list []map[string]interface{}
-        yaml.Unmarshal(content, &local_rank_list)
+        rank := r.FilenameToRank(pt.Name())
+        r.updateCache(timestamp, rankingType, rank, fileName)
+    }
+}
 
-        if len(local_rank_list) > 0 {
-            rank := local_rank_list[0]["rank"].(int)
-            score := local_rank_list[0]["score"].(int)
-            r.data[timestamp][rankingType][rank] = score
-        } else {
-            rank := r.FilenameToRank(pt.Name())
-            r.data[timestamp][rankingType][rank] = 0
+func (r *RankServer) updateCache(timestamp string, rankingType int, rank int, fileName string) {
+    _, ok := r.data[timestamp]
+    _, ok2 := r.data_cache[timestamp]
+    if ! (ok && ok2) {
+        r.data[timestamp] = make([]map[int]int, 2)
+        r.data[timestamp][0] = make(map[int]int)
+        r.data[timestamp][1] = make(map[int]int)
+        r.data_cache[timestamp] = make([]map[int]bool, 2)
+        r.data_cache[timestamp][0] = make(map[int]bool)
+        r.data_cache[timestamp][1] = make(map[int]bool)
+    } else {
+        //log.Print(timestamp, "x", rankingType, "x", rank, r.data_cache)
+        _, ok := r.data[timestamp][rankingType][rank]
+        //os.Exit(1)
+        if ok {
+            // do nothing
+            return
         }
     }
+
+    //log.Print(fileName)
+    content, _ := ioutil.ReadFile(fileName)
+
+    var local_rank_list []map[string]interface{}
+    yaml.Unmarshal(content, &local_rank_list)
+
+    if len(local_rank_list) > 0 {
+        rank := local_rank_list[0]["rank"].(int)
+        score := local_rank_list[0]["score"].(int)
+        r.data[timestamp][rankingType][rank] = score
+    } else {
+        //rank := r.FilenameToRank(fileName)
+        r.data[timestamp][rankingType][rank] = 0
+    }
+    //}
+    r.data_cache[timestamp][rankingType][rank] = true
+    return
 }
 
 // deprecated
@@ -322,6 +352,8 @@ func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
 func MakeRankServer() *RankServer {
     r := &RankServer{}
     r.data = make(map[string][]map[int]int)
+    r.data_cache = make(map[string][]map[int]bool)
+    //r.list_timestamp doesn't need initialization
     http.HandleFunc("/", r.homeHandler)
     http.HandleFunc("/q", r.qHandler)
     http.HandleFunc("/log", r.logHandler)
