@@ -1,8 +1,13 @@
-all: websimple
+
+all: prep websimple
 	./websimple
 run: build
 	./main2
 
+prep:
+	if [ ! -d "data" ]; then \
+	    ln -s ../deresuteme/data; \
+	fi
 build: dumpbody main2
 
 dumpbody: src/apiclient/apiclient.go
