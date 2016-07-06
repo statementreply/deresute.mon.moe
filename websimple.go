@@ -445,7 +445,7 @@ func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
         <td><div id="myLineChart" style="border: 1px solid #ccc"/></td>
 </tr>
 <tr>
-        <td><div id="myAnnotationChart" style="border: 1px solid #ccc"/></td>
+        <td><div id="myAnnotationChart"/></td>
       </tr>
     </table>
     `)
