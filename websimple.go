@@ -18,10 +18,13 @@ import (
 
 var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
+// 15min update interval
+var INTERVAL int = 15 * 60
 
 type RankServer struct {
     //data map[string]map[string]string
     data map[string][]map[int]int
+    speed map[string][]map[int]float32
     //data_cache map[string][]map[int]bool
     // {"1467555420": 
     //    [{10: 2034} ,{30: 203021} ]
@@ -128,6 +131,11 @@ func (r *RankServer) updateCache(timestamp string, rankingType int, rank int, fi
     //}
     //r.data_cache[timestamp][rankingType][rank] = true
     return r.data[timestamp][rankingType][rank]
+}
+
+// speed per hour
+func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float32 {
+    return 0.0
 }
 
 // deprecated
