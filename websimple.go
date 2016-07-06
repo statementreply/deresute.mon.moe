@@ -564,7 +564,7 @@ func (r *RankServer) homeHandler( w http.ResponseWriter, req *http.Request ) {
     fmt.Fprintf(w, "<br>デレステイベントボーダー<br><br>")
 
     fmt.Fprintf(w, "<a href=\"log\">%s</a><br>\n", "過去ボーダー")
-    fmt.Fprintf(w, "<a href=\"chart\">%s</a><br>\n", "chart beta")
+    fmt.Fprintf(w, "<a href=\"chart\">%s</a><br>\n", "グラフΒ")
     fmt.Fprintf(w, "<br>%s<br>\n", "最新ボーダー")
     r.checkData("")
     fmt.Fprint(w, "<pre>")
