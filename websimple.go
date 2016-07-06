@@ -469,8 +469,8 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
     chart.draw(data_r, options);
     chart_a.draw(data_r, options_a);
     chart_speed.draw(data_speed, options_speed);
-    chart_speed_12.draw(data_speed_12, options_a);
-    chart_speed_2.draw(data_speed_2, options_a);
+    chart_speed_12.draw(data_speed_12, options);
+    chart_speed_2.draw(data_speed_2, options);
     }
     `)
 
