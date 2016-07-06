@@ -36,6 +36,8 @@ type RankServer struct {
     // lock for write ops
     mux sync.Mutex
     logger *log.Logger
+    keyFile string
+    certFile string
 }
 
 func MakeRankServer() *RankServer {
@@ -57,6 +59,14 @@ func MakeRankServer() *RankServer {
         LOG_FILE = confLOG_FILE
     }
     log.Print("logfile is ", LOG_FILE)
+    r.keyFile, ok = config["KEY_FILE"]
+    if !ok {
+        r.keyFile = ""
+    }
+    r.certFile, ok = config["CERT_FILE"]
+    if !ok {
+        r.certFile = ""
+    }
     fh, err := os.OpenFile(LOG_FILE, os.O_RDWR | os.O_APPEND | os.O_CREATE, 0644)
     if err != nil {
         log.Fatal("cant open log file")
@@ -242,7 +252,14 @@ func (r *RankServer) FilenameToRank(fileName string) int {
 
 
 func (r *RankServer) run() {
-    http.ListenAndServe(":4001", nil)
+    if (r.keyFile != "") && (r.certFile != "") {
+        log.Print("use https TLS")
+        log.Print("keyFile " + r.keyFile + " certFile " + r.certFile)
+        http.ListenAndServeTLS(":4001", r.certFile, r.keyFile, nil)
+    } else {
+        log.Print("use http plaintext")
+        http.ListenAndServe(":4001", nil)
+    }
 }
 
 func (r *RankServer) dumpData() string {
