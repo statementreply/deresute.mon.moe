@@ -1,7 +1,6 @@
 package main
 import (
     "fmt"
-    // "bufio"
     "net/http"
     "os"
     "path"
@@ -23,6 +22,7 @@ var RANK_CACHE_DIR string = BASE + "/data/rank/"
 // *4 for hour
 var INTERVAL int = 15 * 60 * 4
 var LOG_FILE = "rankserver.log"
+var CONFIG_FILE = "rankserver.yaml"
 
 type RankServer struct {
     //data map[string]map[string]string
@@ -44,6 +44,19 @@ func MakeRankServer() *RankServer {
     r.speed = make(map[string][]map[int]float32)
     //r.data_cache = make(map[string][]map[int]bool)
     //r.list_timestamp doesn't need initialization
+
+    content, err := ioutil.ReadFile(CONFIG_FILE)
+    if err != nil {
+        log.Fatal(err)
+    }
+    var config map[string]string
+    yaml.Unmarshal(content, &config)
+    fmt.Println(config)
+    confLOG_FILE, ok := config["LOG_FILE"]
+    if ok {
+        LOG_FILE = confLOG_FILE
+    }
+    log.Print("logfile is ", LOG_FILE)
     fh, err := os.OpenFile(LOG_FILE, os.O_RDWR | os.O_APPEND | os.O_CREATE, 0644)
     if err != nil {
         log.Fatal("cant open log file")
@@ -641,7 +654,6 @@ func (r *RankServer) qchartHandler( w http.ResponseWriter, req *http.Request ) {
 
 func main() {
     log.Print("RankServer running")
-    log.Print("logfile is ", LOG_FILE)
     r := MakeRankServer()
     r.run()
 }
