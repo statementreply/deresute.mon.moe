@@ -229,7 +229,7 @@ func (r *RankServer) jsonData(timestamp string) string {
         }
     }
     j_data_col := make([]interface{}, 2)
-    j_data_col[0] = map[string]string{"id": "rank", "label": "ranke", "type": "number"}
+    j_data_col[0] = map[string]string{"id": "rank", "label": "rank", "type": "number"}
     j_data_col[1] = map[string]string{"id": "score", "label": "score", "type": "number"}
     j_data := map[string]interface{}{"cols": j_data_col, "rows": j_item[0]}
     // type 1
@@ -244,7 +244,7 @@ func (r *RankServer) jsonData(timestamp string) string {
 func (r *RankServer) rankData(rankingType int, rank int) string {
     r.updateTimestamp()
     raw := ""
-    raw += `{"cols":[{"id":"timestamp","label":"timestamp","type":"date"},{"id":"score","label":"score","type":"number"}],"rows":[`
+    raw += `{"cols":[{"id":"timestamp","label":"timestamp","type":"datetime"},{"id":"score","label":"120001","type":"number"}],"rows":[`
     j_item := make([]map[string][]map[string]interface{}, 0, len(r.list_timestamp))
     j_data_col := make([]interface{}, 2)
     j_data_col[0] = map[string]string{"id": "timestamp", "label": "timestamp", "type": "date"}
@@ -320,9 +320,22 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
     `)
 
     fmt.Fprint(w, `
-      // Instantiate and draw the chart.
-      var chart = new google.visualization.LineChart(document.getElementById('myPieChart'));
-      chart.draw(data_r, null);
+      var options = {
+        //title: 'Rate the Day on a Scale of 1 to 10',
+        //width: 900,
+        height: 500,
+        hAxis: {
+            format: 'MM/dd HH:mm',
+            gridlines: {count: 12}
+        },
+        vAxis: {
+            //gridlines: {color: 'none'},
+            minValue: 0
+        }
+    };
+    // Instantiate and draw the chart.
+    var chart = new google.visualization.LineChart(document.getElementById('myPieChart'));
+    chart.draw(data_r, options);
     }
     `)
 
