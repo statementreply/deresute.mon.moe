@@ -329,7 +329,7 @@ func (r *RankServer) rankData(rankingType int, rank int) string {
 }
 
 func (r *RankServer) rankData_list_f(rankingType int, list_rank []int, dataSource func (string, int, int)interface{}) string {
-    log.Print("functional version of rankData_list_f()")
+    //log.Print("functional version of rankData_list_f()")
     r.updateTimestamp()
     raw := ""
     raw += `{"cols":[{"id":"timestamp","label":"timestamp","type":"datetime"},`
