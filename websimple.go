@@ -22,7 +22,7 @@ var RANK_CACHE_DIR string = BASE + "/data/rank/"
 type RankServer struct {
     //data map[string]map[string]string
     data map[string][]map[int]int
-    data_cache map[string][]map[int]bool
+    //data_cache map[string][]map[int]bool
     // {"1467555420": 
     //    [{10: 2034} ,{30: 203021} ]
     //  }
@@ -80,14 +80,14 @@ func (r *RankServer) checkData(timestamp string) {
 
 func (r *RankServer) updateCache(timestamp string, rankingType int, rank int, fileName string) {
     _, ok := r.data[timestamp]
-    _, ok2 := r.data_cache[timestamp]
-    if ! (ok && ok2) {
+    //_, ok2 := r.data_cache[timestamp]
+    if ! ok {
         r.data[timestamp] = make([]map[int]int, 2)
         r.data[timestamp][0] = make(map[int]int)
         r.data[timestamp][1] = make(map[int]int)
-        r.data_cache[timestamp] = make([]map[int]bool, 2)
-        r.data_cache[timestamp][0] = make(map[int]bool)
-        r.data_cache[timestamp][1] = make(map[int]bool)
+        //r.data_cache[timestamp] = make([]map[int]bool, 2)
+        //r.data_cache[timestamp][0] = make(map[int]bool)
+        //r.data_cache[timestamp][1] = make(map[int]bool)
     } else {
         //log.Print(timestamp, "x", rankingType, "x", rank, r.data_cache)
         _, ok := r.data[timestamp][rankingType][rank]
@@ -113,7 +113,7 @@ func (r *RankServer) updateCache(timestamp string, rankingType int, rank int, fi
         r.data[timestamp][rankingType][rank] = 0
     }
     //}
-    r.data_cache[timestamp][rankingType][rank] = true
+    //r.data_cache[timestamp][rankingType][rank] = true
     return
 }
 
@@ -352,7 +352,7 @@ func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
 func MakeRankServer() *RankServer {
     r := &RankServer{}
     r.data = make(map[string][]map[int]int)
-    r.data_cache = make(map[string][]map[int]bool)
+    //r.data_cache = make(map[string][]map[int]bool)
     //r.list_timestamp doesn't need initialization
     http.HandleFunc("/", r.homeHandler)
     http.HandleFunc("/q", r.qHandler)
