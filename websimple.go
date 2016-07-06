@@ -72,12 +72,12 @@ func (r *RankServer) checkData(timestamp string) {
     key, _ := subdir.Readdir(0)
     for _, pt := range key {
         rankingType := r.RankingType(pt.Name())
-        fileName := subdirPath + pt.Name()
+        //fileName := subdirPath + pt.Name()
         //log.Print(fileName)
         //content, _ := ioutil.ReadFile(fileName)
 
         rank := r.FilenameToRank(pt.Name())
-        r.fetchData(timestamp, rankingType, rank, fileName)
+        r.fetchData_3(timestamp, rankingType, rank)
     }
 }
 
@@ -90,7 +90,12 @@ func (r *RankServer) getFilename(timestamp string, rankingType, rank int) string
     return fileName
 }
 
-func (r *RankServer) fetchData(timestamp string, rankingType int, rank int, fileName string) int {
+func (r *RankServer) fetchData_3(timestamp string, rankingType int, rank int) int {
+    fileName := r.getFilename(timestamp, rankingType, rank)
+    return r.fetchData_internal(timestamp, rankingType, rank, fileName)
+}
+
+func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank int, fileName string) int {
     _, ok := r.data[timestamp]
     //_, ok2 := r.data_cache[timestamp]
     if ! ok {
@@ -260,8 +265,8 @@ func (r *RankServer) rankData(rankingType int, rank int) string {
     j_data_col[1] = map[string]string{"id": "score", "label": "score", "type": "number"}
     for _, timestamp := range r.list_timestamp {
         //timestamp_i, _ := strconv.Atoi(timestamp)
-        fileName := r.getFilename(timestamp, rankingType, rank)
-        score := r.fetchData(timestamp, rankingType, rank, fileName)
+        score := r.fetchData_3(timestamp, rankingType, rank)
+
         log.Print("timestamp ", timestamp, " score ", score)
         vv := map[string][]map[string]interface{}{
             "c": []map[string]interface{}{
@@ -301,8 +306,7 @@ func (r *RankServer) rankData_list(rankingType int, list_rank []int) string {
         // time in milliseconds
         raw += fmt.Sprintf(`{"c":[{"v":new Date(%s000)},`, timestamp)
         for _, rank := range list_rank {
-            fileName := r.getFilename(timestamp, rankingType, rank)
-            score := r.fetchData(timestamp, rankingType, rank, fileName)
+            score := r.fetchData_3(timestamp, rankingType, rank)
             //log.Print("timestamp ", timestamp, " score ", score)
             if score >= 0 {
                 raw += fmt.Sprintf(`{"v":%d},`, score)
