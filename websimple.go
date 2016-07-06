@@ -363,6 +363,7 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
             minValue: 0
         },
         interpolateNulls: true,
+        explorer: {},
     };
     // Instantiate and draw the chart.
     var chart = new google.visualization.LineChart(document.getElementById('myPieChart'));
