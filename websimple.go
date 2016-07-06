@@ -457,13 +457,14 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
         explorer: {},
     };
     var options_a = {width: 900, height: 500,};
+    var options_speed = {width: 900, height: 500,title: '時速'};
     // Instantiate and draw the chart.
     var chart = new google.visualization.LineChart(document.getElementById('myLineChart'));
     var chart_a = new google.visualization.AnnotationChart(document.getElementById('myAnnotationChart'));
     var chart_speed = new google.visualization.AnnotationChart(document.getElementById('mySpeedChart'));
     chart.draw(data_r, options);
     chart_a.draw(data_r, options_a);
-    chart_speed.draw(data_speed, options_a);
+    chart_speed.draw(data_speed, options_speed);
     }
     `)
 
