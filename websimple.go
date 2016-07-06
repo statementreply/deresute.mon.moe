@@ -640,6 +640,8 @@ func (r *RankServer) qchartHandler( w http.ResponseWriter, req *http.Request ) {
 }
 
 func main() {
+    log.Print("RankServer running")
+    log.Print("logfile is ", LOG_FILE)
     r := MakeRankServer()
     r.run()
 }
