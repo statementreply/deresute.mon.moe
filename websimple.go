@@ -1,7 +1,7 @@
 package main
 import (
     "fmt"
-    "bufio"
+    // "bufio"
     "net/http"
     "os"
     "path"
@@ -358,6 +358,7 @@ func (r *RankServer) speedData_list(rankingType int, list_rank []int) string {
     return r.rankData_list_f(rankingType, list_rank, r.getSpeed_i)
 }
 
+// deprecated
 func (r *RankServer) rankData_list(rankingType int, list_rank []int) string {
     r.updateTimestamp()
     raw := ""
