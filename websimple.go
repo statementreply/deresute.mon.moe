@@ -140,7 +140,34 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 
 // speed per hour
 func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float32 {
-    return 0.0
+    _, ok := r.speed[timestamp]
+    if ! ok {
+        r.speed[timestamp] = make([]map[int]float32, 2)
+        r.speed[timestamp][0] = make(map[int]float32)
+        r.speed[timestamp][1] = make(map[int]float32)
+    } else {
+        val, ok := r.speed[timestamp][rankingType][rank]
+        if ok {
+            return val
+        }
+    }
+    timestamp_i, _ := strconv.Atoi(timestamp)
+    prev_timestamp := fmt.Sprintf("%d", timestamp_i - INTERVAL)
+    cur_score := r.fetchData(timestamp, rankingType, rank)
+    prev_score := r.fetchData(prev_timestamp, rankingType, rank)
+    if (cur_score >= 0) && (prev_score >= 0) {
+        r.speed[timestamp][rankingType][rank] = (float32(cur_score - prev_score)) / float32(INTERVAL) * 3600.0;
+        return r.speed[timestamp][rankingType][rank]
+    } else {
+        // one of them is missing data
+        return -1.0
+    }
+}
+
+func (r *RankServer) getSpeed_i(timestamp string, rankingType int, rank int) interface{} {
+    var x interface{}
+    x = r.getSpeed(timestamp, rankingType, rank)
+    return x
 }
 
 // deprecated
@@ -292,6 +319,65 @@ func (r *RankServer) rankData(rankingType int, rank int) string {
     return raw
 }
 
+func (r *RankServer) rankData_list_f(rankingType int, list_rank []int, dataSource func (string, int, int)interface{}) string {
+    log.Print("functional version of rankData_list_f()")
+    r.updateTimestamp()
+    raw := ""
+    raw += `{"cols":[{"id":"timestamp","label":"timestamp","type":"datetime"},`
+    for _, rank := range list_rank {
+        raw += fmt.Sprintf(`{"id":"%d","label":"%d","type":"number"},`, rank, rank)
+    }
+    raw += "\n"
+    raw += `],"rows":[`
+
+    for _, timestamp := range r.list_timestamp {
+        // time in milliseconds
+        raw += fmt.Sprintf(`{"c":[{"v":new Date(%s000)},`, timestamp)
+        for _, rank := range list_rank {
+            score := dataSource(timestamp, rankingType, rank)
+            //log.Print("timestamp ", timestamp, " score ", score)
+            switch score.(type) {
+                case int:
+                    score_i := score.(int)
+                    if score_i >= 0 {
+                        raw += fmt.Sprintf(`{"v":%d},`, score_i)
+                    } else {
+                        // null: missing point
+                        raw += fmt.Sprintf(`{"v":null},`)
+                    }
+                case float32:
+                    score_f := score.(float32)
+                    if score_f >= 0 {
+                        raw += fmt.Sprintf(`{"v":%f},`, score_f)
+                    } else {
+                        // null: missing point
+                        raw += fmt.Sprintf(`{"v":null},`)
+                    }
+            }
+        }
+        raw += fmt.Sprintf(`]},`)
+        raw += "\n"
+    }
+    raw += `]}`
+    return raw
+}
+
+func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) interface{} {
+    var x interface{}
+    x = r.fetchData(timestamp, rankingType, rank)
+    return x
+}
+
+func (r *RankServer) rankData_list_2(rankingType int, list_rank []int) string {
+    //return r.rankData_list_f(rankingType, list_rank, func(string, int, int)interface{}(r.fetchData))
+    return r.rankData_list_f(rankingType, list_rank, r.fetchData_i)
+}
+
+func (r *RankServer) speedData_list(rankingType int, list_rank []int) string {
+    //return r.rankData_list_f(rankingType, list_rank, func(string, int, int)interface{}(r.fetchData))
+    return r.rankData_list_f(rankingType, list_rank, r.getSpeed_i)
+}
+
 func (r *RankServer) rankData_list(rankingType int, list_rank []int) string {
     r.updateTimestamp()
     raw := ""
@@ -350,7 +436,8 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
       // Define the chart to be drawn.
       //var data = new google.visualization.DataTable();`)
     fmt.Fprint(w, "\nvar data = new google.visualization.DataTable(", r.jsonData(r.latestTimestamp()), ")")
-    fmt.Fprint(w, "\nvar data_r = new google.visualization.DataTable(", r.rankData_list(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
+    fmt.Fprint(w, "\nvar data_r = new google.visualization.DataTable(", r.rankData_list_2(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
+    fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
 
 
     fmt.Fprint(w, `
@@ -373,8 +460,10 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
     // Instantiate and draw the chart.
     var chart = new google.visualization.LineChart(document.getElementById('myLineChart'));
     var chart_a = new google.visualization.AnnotationChart(document.getElementById('myAnnotationChart'));
+    var chart_speed = new google.visualization.AnnotationChart(document.getElementById('mySpeedChart'));
     chart.draw(data_r, options);
     chart_a.draw(data_r, options_a);
+    chart_speed.draw(data_speed, options_a);
     }
     `)
 
@@ -456,9 +545,8 @@ func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
       <tr>
         <td><div id="myLineChart" style="border: 1px solid #ccc"/></td>
 </tr>
-<tr>
-        <td><div id="myAnnotationChart"/></td>
-      </tr>
+<tr><td><div id="myAnnotationChart"/></td></tr>
+<tr><td><div id="mySpeedChart"/></td></tr>
     </table>
     `)
 }
@@ -467,6 +555,7 @@ func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
 func MakeRankServer() *RankServer {
     r := &RankServer{}
     r.data = make(map[string][]map[int]int)
+    r.speed = make(map[string][]map[int]float32)
     //r.data_cache = make(map[string][]map[int]bool)
     //r.list_timestamp doesn't need initialization
     http.HandleFunc("/", r.homeHandler)
