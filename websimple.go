@@ -171,27 +171,6 @@ func (r *RankServer) getSpeed_i(timestamp string, rankingType int, rank int) int
     return x
 }
 
-// deprecated
-func (r *RankServer) ReadFile(fileName string) string {
-    var content string
-    content = ""
-    fh, _ := os.Open(fileName)
-    defer fh.Close()
-    bfh := bufio.NewReader(fh)
-    filter, _ := regexp.Compile("^\\s*(score|rank):")
-    for {
-        line, _ := bfh.ReadString('\n')
-        if line == "" {
-            break
-        }
-        if filter.MatchString(line) {
-            content += line
-            //log.Print(line)
-        }
-    }
-    return content
-}
-
 func (r *RankServer) RankingType(fileName string) int {
     filter, _ := regexp.Compile("r01\\.\\d+$")
     if filter.MatchString(fileName) {
