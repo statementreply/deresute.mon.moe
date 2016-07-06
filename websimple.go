@@ -241,6 +241,7 @@ func (r *RankServer) jsonData(timestamp string) string {
     return string(text)
 }
 
+    // {"cols":[{"id":"timestamp","label":"timestamp","type":"date"},{"id":"score","label":"score","type":"number"}],"rows":[{"c":[{"v":"new Date(1467770520)"},{"v":14908}]}]}
 func (r *RankServer) rankData(rankingType int, rank int) string {
     r.updateTimestamp()
     raw := ""
@@ -273,11 +274,40 @@ func (r *RankServer) rankData(rankingType int, rank int) string {
     if err != nil {
         log.Fatal(err)
     }
-    // {"cols":[{"id":"timestamp","label":"timestamp","type":"date"},{"id":"score","label":"score","type":"number"}],"rows":[{"c":[{"v":"new Date(1467770520)"},{"v":14908}]}]}
     raw += `]}`
     //return string(text)
     return raw
+}
 
+func (r *RankServer) rankData_list(rankingType int, list_rank []int) string {
+    r.updateTimestamp()
+    raw := ""
+    raw += `{"cols":[{"id":"timestamp","label":"timestamp","type":"datetime"},`
+    for _, rank := range list_rank {
+        raw += fmt.Sprintf(`{"id":"%d","label":"%d","type":"number"},`, rank, rank)
+    }
+    raw += "\n"
+    raw += `],"rows":[`
+
+    for _, timestamp := range r.list_timestamp {
+        // time in milliseconds
+        raw += fmt.Sprintf(`{"c":[{"v":new Date(%s000)},`, timestamp)
+        for _, rank := range list_rank {
+            fileName := r.getFilename(timestamp, rankingType, rank)
+            score := r.updateCache(timestamp, rankingType, rank, fileName)
+            //log.Print("timestamp ", timestamp, " score ", score)
+            if score >= 0 {
+                raw += fmt.Sprintf(`{"v":%d},`, score)
+            } else {
+                // null: missing point
+                raw += fmt.Sprintf(`{"v":null},`)
+            }
+        }
+        raw += fmt.Sprintf(`]},`)
+        raw += "\n"
+    }
+    raw += `]}`
+    return raw
 }
 
 func (r *RankServer) init_req( w http.ResponseWriter, req *http.Request ) {
@@ -307,7 +337,7 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
       // Define the chart to be drawn.
       //var data = new google.visualization.DataTable();`)
     fmt.Fprint(w, "\nvar data = new google.visualization.DataTable(", r.jsonData(r.latestTimestamp()), ")")
-    fmt.Fprint(w, "\nvar data_r = new google.visualization.DataTable(", r.rankData(0, 120001), ")")
+    fmt.Fprint(w, "\nvar data_r = new google.visualization.DataTable(", r.rankData_list(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
 
     fmt.Fprint(w, `
       //data.addColumn('string', 'Element');
@@ -331,7 +361,8 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
         vAxis: {
             //gridlines: {color: 'none'},
             minValue: 0
-        }
+        },
+        interpolateNulls: true,
     };
     // Instantiate and draw the chart.
     var chart = new google.visualization.LineChart(document.getElementById('myPieChart'));
