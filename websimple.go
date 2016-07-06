@@ -13,6 +13,7 @@ import (
     "time"
     "strconv"
     "encoding/json"
+    "sync"
 )
 
 
@@ -31,6 +32,8 @@ type RankServer struct {
     //    [{10: 2034} ,{30: 203021} ]
     //  }
     list_timestamp []string
+    // lock for write ops
+    mux sync.Mutex
 }
 
 func MakeRankServer() *RankServer {
@@ -55,6 +58,7 @@ func (r *RankServer) updateTimestamp() {
     }
 
     fi, _ := dir.Readdir(0)
+    r.mux.Lock()
     r.list_timestamp = make([]string, 0, len(fi))
     // sub: dir name 1467555420
     for _, sub := range fi {
@@ -63,6 +67,7 @@ func (r *RankServer) updateTimestamp() {
         }
     }
     sort.Strings(r.list_timestamp)
+    r.mux.Unlock()
 }
 
 func (r *RankServer) latestTimestamp() string {
@@ -114,9 +119,11 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
     _, ok := r.data[timestamp]
     //_, ok2 := r.data_cache[timestamp]
     if ! ok {
+        r.mux.Lock()
         r.data[timestamp] = make([]map[int]int, 2)
         r.data[timestamp][0] = make(map[int]int)
         r.data[timestamp][1] = make(map[int]int)
+        r.mux.Unlock()
         //r.data_cache[timestamp] = make([]map[int]bool, 2)
         //r.data_cache[timestamp][0] = make(map[int]bool)
         //r.data_cache[timestamp][1] = make(map[int]bool)
@@ -143,10 +150,14 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
     if len(local_rank_list) > 0 {
         rank := local_rank_list[0]["rank"].(int)
         score := local_rank_list[0]["score"].(int)
+        r.mux.Lock()
         r.data[timestamp][rankingType][rank] = score
+        r.mux.Unlock()
     } else {
+        r.mux.Lock()
         //rank := r.FilenameToRank(fileName)
         r.data[timestamp][rankingType][rank] = 0
+        r.mux.Unlock()
     }
     //}
     //r.data_cache[timestamp][rankingType][rank] = true
@@ -157,9 +168,11 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float32 {
     _, ok := r.speed[timestamp]
     if ! ok {
+        r.mux.Lock()
         r.speed[timestamp] = make([]map[int]float32, 2)
         r.speed[timestamp][0] = make(map[int]float32)
         r.speed[timestamp][1] = make(map[int]float32)
+        r.mux.Unlock()
     } else {
         val, ok := r.speed[timestamp][rankingType][rank]
         if ok {
@@ -171,7 +184,9 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
     cur_score := r.fetchData(timestamp, rankingType, rank)
     prev_score := r.fetchData(prev_timestamp, rankingType, rank)
     if (cur_score >= 0) && (prev_score >= 0) {
+        r.mux.Lock()
         r.speed[timestamp][rankingType][rank] = (float32(cur_score - prev_score)) / float32(INTERVAL) * 3600.0;
+        r.mux.Unlock()
         return r.speed[timestamp][rankingType][rank]
     } else {
         // one of them is missing data
