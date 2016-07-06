@@ -77,7 +77,7 @@ func (r *RankServer) checkData(timestamp string) {
         //content, _ := ioutil.ReadFile(fileName)
 
         rank := r.FilenameToRank(pt.Name())
-        r.fetchData_3(timestamp, rankingType, rank)
+        r.fetchData(timestamp, rankingType, rank)
     }
 }
 
@@ -90,7 +90,7 @@ func (r *RankServer) getFilename(timestamp string, rankingType, rank int) string
     return fileName
 }
 
-func (r *RankServer) fetchData_3(timestamp string, rankingType int, rank int) int {
+func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int {
     fileName := r.getFilename(timestamp, rankingType, rank)
     return r.fetchData_internal(timestamp, rankingType, rank, fileName)
 }
@@ -265,7 +265,7 @@ func (r *RankServer) rankData(rankingType int, rank int) string {
     j_data_col[1] = map[string]string{"id": "score", "label": "score", "type": "number"}
     for _, timestamp := range r.list_timestamp {
         //timestamp_i, _ := strconv.Atoi(timestamp)
-        score := r.fetchData_3(timestamp, rankingType, rank)
+        score := r.fetchData(timestamp, rankingType, rank)
 
         log.Print("timestamp ", timestamp, " score ", score)
         vv := map[string][]map[string]interface{}{
@@ -306,7 +306,7 @@ func (r *RankServer) rankData_list(rankingType int, list_rank []int) string {
         // time in milliseconds
         raw += fmt.Sprintf(`{"c":[{"v":new Date(%s000)},`, timestamp)
         for _, rank := range list_rank {
-            score := r.fetchData_3(timestamp, rankingType, rank)
+            score := r.fetchData(timestamp, rankingType, rank)
             //log.Print("timestamp ", timestamp, " score ", score)
             if score >= 0 {
                 raw += fmt.Sprintf(`{"v":%d},`, score)
