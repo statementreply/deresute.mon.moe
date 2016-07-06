@@ -440,6 +440,9 @@ func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
     r.preload_c(w, req)
     defer r.postload(w, req)
     fmt.Fprint(w, `
+    uses javascript library from <code>https://www.gstatic.com/charts/loader.js</code><br>`)
+    fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "ホームページ")
+    fmt.Fprint(w, `
 <!-- Identify where the chart should be drawn. -->
 <div id="myPieChart"/>
     `)
