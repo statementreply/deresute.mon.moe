@@ -243,33 +243,40 @@ func (r *RankServer) jsonData(timestamp string) string {
 
 func (r *RankServer) rankData(rankingType int, rank int) string {
     r.updateTimestamp()
-    j_item := make([]map[string][]map[string]int, 0, len(r.list_timestamp))
+    raw := ""
+    raw += `{"cols":[{"id":"timestamp","label":"timestamp","type":"date"},{"id":"score","label":"score","type":"number"}],"rows":[`
+    j_item := make([]map[string][]map[string]interface{}, 0, len(r.list_timestamp))
     j_data_col := make([]interface{}, 2)
-    j_data_col[0] = map[string]string{"id": "timestamp", "label": "timestamp", "type": "number"}
+    j_data_col[0] = map[string]string{"id": "timestamp", "label": "timestamp", "type": "date"}
     j_data_col[1] = map[string]string{"id": "score", "label": "score", "type": "number"}
     for _, timestamp := range r.list_timestamp {
-        timestamp_i, _ := strconv.Atoi(timestamp)
+        //timestamp_i, _ := strconv.Atoi(timestamp)
         fileName := r.getFilename(timestamp, rankingType, rank)
         score := r.updateCache(timestamp, rankingType, rank, fileName)
         log.Print("timestamp ", timestamp, " score ", score)
-        vv := map[string][]map[string]int{
-            "c": []map[string]int{
-                map[string]int{"v":timestamp_i},
-                map[string]int{"v":score},
+        vv := map[string][]map[string]interface{}{
+            "c": []map[string]interface{}{
+                map[string]interface{}{"v":"new Date("+timestamp+")"},
+                map[string]interface{}{"v":score},
             },
         }
         if score >= 0 {
             j_item = append(j_item, vv)
+            raw += fmt.Sprintf(`{"c":[{"v":new Date(%s000)},{"v":%d}]},`, timestamp, score)
         }
     }
     j_data := map[string]interface{}{"cols": j_data_col, "rows": j_item}
     log.Print(j_data)
 
     text, err := json.Marshal(j_data)
+    _ = text
     if err != nil {
         log.Fatal(err)
     }
-    return string(text)
+    // {"cols":[{"id":"timestamp","label":"timestamp","type":"date"},{"id":"score","label":"score","type":"number"}],"rows":[{"c":[{"v":"new Date(1467770520)"},{"v":14908}]}]}
+    raw += `]}`
+    //return string(text)
+    return raw
 
 }
 
