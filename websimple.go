@@ -547,7 +547,7 @@ func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
         <td><div id="myLineChart" style="border: 1px solid #ccc"/></td>
 </tr>
 <tr><td><div id="myAnnotationChart"/></td></tr>
-<tr><td><div id="mySpeedChart"/></td></tr>
+<tr><td>時速<div id="mySpeedChart"/></td></tr>
     </table>
     `)
 }
