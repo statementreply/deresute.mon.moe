@@ -14,7 +14,7 @@ import (
     "encoding/base64"
     "encoding/hex"
     "net/http"
-    //buggy "gopkg.in/vmihailenco/msgpack.v2"
+    // buggy "gopkg.in/vmihailenco/msgpack.v2"
     msgpack "github.com/ugorji/go-msgpack"
     //_ "gopkg.in/yaml.v2"
 )
