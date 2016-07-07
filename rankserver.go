@@ -131,7 +131,16 @@ func (r *RankServer) updateTimestamp() {
 
 func (r *RankServer) latestTimestamp() string {
     r.updateTimestamp()
-    latest := r.list_timestamp[len(r.list_timestamp)-1]
+    var latest string
+    latest = ""
+    // skip empty timestamps
+    for ind := len(r.list_timestamp)-1; ind >=0; ind-- {
+        latest = r.list_timestamp[ind]
+        val, ok := r.data[latest]
+        if ok && len(val[0]) > 0 {
+            break
+        }
+    }
     return latest
 }
 
