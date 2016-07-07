@@ -8,7 +8,7 @@ import (
     "math/rand"
     "io/ioutil"
     "encoding/hex"
-    _ "crypto/aes"
+    //_ "crypto/aes"
     "crypto/md5"
     //"crypto/cipher"
     //"rijndael_wrapper"
