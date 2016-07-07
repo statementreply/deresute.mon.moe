@@ -1,5 +1,6 @@
 package apiclient
 import (
+    // golang core libs
     "fmt"
     "strconv"
     "strings"
@@ -7,19 +8,23 @@ import (
     "log"
     "io/ioutil"
     "math/rand"
+    "math/big"
     crand "crypto/rand"
-    "rijndael_wrapper"
     "crypto/md5"
     "crypto/sha1"
     "crypto/cipher"
     "encoding/base64"
     "encoding/hex"
     "net/http"
+    // external libs
+    // depends on rijndael by agl (embedded)
+    "rijndael_wrapper"
+    // msgpack/yaml/json libs
     // buggy "gopkg.in/vmihailenco/msgpack.v2"
     // good, deprecated, msgpack "github.com/ugorji/go-msgpack"
+    // good updated msgpack lib (with a different API)
     "github.com/ugorji/go/codec"
-    //"reflect"
-    //_ "gopkg.in/yaml.v2"
+    //"gopkg.in/yaml.v2"
 )
 
 const BASE string = "http://game.starlight-stage.jp"
@@ -104,18 +109,17 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 func (client *ApiClient) Call(path string, args map[string]interface{}) map[string]interface{} {
     // Prepare request body
     // vid_iv is \d{32}
-    vid_iv := fmt.Sprintf("%016d%016d", rand.Int63n(1e16), rand.Int63n(1e16))
-    //var vid_iv2_b [16]byte
-    vid_iv2_b := make([]byte, 16)
-    n, err := crand.Read(vid_iv2_b)
+    vid_iv_byte := make([]byte, 16)
+    n, err := crand.Read(vid_iv_byte)
     if (n != 16) || (err != nil) {
         log.Fatal(n, err)
     }
-    vid_iv2 := fmt.Sprintf("%x", vid_iv2_b)
+    var vid_iv_big big.Int
+    vid_iv_big.SetBytes(vid_iv_byte)
+    vid_iv_string := fmt.Sprintf("%032d", &vid_iv_big)
+    vid_iv := vid_iv_string[len(vid_iv_string)-32:]
+    //log.Fatal(vid_iv, " ", len(vid_iv))
 
-    log.Print(vid_iv)
-    log.Print(vid_iv2)
-    vid_iv = string(vid_iv2)
     args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
 
     mp := msgpackEncode(args)
