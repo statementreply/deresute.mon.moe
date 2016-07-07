@@ -16,9 +16,9 @@ import (
     "encoding/hex"
     "net/http"
     // buggy "gopkg.in/vmihailenco/msgpack.v2"
-    msgpack "github.com/ugorji/go-msgpack"
+    // good, deprecated, msgpack "github.com/ugorji/go-msgpack"
     "github.com/ugorji/go/codec"
-    "reflect"
+    //"reflect"
     //_ "gopkg.in/yaml.v2"
 )
 
@@ -270,22 +270,25 @@ func msgpackEncode(v interface{}) []byte {
 
 func Test1() {
     var args map[string]interface{}
-    var content map[string]interface{}
+    //var content map[string]interface{}
     var content2 map[string]interface{}
     args = make(map[string]interface{})
     fmt.Println("here")
     args["1"] = 2
     args["2"] = "string"
+    args["c"] = map[string]int{"c92": 12}
     fmt.Println("here2")
     // old lib
-    mp, _ := msgpack.Marshal(args)
-    msgpack.Unmarshal(mp, &content, nil)
-    fmt.Println(args, content)
+    // don't use
+    //mp, _ := msgpack.Marshal(args)
+    //msgpack.Unmarshal(mp, &content, nil)
+    //fmt.Println(args, content)
 
     // new lib
     mp2 := msgpackEncode(args)
     msgpackDecode(mp2, &content2)
-    fmt.Println(args, content2)
-    fmt.Println(mp)
+    fmt.Println(args)
+    fmt.Println(content2)
+    //fmt.Println(mp)
     fmt.Println(mp2)
 }
