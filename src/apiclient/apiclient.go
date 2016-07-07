@@ -1,25 +1,25 @@
 package apiclient
 import (
+    "fmt"
+    "strconv"
+    "strings"
+    //"os"
+    "io/ioutil"
+    "math/rand"
+    crand "crypto/rand"
     "rijndael_wrapper"
     "crypto/md5"
     "crypto/sha1"
     "crypto/cipher"
-    "math/rand"
-    crand "crypto/rand"
-    "fmt"
-    "strconv"
     "encoding/base64"
     "encoding/hex"
-    _ "gopkg.in/vmihailenco/msgpack.v2"
-    msgpack "github.com/ugorji/go-msgpack"
-    "strings"
     "net/http"
-    "io/ioutil"
-    _ "gopkg.in/yaml.v2"
-    "os"
+    //buggy "gopkg.in/vmihailenco/msgpack.v2"
+    msgpack "github.com/ugorji/go-msgpack"
+    //_ "gopkg.in/yaml.v2"
 )
 
-const BASE = "http://game.starlight-stage.jp"
+const BASE string = "http://game.starlight-stage.jp"
 
 type ApiClient struct {
     user int32
@@ -103,14 +103,14 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     vid_iv := fmt.Sprintf("%016d%016d", rand.Int63n(1e16), rand.Int63n(1e16))
     // FIXME
     //vid_iv = "36615326790296635494734625599255"
-    fmt.Println("derand-vid_iv", vid_iv)
+    //fmt.Println("derand-vid_iv", vid_iv)
 
     args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
 
-    fmt.Println("derand-args", args)
+    //fmt.Println("derand-args", args)
     mp, _ := msgpack.Marshal(args)
-    fmt.Println("derand-plainmp", string(mp))
-    fmt.Printf("derand-plainmp %#v\n", string(mp))
+    //fmt.Println("derand-plainmp", string(mp))
+    //fmt.Printf("derand-plainmp %#v\n", string(mp))
     plain := base64.StdEncoding.EncodeToString(mp)
     //var key_tmp [64]byte
     key_tmp := make([]byte, 64)
@@ -176,7 +176,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     // Prepare Request struct
     // FIXME body is ReadCloser
     req, _ := http.NewRequest("POST", BASE + path, ioutil.NopCloser(strings.NewReader(body)))
-    fmt.Println("req-body", req.Body)
+    //fmt.Println("req-body", req.Body)
 
 
     for k := range headers {
@@ -185,9 +185,9 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     }
     req.Close = true
 
-    fmt.Println("==============begin")
-    req.Write(os.Stdout)
-    fmt.Println("==============end")
+    //fmt.Println("==============begin")
+    //req.Write(os.Stdout)
+    //fmt.Println("==============end")
 
     // set body again
     req.Body = ioutil.NopCloser(strings.NewReader(body))
@@ -204,25 +204,25 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     // Processing response
     resp_body, _ := ioutil.ReadAll(resp.Body)
     reply := make([]byte, base64.StdEncoding.DecodedLen(len(resp_body)))
-    fmt.Println("resp_body ", string(resp_body))
+    //fmt.Println("resp_body ", string(resp_body))
     n, _ := base64.StdEncoding.Decode(reply, resp_body)
 
     // trim NULs
     reply = reply[:n]
 
     plain2 := Decrypt_cbc(reply[:len(reply)-32], msg_iv, reply[len(reply)-32:])
-    fmt.Println("plain2", string(plain2))
+    //fmt.Println("plain2", string(plain2))
     mp2 := make([]byte, base64.StdEncoding.DecodedLen(len(plain2)))
     base64.StdEncoding.Decode(mp2, plain2)
     //var content interface{}
     var content map[string]interface{}
     msgpack.Unmarshal(mp2, &content, nil)
-    fmt.Println("content", content)
+    //fmt.Println("content", content)
     data_headers, ok := content["data_headers"]
     if ok {
         new_sid, ok := (data_headers.(map[interface{}]interface{}))["sid"]
         if ok && (new_sid != "") {
-            fmt.Println("get new sid", new_sid)
+            //fmt.Println("get new sid", new_sid)
             client.sid = new_sid.(string)
         }
     }
