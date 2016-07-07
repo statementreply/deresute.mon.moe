@@ -103,7 +103,19 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 
 func (client *ApiClient) Call(path string, args map[string]interface{}) map[string]interface{} {
     // Prepare request body
+    // vid_iv is \d{32}
     vid_iv := fmt.Sprintf("%016d%016d", rand.Int63n(1e16), rand.Int63n(1e16))
+    //var vid_iv2_b [16]byte
+    vid_iv2_b := make([]byte, 16)
+    n, err := crand.Read(vid_iv2_b)
+    if (n != 16) || (err != nil) {
+        log.Fatal(n, err)
+    }
+    vid_iv2 := fmt.Sprintf("%x", vid_iv2_b)
+
+    log.Print(vid_iv)
+    log.Print(vid_iv2)
+    vid_iv = string(vid_iv2)
     args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
 
     mp := msgpackEncode(args)
@@ -170,7 +182,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     // Processing response
     resp_body, _ := ioutil.ReadAll(resp.Body)
     reply := make([]byte, base64.StdEncoding.DecodedLen(len(resp_body)))
-    n, _ := base64.StdEncoding.Decode(reply, resp_body)
+    n, _ = base64.StdEncoding.Decode(reply, resp_body)
 
     // trim NULs
     reply = reply[:n]
