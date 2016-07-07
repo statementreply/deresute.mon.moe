@@ -25,7 +25,6 @@ var LOG_FILE = "rankserver.log"
 var CONFIG_FILE = "rankserver.yaml"
 
 type RankServer struct {
-    //data map[string]map[string]string
     data map[string][]map[int]int
     speed map[string][]map[int]float32
     // {"1467555420": 
@@ -163,6 +162,26 @@ func (r *RankServer) getFilename(timestamp string, rankingType, rank int) string
     return fileName
 }
 
+func (r *RankServer) FilenameToRank(fileName string) int {
+    //log.Print("fileName", fileName)
+    filter, _ := regexp.Compile("r\\d{2}\\.(\\d+)$")
+    submatch := filter.FindStringSubmatch(fileName)
+    n, _ := strconv.Atoi(submatch[1])
+    //log.Print("fileName", fileName, "n", n, "submatch", submatch)
+    return (n - 1) * 10 + 1
+}
+
+func (r *RankServer) RankingType(fileName string) int {
+    filter, _ := regexp.Compile("r01\\.\\d+$")
+    if filter.MatchString(fileName) {
+        // event pt
+        return 0 // r01.xxxxxx
+    } else {
+        // high score
+        return 1 // r02.xxxxxx
+    }
+}
+
 func (r *RankServer) formatTimestamp (timestamp string) string {
     itime, _ := strconv.Atoi(timestamp)
     jst, _ := time.LoadLocation("Asia/Tokyo")
@@ -255,26 +274,6 @@ func (r *RankServer) getSpeed_i(timestamp string, rankingType int, rank int) int
     return r.getSpeed(timestamp, rankingType, rank)
 }
 
-func (r *RankServer) RankingType(fileName string) int {
-    filter, _ := regexp.Compile("r01\\.\\d+$")
-    if filter.MatchString(fileName) {
-        // event pt
-        return 0 // r01.xxxxxx
-    } else {
-        // high score
-        return 1 // r02.xxxxxx
-    }
-}
-
-func (r *RankServer) FilenameToRank(fileName string) int {
-    //log.Print("fileName", fileName)
-    filter, _ := regexp.Compile("r\\d{2}\\.(\\d+)$")
-    submatch := filter.FindStringSubmatch(fileName)
-    n, _ := strconv.Atoi(submatch[1])
-    //log.Print("fileName", fileName, "n", n, "submatch", submatch)
-    return (n - 1) * 10 + 1
-}
-
 func (r *RankServer) run() {
     if r.tlsServer != nil {
         //fmt.Println("here-1")
@@ -319,8 +318,6 @@ func (r *RankServer) showData(timestamp string) string {
 //   [{"id":"timestamp","label":"timestamp","type":"date"},{"id":"score","label":"score","type":"number"}],
 //  "rows":[{"c":[{"v":"new Date(1467770520)"},{"v":14908}]}]}
 
-
-
 func (r *RankServer) rankData_list_f(rankingType int, list_rank []int, dataSource func (string, int, int)interface{}) string {
     //log.Print("functional version of rankData_list_f()")
     r.updateTimestamp()
@@ -363,7 +360,6 @@ func (r *RankServer) rankData_list_f(rankingType int, list_rank []int, dataSourc
     raw += `]}`
     return raw
 }
-
 
 func (r *RankServer) rankData_list_2(rankingType int, list_rank []int) string {
     return r.rankData_list_f(rankingType, list_rank, r.fetchData_i)
@@ -480,6 +476,7 @@ func (r *RankServer) preload_qchart( w http.ResponseWriter, req *http.Request, l
     fmt.Fprint(w, "<html>")
     fmt.Fprint(w, "<body>")
 }
+
 func (r *RankServer) postload( w http.ResponseWriter, req *http.Request ) {
     fmt.Fprint(w, "</body>")
     fmt.Fprint(w, "</html>")
@@ -504,7 +501,6 @@ func (r *RankServer) qHandler( w http.ResponseWriter, req *http.Request ) {
     }
 }
 
-
 func (r *RankServer) homeHandler( w http.ResponseWriter, req *http.Request ) {
     r.preload(w, req)
     defer r.postload(w, req)
@@ -519,7 +515,6 @@ func (r *RankServer) homeHandler( w http.ResponseWriter, req *http.Request ) {
     fmt.Fprint( w, r.latestData() )
 }
 
-
 func (r *RankServer) logHandler( w http.ResponseWriter, req *http.Request ) {
     r.updateTimestamp()
     r.preload(w, req)
@@ -530,7 +525,6 @@ func (r *RankServer) logHandler( w http.ResponseWriter, req *http.Request ) {
         fmt.Fprintf(w, "<a href=\"q?t=%s\">%s</a><br>\n", timestamp, r.formatTimestamp(timestamp))
     }
 }
-
 
 func (r *RankServer) chartHandler( w http.ResponseWriter, req *http.Request ) {
     r.checkData("")
