@@ -216,6 +216,12 @@ func (client *ApiClient) Set_res_ver(res_ver string) {
 
 func MsgpackDecode(b []byte, v interface{}) {
     var bh codec.MsgpackHandle
+    bh.RawToString = true
+    //bh.WriteExt = true
+    //bh.SliceType = reflect.TypeOf([]byte(nil))
+    //bh.SliceType = reflect.TypeOf(string(""))
+    //bh.MapType = reflect.TypeOf(map[string]string(nil))
+    //log.Fatal(fmt.Printf("%V\n%#v\n%t\n%T\n", bh, bh, bh, bh))
     dec := codec.NewDecoderBytes(b, &bh)
     err := dec.Decode(v)
     log.Printf("msgpackDecode\n%s\n", hex.Dump(b))
@@ -230,13 +236,6 @@ func MsgpackEncode(v interface{}) []byte {
     var bh codec.MsgpackHandle
     // canonicalize map key order
     bh.Canonical = true
-
-    // useless
-    bh.RawToString = true
-    //bh.SliceType = reflect.TypeOf([]byte(nil))
-    //bh.SliceType = reflect.TypeOf(string(""))
-    //bh.MapType = reflect.TypeOf(map[string]string(nil))
-    //log.Fatal(fmt.Printf("%V\n%#v\n%t\n%T\n", bh, bh, bh, bh))
 
     var b []byte
     enc := codec.NewEncoderBytes(&b, &bh)
