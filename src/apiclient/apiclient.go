@@ -218,6 +218,7 @@ func msgpackDecode(b []byte, v interface{}) {
     var bh codec.MsgpackHandle
     dec := codec.NewDecoderBytes(b, &bh)
     err := dec.Decode(v)
+    log.Printf("msgpackDecode\n%s\n", hex.Dump(b))
     if err != nil {
         log.Fatal(err)
     }
@@ -231,10 +232,11 @@ func msgpackEncode(v interface{}) []byte {
     bh.Canonical = true
 
     // useless
-    //bh.RawToString = true
+    bh.RawToString = true
     //bh.SliceType = reflect.TypeOf([]byte(nil))
     //bh.SliceType = reflect.TypeOf(string(""))
     //bh.MapType = reflect.TypeOf(map[string]string(nil))
+    //log.Fatal(fmt.Printf("%V\n%#v\n%t\n%T\n", bh, bh, bh, bh))
 
     var b []byte
     enc := codec.NewEncoderBytes(&b, &bh)

@@ -52,4 +52,7 @@ func main() {
         log.Print(check)
     }
 
+    data := client.Call("/profile/get_profile", map[string]interface{}{"friend_id": 679923520})
+    yy, _ := yaml.Marshal(data)
+    fmt.Println(string(yy))
 }
