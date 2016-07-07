@@ -177,9 +177,7 @@ func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int 
 }
 
 func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) interface{} {
-    var x interface{}
-    x = r.fetchData(timestamp, rankingType, rank)
-    return x
+    return r.fetchData(timestamp, rankingType, rank)
 }
 
 func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank int, fileName string) int {
@@ -254,9 +252,7 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
 }
 
 func (r *RankServer) getSpeed_i(timestamp string, rankingType int, rank int) interface{} {
-    var x interface{}
-    x = r.getSpeed(timestamp, rankingType, rank)
-    return x
+    return r.getSpeed(timestamp, rankingType, rank)
 }
 
 func (r *RankServer) RankingType(fileName string) int {
