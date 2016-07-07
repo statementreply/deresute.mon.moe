@@ -202,6 +202,7 @@ func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) in
 func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank int, fileName string) int {
     _, ok := r.data[timestamp]
     if ! ok {
+        // initialize keyvalue
         r.mux.Lock()
         r.data[timestamp] = make([]map[int]int, 2)
         r.data[timestamp][0] = make(map[int]int)
@@ -233,7 +234,6 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
         r.mux.Unlock()
     } else {
         r.mux.Lock()
-        //rank := r.FilenameToRank(fileName)
         r.data[timestamp][rankingType][rank] = 0
         r.mux.Unlock()
     }
@@ -244,6 +244,7 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float32 {
     _, ok := r.speed[timestamp]
     if ! ok {
+        // initialize keyvalue
         r.mux.Lock()
         r.speed[timestamp] = make([]map[int]float32, 2)
         r.speed[timestamp][0] = make(map[int]float32)
@@ -257,13 +258,15 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
     }
     timestamp_i, _ := strconv.Atoi(timestamp)
     prev_timestamp := fmt.Sprintf("%d", timestamp_i - INTERVAL)
-    cur_score := r.fetchData(timestamp, rankingType, rank)
+    cur_score  := r.fetchData(timestamp, rankingType, rank)
     prev_score := r.fetchData(prev_timestamp, rankingType, rank)
     if (cur_score >= 0) && (prev_score >= 0) {
+        // both score are valid
+        speed := (float32(cur_score - prev_score)) / float32(INTERVAL) * 3600.0;
         r.mux.Lock()
-        r.speed[timestamp][rankingType][rank] = (float32(cur_score - prev_score)) / float32(INTERVAL) * 3600.0;
+        r.speed[timestamp][rankingType][rank] = speed
         r.mux.Unlock()
-        return r.speed[timestamp][rankingType][rank]
+        return speed
     } else {
         // one of them is missing data
         return -1.0
@@ -490,12 +493,10 @@ func (r *RankServer) qHandler( w http.ResponseWriter, req *http.Request ) {
     //fmt.Fprint( w, r.dumpData() )
     req.ParseForm()
     timestamp, ok := req.Form["t"]
-    //log.Print(req.Form)
     if ! ok {
         r.checkData("")
         fmt.Fprint( w, r.latestData() )
     } else {
-        //log.Print("showData", timestamp[0])
         r.checkData(timestamp[0])
         fmt.Fprint( w, r.showData(timestamp[0]) )
     }
@@ -549,7 +550,6 @@ func (r *RankServer) qchartHandler( w http.ResponseWriter, req *http.Request ) {
     r.checkData("")
     req.ParseForm()
     list_rank_str, ok := req.Form["rank"]
-    //list_rank = []int
     var list_rank []int
     if ok {
         list_rank = make([]int, 0, len(list_rank_str))
