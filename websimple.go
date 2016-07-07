@@ -2,6 +2,7 @@ package main
 import (
     "fmt"
     "net/http"
+    "crypto/tls"
     "os"
     "path"
     "log"
@@ -38,6 +39,8 @@ type RankServer struct {
     logger *log.Logger
     keyFile string
     certFile string
+    plainServer *http.Server
+    tlsServer *http.Server
 }
 
 func MakeRankServer() *RankServer {
@@ -46,6 +49,8 @@ func MakeRankServer() *RankServer {
     r.speed = make(map[string][]map[int]float32)
     //r.data_cache = make(map[string][]map[int]bool)
     //r.list_timestamp doesn't need initialization
+    r.plainServer = nil
+    r.tlsServer = nil
 
     content, err := ioutil.ReadFile(CONFIG_FILE)
     if err != nil {
@@ -72,12 +77,45 @@ func MakeRankServer() *RankServer {
         log.Fatal("cant open log file")
     }
     r.logger = log.New(fh, "", log.LstdFlags)
+
+    //r.plainServer = &http.Server{ Addr: ":4001", }
+    if (r.keyFile != "") && (r.certFile != "") {
+        r.logger.Print("use https TLS")
+        r.logger.Print("keyFile " + r.keyFile + " certFile " + r.certFile)
+        //http.ListenAndServeTLS(":4002", r.certFile, r.keyFile, nil)
+        cert, err := tls.LoadX509KeyPair(r.certFile, r.keyFile)
+        if err != nil {
+            r.logger.Fatal(err)
+        }
+        r.tlsServer = &http.Server{
+            Addr: ":4002",
+            TLSConfig: &tls.Config{ Certificates: []tls.Certificate{cert} },
+        }
+        r.plainServer = &http.Server{Addr: ":4001", Handler: http.NewServeMux()}
+        r.plainServer.Handler.(*http.ServeMux).HandleFunc("/", r.redirectHandler)
+    } else {
+        log.Print("use http plaintext")
+        //http.ListenAndServe(":4001", nil)
+        r.plainServer = &http.Server{ Addr: ":4001" }
+    }
+    r.setHandleFunc()
+    return r
+}
+
+func (r *RankServer) setHandleFunc() {
+    //var defaultServer *http.Server
+    if (r.tlsServer != nil) {
+        //defaultServer = r.tlsServer
+        // register 302
+    } else {
+        //defaultServer = r.plainServer
+    }
+    // for DefaultServMux
     http.HandleFunc("/", r.homeHandler)
     http.HandleFunc("/q", r.qHandler)
     http.HandleFunc("/log", r.logHandler)
     http.HandleFunc("/chart", r.chartHandler)
     http.HandleFunc("/qchart", r.qchartHandler)
-    return r
 }
 
 func (r *RankServer) updateTimestamp() {
@@ -251,15 +289,17 @@ func (r *RankServer) FilenameToRank(fileName string) int {
 }
 
 
+
+
 func (r *RankServer) run() {
-    if (r.keyFile != "") && (r.certFile != "") {
-        log.Print("use https TLS")
-        log.Print("keyFile " + r.keyFile + " certFile " + r.certFile)
-        http.ListenAndServeTLS(":4001", r.certFile, r.keyFile, nil)
-    } else {
-        log.Print("use http plaintext")
-        http.ListenAndServe(":4001", nil)
+    if r.tlsServer != nil {
+        fmt.Println("here-1")
+        go r.tlsServer.ListenAndServe()
+        fmt.Println("here")
     }
+    fmt.Println("here+1")
+    r.plainServer.ListenAndServe()
+    fmt.Println("here+1")
 }
 
 func (r *RankServer) dumpData() string {
@@ -667,6 +707,10 @@ func (r *RankServer) qchartHandler( w http.ResponseWriter, req *http.Request ) {
 <tr><td><div id="mySpeedChart" style="border: 1px solid #ccc"/></td></tr>
     </table>
     `)
+}
+
+func (r *RankServer) redirectHandler( w http.ResponseWriter, req *http.Request ) {
+    http.Redirect(w, req, "https://pseven.moe:4002/", http.StatusMovedPermanently)
 }
 
 func main() {
