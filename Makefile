@@ -2,16 +2,16 @@
 all: prep rankserver
 	./rankserver
 run: build
-	./main2
+	./datafetcher
 
 prep:
 	if [ ! -d "data" ]; then \
 	    ln -s ../deresuteme/data; \
 	fi
-build: dumpbody main2
+build: dumpbody datafetcher
 
 dumpbody: src/apiclient/apiclient.go
-main2: src/apiclient/apiclient.go
+datafetcher: src/apiclient/apiclient.go
 
 %: %.go
 	source ./go_env.sh; \
