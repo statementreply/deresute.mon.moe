@@ -298,12 +298,20 @@ func (r *RankServer) FilenameToRank(fileName string) int {
 
 func (r *RankServer) run() {
     if r.tlsServer != nil {
-        fmt.Println("here-1")
-        go r.tlsServer.ListenAndServeTLS(r.certFile, r.keyFile)
-        fmt.Println("here")
+        //fmt.Println("here-1")
+        go func () {
+            err := r.tlsServer.ListenAndServeTLS(r.certFile, r.keyFile)
+            if err != nil {
+                log.Fatal(err)
+            }
+        }()
+        //fmt.Println("here")
     }
-    fmt.Println("here+1")
-    r.plainServer.ListenAndServe()
+    //fmt.Println("here+1")
+    err := r.plainServer.ListenAndServe()
+    if err != nil {
+        log.Fatal(err)
+    }
     fmt.Println("here+1")
 }
 
@@ -595,7 +603,7 @@ func (r *RankServer) preload_qchart( w http.ResponseWriter, req *http.Request, l
             minValue: 0
         },
         interpolateNulls: true,
-        explorer: {},
+        explorer: {maxZoomIn: 0.1},
     };
     var chart = new google.visualization.LineChart(document.getElementById('myLineChart'));
     var chart_speed = new google.visualization.LineChart(document.getElementById('mySpeedChart'));
@@ -715,10 +723,10 @@ func (r *RankServer) qchartHandler( w http.ResponseWriter, req *http.Request ) {
 }
 
 func (r *RankServer) redirectHandler( w http.ResponseWriter, req *http.Request ) {
-    fmt.Println("url is ", req.URL)
+    //fmt.Println("url is ", req.URL)
     req.URL.Host = r.hostname + ":4002"
     req.URL.Scheme = "https"
-    fmt.Println("redirecting to ", req.URL)
+    //fmt.Println("redirecting to ", req.URL)
     http.Redirect(w, req, req.URL.String(), http.StatusMovedPermanently)
 }
 
