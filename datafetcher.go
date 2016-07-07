@@ -9,8 +9,8 @@ import (
     "encoding/hex"
     _ "crypto/aes"
     "crypto/md5"
-    "crypto/cipher"
-    "rijndael_wrapper"
+    //"crypto/cipher"
+    //"rijndael_wrapper"
     "apiclient"
     "gopkg.in/yaml.v2"
 )
