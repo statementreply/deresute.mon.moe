@@ -122,7 +122,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 
     args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
 
-    mp := msgpackEncode(args)
+    mp := MsgpackEncode(args)
     plain := base64.StdEncoding.EncodeToString(mp)
 
     key_tmp := make([]byte, 64)
@@ -195,7 +195,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     mp2 := make([]byte, base64.StdEncoding.DecodedLen(len(plain2)))
     base64.StdEncoding.Decode(mp2, plain2)
     var content map[string]interface{}
-    msgpackDecode(mp2, &content)
+    MsgpackDecode(mp2, &content)
     data_headers, ok := content["data_headers"]
     if ok {
         new_sid, ok := (data_headers.(map[interface{}]interface{}))["sid"]
@@ -214,7 +214,7 @@ func (client *ApiClient) Set_res_ver(res_ver string) {
     client.res_ver = res_ver
 }
 
-func msgpackDecode(b []byte, v interface{}) {
+func MsgpackDecode(b []byte, v interface{}) {
     var bh codec.MsgpackHandle
     dec := codec.NewDecoderBytes(b, &bh)
     err := dec.Decode(v)
@@ -224,7 +224,7 @@ func msgpackDecode(b []byte, v interface{}) {
     }
 }
 
-func msgpackEncode(v interface{}) []byte {
+func MsgpackEncode(v interface{}) []byte {
     //codec.EncodeOptions{Canonical: true}
     //codec.BasicHandle{EncodeOptions: codec.EncodeOptions{Canonical: true}}
     var bh codec.MsgpackHandle
@@ -264,8 +264,8 @@ func Test1() {
     //fmt.Println(args, content)
 
     // new lib
-    mp2 := msgpackEncode(args)
-    msgpackDecode(mp2, &content2)
+    mp2 := MsgpackEncode(args)
+    MsgpackDecode(mp2, &content2)
     fmt.Println(args)
     fmt.Println(content2)
     //fmt.Println(mp)
