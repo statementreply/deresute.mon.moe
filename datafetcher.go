@@ -24,7 +24,7 @@ func main() {
     secret, _ := ioutil.ReadFile(SECRET_FILE)
     var secret_dict map[string]interface{}
     yaml.Unmarshal(secret, &secret_dict)
-    fmt.Println(secret_dict)
+    //fmt.Println(secret_dict)
 
     client := apiclient.NewApiClient(
         int32(secret_dict["user"].(int)),
@@ -34,11 +34,16 @@ func main() {
         []byte(secret_dict["VIEWER_ID_KEY"].(string)),
         []byte(secret_dict["SID_KEY"].(string)))
     sum_tmp := md5.Sum([]byte("All your APIs are belong to us"))
-
-    fmt.Println(client.Call(
-        "/load/check",
-        map[string]interface{}{"campaign_data":"",
+    args := map[string]interface{}{"campaign_data":"",
         "campaign_user": 171780,
         "campaign_sign": hex.EncodeToString(sum_tmp[:]),
-        "app_type": 0,}))
+        "app_type": 0,}
+
+    check := client.Call("/load/check", args)
+    new_res_ver, ok := check["data_headers"].(map[interface{}]interface{})["required_res_ver"].(string)
+    if ok {
+        client.Set_res_ver(new_res_ver)
+        fmt.Println("Update res_ver to ", new_res_ver)
+    }
+
 }

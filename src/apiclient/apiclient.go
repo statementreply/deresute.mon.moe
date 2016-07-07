@@ -228,3 +228,8 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     }
     return content
 }
+
+
+func (client *ApiClient) Set_res_ver(res_ver string) {
+    client.res_ver = res_ver
+}
