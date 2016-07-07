@@ -4,6 +4,7 @@ import (
     "time"
     "os"
     "path"
+    "log"
     "math/rand"
     "io/ioutil"
     "encoding/hex"
@@ -40,10 +41,13 @@ func main() {
         "app_type": 0,}
 
     check := client.Call("/load/check", args)
+    log.Print(check)
     new_res_ver, ok := check["data_headers"].(map[interface{}]interface{})["required_res_ver"].(string)
     if ok {
         client.Set_res_ver(new_res_ver)
         fmt.Println("Update res_ver to ", new_res_ver)
+        check := client.Call("/load/check", args)
+        log.Print(check)
     }
 
 }
