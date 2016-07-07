@@ -28,7 +28,6 @@ type RankServer struct {
     //data map[string]map[string]string
     data map[string][]map[int]int
     speed map[string][]map[int]float32
-    //data_cache map[string][]map[int]bool
     // {"1467555420": 
     //    [{10: 2034} ,{30: 203021} ]
     //  }
@@ -47,7 +46,6 @@ func MakeRankServer() *RankServer {
     r := &RankServer{}
     r.data = make(map[string][]map[int]int)
     r.speed = make(map[string][]map[int]float32)
-    //r.data_cache = make(map[string][]map[int]bool)
     //r.list_timestamp doesn't need initialization
     r.plainServer = nil
     r.tlsServer = nil
@@ -78,7 +76,7 @@ func MakeRankServer() *RankServer {
     }
     fh, err := os.OpenFile(LOG_FILE, os.O_RDWR | os.O_APPEND | os.O_CREATE, 0644)
     if err != nil {
-        log.Fatal("cant open log file")
+        log.Fatal(err)
     }
     r.logger = log.New(fh, "", log.LstdFlags)
 
@@ -165,9 +163,23 @@ func (r *RankServer) getFilename(timestamp string, rankingType, rank int) string
     return fileName
 }
 
+func (r *RankServer) formatTimestamp (timestamp string) string {
+    itime, _ := strconv.Atoi(timestamp)
+    jst, _ := time.LoadLocation("Asia/Tokyo")
+    t := time.Unix(int64(itime), 0).In(jst)
+    st := t.Format(time.RFC3339)
+    return st
+}
+
 func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int {
     fileName := r.getFilename(timestamp, rankingType, rank)
     return r.fetchData_internal(timestamp, rankingType, rank, fileName)
+}
+
+func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) interface{} {
+    var x interface{}
+    x = r.fetchData(timestamp, rankingType, rank)
+    return x
 }
 
 func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank int, fileName string) int {
@@ -179,7 +191,6 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
         r.data[timestamp][1] = make(map[int]int)
         r.mux.Unlock()
     } else {
-        //log.Print(timestamp, "x", rankingType, "x", rank, r.data_cache)
         score, ok := r.data[timestamp][rankingType][rank]
         if ok {
             return score
@@ -190,6 +201,7 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
     content, err := ioutil.ReadFile(fileName)
     if err != nil {
         // file doesn't exist?
+        // -1 for missing data
         return -1
     }
 
@@ -356,11 +368,6 @@ func (r *RankServer) rankData_list_f(rankingType int, list_rank []int, dataSourc
     return raw
 }
 
-func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) interface{} {
-    var x interface{}
-    x = r.fetchData(timestamp, rankingType, rank)
-    return x
-}
 
 func (r *RankServer) rankData_list_2(rankingType int, list_rank []int) string {
     return r.rankData_list_f(rankingType, list_rank, r.fetchData_i)
@@ -501,13 +508,6 @@ func (r *RankServer) qHandler( w http.ResponseWriter, req *http.Request ) {
     }
 }
 
-func (r *RankServer) formatTimestamp (timestamp string) string {
-    itime, _ := strconv.Atoi(timestamp)
-    jst, _ := time.LoadLocation("Asia/Tokyo")
-    t := time.Unix(int64(itime), 0).In(jst)
-    st := t.Format(time.RFC3339)
-    return st
-}
 
 func (r *RankServer) homeHandler( w http.ResponseWriter, req *http.Request ) {
     r.preload(w, req)
