@@ -104,16 +104,10 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 func (client *ApiClient) Call(path string, args map[string]interface{}) map[string]interface{} {
     // Prepare request body
     vid_iv := fmt.Sprintf("%016d%016d", rand.Int63n(1e16), rand.Int63n(1e16))
-    // FIXME
-    //vid_iv = "36615326790296635494734625599255"
-    //fmt.Println("derand-vid_iv", vid_iv)
 
     args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
 
-    //fmt.Println("derand-args", args)
     mp := msgpackEncode(args)
-    //fmt.Println("derand-plainmp", string(mp))
-    //fmt.Printf("derand-plainmp %#v\n", string(mp))
     plain := base64.StdEncoding.EncodeToString(mp)
     //var key_tmp [64]byte
     key_tmp := make([]byte, 64)
@@ -121,19 +115,11 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     key := []byte(base64.StdEncoding.EncodeToString(key_tmp))
     // trim to 32 bytes
     key = key[:32]
-    // FIXME debug no-rand
-    //key = []byte("NWQzZDk0M2UzYjJlMzRmYTg4ZTliODNi")
     msg_iv := []byte(strings.Replace(client.udid, "-", "", -1))
 
 
-    // FIXME take from py
-    //plain = "ha1jYW1wYWlnbl9kYXRhoK1jYW1wYWlnbl91c2VyzgACnwStY2FtcGFpZ25fc2lnbtoAIGZiOWQ0NDAwNTM4ZjZjYTdjMWJhYjM4ZjI3NGFmYWMxqGFwcF90eXBlAKl2aWV3ZXJfaWTaAEwxMzI0NjU0ODc1NDYwMDcyMDAzMTY2MTYwNDExNzQwMlhDSTRBYUIvdDNOcEpNZm01SE9uUjZQUXF3RTNiMmJuZ1Nrb0pxYVpHNlk9"
-    //fmt.Println("derand-plain", plain)
-    //fmt.Println("derand-key", string(key))
-    //fmt.Println("derand-msg_iv", string(msg_iv))
     body_tmp := Encrypt_cbc([]byte(plain), msg_iv, key)
     body := base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
-    //fmt.Println("derand-body", body)
     // Request body finished
 
     // Prepare request header
@@ -146,17 +132,12 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     param_tmp := sha1.Sum([]byte(client.udid + client.viewer_id_str + path + plain))
     sid_tmp := md5.Sum([]byte(sid + string(client.SID_KEY)))
     device_id_tmp := md5.Sum([]byte("Totally a real Android"))
-    // FIXME
-    //derand_udid := "002490A277m351;359<170=977o992?304C7347007p711@069n161k5297556>159k794p242B2057110C527?863m883B7917968n276=410?146>617:473l601k186C206n283o831<443l047314234117577444514891562641236"
-    //derand_user_id := "000959=146>669=637@383;693A401:364>652>921140939897578176817523287703420"
     headers := map[string]string{
         "PARAM": hex.EncodeToString(param_tmp[:]),
         "KEYCHAIN": "",
         "USER_ID": Lolfuscate(fmt.Sprintf("%d", client.user)),
-        //"User_Id": derand_user_id,
         "CARRIER": "google",
         "UDID": Lolfuscate(client.udid),
-        //"UDID": derand_udid,
         "APP_VER": "2.0.3",
         "RES_VER": client.res_ver,
         "IP_ADDRESS": "127.0.0.1",
@@ -172,55 +153,36 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
         "Accept-Encoding": "identity",
         "Connection": "close",
     }
-    //fmt.Println("derand-UDID", headers["UDID"])
-    //fmt.Println("derand_user_id", headers["User_Id"])
     // Request header ready
 
     // Prepare Request struct
-    // FIXME body is ReadCloser
+    // FIXME req.body is ReadCloser
     req, _ := http.NewRequest("POST", BASE + path, ioutil.NopCloser(strings.NewReader(body)))
-    //fmt.Println("req-body", req.Body)
-
 
     for k := range headers {
-        req.Header.Set(http.CanonicalHeaderKey(k), headers[k])
-        //fmt.Println(http.CanonicalHeaderKey(k), headers[k])
+        req.Header.Set(k, headers[k])
+        // not needed?
+        //req.Header.Set(http.CanonicalHeaderKey(k), headers[k])
     }
     req.Close = true
 
-    //fmt.Println("==============begin")
-    //req.Write(os.Stdout)
-    //fmt.Println("==============end")
-
-    // set body again
-    req.Body = ioutil.NopCloser(strings.NewReader(body))
-    //fmt.Println("==============begin")
-    //req.Write(os.Stdout)
-    //fmt.Println("==============end")
-
     // Do request
     hclient := &http.Client{};
-    // FIXME
-    //return map[string]interface{}{"1":2}
     resp, _ := hclient.Do(req)
 
     // Processing response
     resp_body, _ := ioutil.ReadAll(resp.Body)
     reply := make([]byte, base64.StdEncoding.DecodedLen(len(resp_body)))
-    //fmt.Println("resp_body ", string(resp_body))
     n, _ := base64.StdEncoding.Decode(reply, resp_body)
 
     // trim NULs
     reply = reply[:n]
 
     plain2 := Decrypt_cbc(reply[:len(reply)-32], msg_iv, reply[len(reply)-32:])
-    //fmt.Println("plain2", string(plain2))
     mp2 := make([]byte, base64.StdEncoding.DecodedLen(len(plain2)))
     base64.StdEncoding.Decode(mp2, plain2)
-    //var content interface{}
     var content map[string]interface{}
     msgpackDecode(mp2, &content)
-    //fmt.Println("content", content)
     data_headers, ok := content["data_headers"]
     if ok {
         new_sid, ok := (data_headers.(map[interface{}]interface{}))["sid"]
