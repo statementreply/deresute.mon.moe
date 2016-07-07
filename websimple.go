@@ -294,7 +294,7 @@ func (r *RankServer) FilenameToRank(fileName string) int {
 func (r *RankServer) run() {
     if r.tlsServer != nil {
         fmt.Println("here-1")
-        go r.tlsServer.ListenAndServe()
+        go r.tlsServer.ListenAndServeTLS(r.certFile, r.keyFile)
         fmt.Println("here")
     }
     fmt.Println("here+1")
