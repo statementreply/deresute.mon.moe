@@ -41,6 +41,7 @@ type RankServer struct {
     certFile string
     plainServer *http.Server
     tlsServer *http.Server
+    hostname string
 }
 
 func MakeRankServer() *RankServer {
@@ -71,6 +72,10 @@ func MakeRankServer() *RankServer {
     r.certFile, ok = config["CERT_FILE"]
     if !ok {
         r.certFile = ""
+    }
+    r.hostname, ok = config["hostname"]
+    if !ok {
+        log.Fatal("no hostname in config")
     }
     fh, err := os.OpenFile(LOG_FILE, os.O_RDWR | os.O_APPEND | os.O_CREATE, 0644)
     if err != nil {
@@ -710,7 +715,11 @@ func (r *RankServer) qchartHandler( w http.ResponseWriter, req *http.Request ) {
 }
 
 func (r *RankServer) redirectHandler( w http.ResponseWriter, req *http.Request ) {
-    http.Redirect(w, req, "https://pseven.moe:4002/", http.StatusMovedPermanently)
+    fmt.Println("url is ", req.URL)
+    req.URL.Host = r.hostname + ":4002"
+    req.URL.Scheme = "https"
+    fmt.Println("redirecting to ", req.URL)
+    http.Redirect(w, req, req.URL.String(), http.StatusMovedPermanently)
 }
 
 func main() {
