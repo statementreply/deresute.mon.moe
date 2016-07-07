@@ -224,7 +224,7 @@ func MsgpackDecode(b []byte, v interface{}) {
     //log.Fatal(fmt.Printf("%V\n%#v\n%t\n%T\n", bh, bh, bh, bh))
     dec := codec.NewDecoderBytes(b, &bh)
     err := dec.Decode(v)
-    log.Printf("msgpackDecode\n%s\n", hex.Dump(b))
+    //log.Printf("msgpackDecode\n%s\n", hex.Dump(b))
     if err != nil {
         log.Fatal(err)
     }
