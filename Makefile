@@ -12,6 +12,7 @@ prep:
 
 dumpbody: src/apiclient/apiclient.go
 datafetcher: src/apiclient/apiclient.go
+test1: src/apiclient/apiclient.go
 
 %: %.go
 	source ./go_env.sh; \

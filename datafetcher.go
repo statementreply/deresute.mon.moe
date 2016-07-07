@@ -42,10 +42,12 @@ func main() {
 
     check := client.Call("/load/check", args)
     log.Print(check)
-    new_res_ver, ok := check["data_headers"].(map[interface{}]interface{})["required_res_ver"].(string)
+    new_res_ver, ok := check["data_headers"].(map[interface{}]interface{})["required_res_ver"]
     if ok {
-        client.Set_res_ver(new_res_ver)
-        fmt.Println("Update res_ver to ", new_res_ver)
+        s := string(new_res_ver.([]byte))
+        client.Set_res_ver(s)
+        fmt.Println("Update res_ver to ", s)
+        time.Sleep(1.3e9)
         check := client.Call("/load/check", args)
         log.Print(check)
     }

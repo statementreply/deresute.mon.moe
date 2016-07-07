@@ -4,6 +4,7 @@ import (
     "strconv"
     "strings"
     //"os"
+    "log"
     "io/ioutil"
     "math/rand"
     crand "crypto/rand"
@@ -16,6 +17,8 @@ import (
     "net/http"
     // buggy "gopkg.in/vmihailenco/msgpack.v2"
     msgpack "github.com/ugorji/go-msgpack"
+    "github.com/ugorji/go/codec"
+    "reflect"
     //_ "gopkg.in/yaml.v2"
 )
 
@@ -108,7 +111,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
 
     //fmt.Println("derand-args", args)
-    mp, _ := msgpack.Marshal(args)
+    mp := msgpackEncode(args)
     //fmt.Println("derand-plainmp", string(mp))
     //fmt.Printf("derand-plainmp %#v\n", string(mp))
     plain := base64.StdEncoding.EncodeToString(mp)
@@ -216,14 +219,14 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
     base64.StdEncoding.Decode(mp2, plain2)
     //var content interface{}
     var content map[string]interface{}
-    msgpack.Unmarshal(mp2, &content, nil)
+    msgpackDecode(mp2, &content)
     //fmt.Println("content", content)
     data_headers, ok := content["data_headers"]
     if ok {
         new_sid, ok := (data_headers.(map[interface{}]interface{}))["sid"]
         if ok && (new_sid != "") {
             //fmt.Println("get new sid", new_sid)
-            client.sid = new_sid.(string)
+            client.sid = string(new_sid.([]byte))
         }
     }
     return content
@@ -232,4 +235,57 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 
 func (client *ApiClient) Set_res_ver(res_ver string) {
     client.res_ver = res_ver
+}
+
+func msgpackDecode(b []byte, v interface{}) {
+    var bh codec.MsgpackHandle
+    dec := codec.NewDecoderBytes(b, &bh)
+    err := dec.Decode(v)
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+
+func msgpackEncode(v interface{}) []byte {
+    //codec.EncodeOptions{Canonical: true}
+    //codec.BasicHandle{EncodeOptions: codec.EncodeOptions{Canonical: true}}
+    var bh codec.MsgpackHandle
+    // canonicalize map key order
+    bh.Canonical = true
+
+    // useless
+    //bh.RawToString = true
+    //bh.SliceType = reflect.TypeOf([]byte(nil))
+    //bh.SliceType = reflect.TypeOf(string(""))
+    //bh.MapType = reflect.TypeOf(map[string]string(nil))
+
+    var b []byte
+    enc := codec.NewEncoderBytes(&b, &bh)
+    err := enc.Encode(v)
+    if err != nil {
+        log.Fatal(err)
+    }
+    return b
+}
+
+func Test1() {
+    var args map[string]interface{}
+    var content map[string]interface{}
+    var content2 map[string]interface{}
+    args = make(map[string]interface{})
+    fmt.Println("here")
+    args["1"] = 2
+    args["2"] = "string"
+    fmt.Println("here2")
+    // old lib
+    mp, _ := msgpack.Marshal(args)
+    msgpack.Unmarshal(mp, &content, nil)
+    fmt.Println(args, content)
+
+    // new lib
+    mp2 := msgpackEncode(args)
+    msgpackDecode(mp2, &content2)
+    fmt.Println(args, content2)
+    fmt.Println(mp)
+    fmt.Println(mp2)
 }
