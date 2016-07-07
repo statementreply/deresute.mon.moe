@@ -125,12 +125,12 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 
     // FIXME take from py
     //plain = "ha1jYW1wYWlnbl9kYXRhoK1jYW1wYWlnbl91c2VyzgACnwStY2FtcGFpZ25fc2lnbtoAIGZiOWQ0NDAwNTM4ZjZjYTdjMWJhYjM4ZjI3NGFmYWMxqGFwcF90eXBlAKl2aWV3ZXJfaWTaAEwxMzI0NjU0ODc1NDYwMDcyMDAzMTY2MTYwNDExNzQwMlhDSTRBYUIvdDNOcEpNZm01SE9uUjZQUXF3RTNiMmJuZ1Nrb0pxYVpHNlk9"
-    fmt.Println("derand-plain", plain)
-    fmt.Println("derand-key", string(key))
-    fmt.Println("derand-msg_iv", string(msg_iv))
+    //fmt.Println("derand-plain", plain)
+    //fmt.Println("derand-key", string(key))
+    //fmt.Println("derand-msg_iv", string(msg_iv))
     body_tmp := Encrypt_cbc([]byte(plain), msg_iv, key)
     body := base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
-    fmt.Println("derand-body", body)
+    //fmt.Println("derand-body", body)
     // Request body finished
 
     // Prepare request header
@@ -226,5 +226,5 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
             client.sid = new_sid.(string)
         }
     }
-    return args
+    return content
 }

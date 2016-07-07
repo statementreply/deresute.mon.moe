@@ -42,17 +42,3 @@ func main() {
         "campaign_sign": hex.EncodeToString(sum_tmp[:]),
         "app_type": 0,}))
 }
-
-func decrypt_cbc(s, iv, key []byte) []byte {
-    c0, _ := rijndael_wrapper.NewCipher(key)
-    cbc := cipher.NewCBCDecrypter(c0, iv)
-    cbc.CryptBlocks(s, s)
-    return s
-}
-
-func encrypt_cbc(s, iv, key []byte) []byte {
-    c0, _ := rijndael_wrapper.NewCipher(key)
-    cbc := cipher.NewCBCEncrypter(c0, iv)
-    cbc.CryptBlocks(s, s)
-    return s
-}
