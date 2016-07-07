@@ -312,23 +312,6 @@ func (r *RankServer) showData(timestamp string) string {
 //  "rows":[{"c":[{"v":"new Date(1467770520)"},{"v":14908}]}]}
 
 
-// deprecated
-func (r *RankServer) rankData(rankingType int, rank int) string {
-    r.updateTimestamp()
-    raw := ""
-    raw += `{"cols":[{"id":"timestamp","label":"timestamp","type":"datetime"},{"id":"score","label":"120001","type":"number"}],"rows":[`
-    for _, timestamp := range r.list_timestamp {
-        //timestamp_i, _ := strconv.Atoi(timestamp)
-        score := r.fetchData(timestamp, rankingType, rank)
-
-        log.Print("timestamp ", timestamp, " score ", score)
-        if score >= 0 {
-            raw += fmt.Sprintf(`{"c":[{"v":new Date(%s000)},{"v":%d}]},`, timestamp, score)
-        }
-    }
-    raw += `]}`
-    return raw
-}
 
 func (r *RankServer) rankData_list_f(rankingType int, list_rank []int, dataSource func (string, int, int)interface{}) string {
     //log.Print("functional version of rankData_list_f()")
