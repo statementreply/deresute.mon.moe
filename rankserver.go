@@ -136,12 +136,23 @@ func (r *RankServer) latestTimestamp() string {
     // skip empty timestamps
     for ind := len(r.list_timestamp)-1; ind >=0; ind-- {
         latest = r.list_timestamp[ind]
-        val, ok := r.data[latest]
-        if ok && len(val[0]) > 0 {
+        if r.checkDir(latest) {
             break
         }
     }
     return latest
+}
+
+// true: nonempty; false: empty
+func (r *RankServer) checkDir(timestamp string) bool {
+    subdirPath := RANK_CACHE_DIR + timestamp + "/"
+    subdir, _ := os.Open(subdirPath)
+    key, _ := subdir.Readdir(0)
+    if len(key) > 0 {
+        return true
+    } else {
+        return false
+    }
 }
 
 func (r *RankServer) checkData(timestamp string) {
