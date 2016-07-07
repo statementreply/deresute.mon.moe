@@ -1,6 +1,6 @@
 
-all: prep websimple
-	./websimple
+all: prep rankserver
+	./rankserver
 run: build
 	./main2
 
