@@ -1,19 +1,19 @@
 package main
 import (
     "fmt"
-    "net/http"
-    "crypto/tls"
+    "strconv"
+    "regexp"
     "os"
     "path"
     "log"
-    "io/ioutil"
-    "gopkg.in/yaml.v2"
-    "regexp"
-    "sort"
     "time"
-    "strconv"
-    "encoding/json"
+    "sort"
     "sync"
+    "io/ioutil"
+    "net/http"
+    "crypto/tls"
+    "gopkg.in/yaml.v2"
+    "encoding/json"
 )
 
 
@@ -83,11 +83,9 @@ func MakeRankServer() *RankServer {
     }
     r.logger = log.New(fh, "", log.LstdFlags)
 
-    //r.plainServer = &http.Server{ Addr: ":4001", }
     if (r.keyFile != "") && (r.certFile != "") {
         r.logger.Print("use https TLS")
         r.logger.Print("keyFile " + r.keyFile + " certFile " + r.certFile)
-        //http.ListenAndServeTLS(":4002", r.certFile, r.keyFile, nil)
         cert, err := tls.LoadX509KeyPair(r.certFile, r.keyFile)
         if err != nil {
             r.logger.Fatal(err)
@@ -99,8 +97,7 @@ func MakeRankServer() *RankServer {
         r.plainServer = &http.Server{Addr: ":4001", Handler: http.NewServeMux()}
         r.plainServer.Handler.(*http.ServeMux).HandleFunc("/", r.redirectHandler)
     } else {
-        log.Print("use http plaintext")
-        //http.ListenAndServe(":4001", nil)
+        r.logger.Print("use http plaintext")
         r.plainServer = &http.Server{ Addr: ":4001" }
     }
     r.setHandleFunc()
@@ -108,14 +105,7 @@ func MakeRankServer() *RankServer {
 }
 
 func (r *RankServer) setHandleFunc() {
-    //var defaultServer *http.Server
-    if (r.tlsServer != nil) {
-        //defaultServer = r.tlsServer
-        // register 302
-    } else {
-        //defaultServer = r.plainServer
-    }
-    // for DefaultServMux
+    // for DefaultServeMux
     http.HandleFunc("/", r.homeHandler)
     http.HandleFunc("/q", r.qHandler)
     http.HandleFunc("/log", r.logHandler)
@@ -155,9 +145,6 @@ func (r *RankServer) checkData(timestamp string) {
     if timestamp == "" {
         timestamp = latest
     }
-    //r.data[timestamp] = make([]map[int]int, 2)
-    //r.data[timestamp][0] = make(map[int]int)
-    //r.data[timestamp][1] = make(map[int]int)
     subdirPath := RANK_CACHE_DIR + timestamp + "/"
 
     subdir, _ := os.Open(subdirPath)
@@ -165,10 +152,6 @@ func (r *RankServer) checkData(timestamp string) {
     key, _ := subdir.Readdir(0)
     for _, pt := range key {
         rankingType := r.RankingType(pt.Name())
-        //fileName := subdirPath + pt.Name()
-        //log.Print(fileName)
-        //content, _ := ioutil.ReadFile(fileName)
-
         rank := r.FilenameToRank(pt.Name())
         r.fetchData(timestamp, rankingType, rank)
     }
@@ -190,22 +173,16 @@ func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int 
 
 func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank int, fileName string) int {
     _, ok := r.data[timestamp]
-    //_, ok2 := r.data_cache[timestamp]
     if ! ok {
         r.mux.Lock()
         r.data[timestamp] = make([]map[int]int, 2)
         r.data[timestamp][0] = make(map[int]int)
         r.data[timestamp][1] = make(map[int]int)
         r.mux.Unlock()
-        //r.data_cache[timestamp] = make([]map[int]bool, 2)
-        //r.data_cache[timestamp][0] = make(map[int]bool)
-        //r.data_cache[timestamp][1] = make(map[int]bool)
     } else {
         //log.Print(timestamp, "x", rankingType, "x", rank, r.data_cache)
         score, ok := r.data[timestamp][rankingType][rank]
-        //os.Exit(1)
         if ok {
-            // do nothing
             return score
         }
     }
@@ -232,8 +209,6 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
         r.data[timestamp][rankingType][rank] = 0
         r.mux.Unlock()
     }
-    //}
-    //r.data_cache[timestamp][rankingType][rank] = true
     return r.data[timestamp][rankingType][rank]
 }
 
@@ -293,9 +268,6 @@ func (r *RankServer) FilenameToRank(fileName string) int {
     return (n - 1) * 10 + 1
 }
 
-
-
-
 func (r *RankServer) run() {
     if r.tlsServer != nil {
         //fmt.Println("here-1")
@@ -320,7 +292,6 @@ func (r *RankServer) dumpData() string {
     return string(yy)
 }
 
-
 func (r *RankServer) latestData() string {
     timestamp := r.latestTimestamp()
     return r.showData(timestamp)
@@ -334,50 +305,6 @@ func (r *RankServer) showData(timestamp string) string {
     yy, _ := yaml.Marshal(item)
     st := r.formatTimestamp(timestamp)
     return timestamp + "\n" + st + "\n" + string(yy)
-}
-
-func (r *RankServer) jsonData(timestamp string) string {
-    //log.Print("jsonData", timestamp)
-    item, ok := r.data[timestamp]
-    if ! ok {
-        return ""
-    }
-    //log.Print("jsonData", item)
-    s_item := make([]map[string]int, 2)
-    j_item := make([][]map[string][]map[string]int, 2)
-    for ind, sub := range item {
-        // ind = 0, 1
-        s_item[ind] = make(map[string]int)
-        j_item[ind] = make([]map[string][]map[string]int, 0, len(sub))
-        keys := make([]int, 0, len(sub))
-        // need sort according to k
-        for k, v := range sub {
-            s_item[ind][strconv.Itoa(k)] = v
-            keys = append(keys, k)
-        }
-        sort.Ints(keys)
-        for _, k := range keys {
-            v := sub[k]
-            vv := make(map[string][]map[string]int)
-            vv["c"] = make([]map[string]int, 2)
-            vv["c"][0] = make(map[string]int)
-            vv["c"][1] = make(map[string]int)
-            vv["c"][0]["v"] = k
-            vv["c"][1]["v"] = v
-            j_item[ind] = append(j_item[ind], vv)
-        }
-    }
-    j_data_col := make([]interface{}, 2)
-    j_data_col[0] = map[string]string{"id": "rank", "label": "rank", "type": "number"}
-    j_data_col[1] = map[string]string{"id": "score", "label": "score", "type": "number"}
-    j_data := map[string]interface{}{"cols": j_data_col, "rows": j_item[0]}
-    // type 1
-    text, err := json.Marshal(j_data)
-    if err != nil {
-        log.Fatal(err)
-    }
-    //log.Print("jsonData", string(text))
-    return string(text)
 }
 
     // {"cols":[{"id":"timestamp","label":"timestamp","type":"date"},{"id":"score","label":"score","type":"number"}],"rows":[{"c":[{"v":"new Date(1467770520)"},{"v":14908}]}]}
@@ -468,12 +395,10 @@ func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) in
 }
 
 func (r *RankServer) rankData_list_2(rankingType int, list_rank []int) string {
-    //return r.rankData_list_f(rankingType, list_rank, func(string, int, int)interface{}(r.fetchData))
     return r.rankData_list_f(rankingType, list_rank, r.fetchData_i)
 }
 
 func (r *RankServer) speedData_list(rankingType int, list_rank []int) string {
-    //return r.rankData_list_f(rankingType, list_rank, func(string, int, int)interface{}(r.fetchData))
     return r.rankData_list_f(rankingType, list_rank, r.getSpeed_i)
 }
 
@@ -534,7 +459,6 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
     function drawLineChart() {
       // Define the chart to be drawn.
       //var data = new google.visualization.DataTable();`)
-    fmt.Fprint(w, "\nvar data = new google.visualization.DataTable(", r.jsonData(r.latestTimestamp()), ")")
     fmt.Fprint(w, "\nvar data_r = new google.visualization.DataTable(", r.rankData_list_2(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
     fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
     fmt.Fprint(w, "\nvar data_speed_12 = new google.visualization.DataTable(", r.speedData_list(0, []int{60001, 120001,}), ")")
