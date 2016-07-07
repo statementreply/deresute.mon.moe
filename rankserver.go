@@ -370,37 +370,6 @@ func (r *RankServer) speedData_list(rankingType int, list_rank []int) string {
     return r.rankData_list_f(rankingType, list_rank, r.getSpeed_i)
 }
 
-// deprecated
-func (r *RankServer) rankData_list(rankingType int, list_rank []int) string {
-    r.updateTimestamp()
-    raw := ""
-    raw += `{"cols":[{"id":"timestamp","label":"timestamp","type":"datetime"},`
-    for _, rank := range list_rank {
-        raw += fmt.Sprintf(`{"id":"%d","label":"%d","type":"number"},`, rank, rank)
-    }
-    raw += "\n"
-    raw += `],"rows":[`
-
-    for _, timestamp := range r.list_timestamp {
-        // time in milliseconds
-        raw += fmt.Sprintf(`{"c":[{"v":new Date(%s000)},`, timestamp)
-        for _, rank := range list_rank {
-            score := r.fetchData(timestamp, rankingType, rank)
-            //log.Print("timestamp ", timestamp, " score ", score)
-            if score >= 0 {
-                raw += fmt.Sprintf(`{"v":%d},`, score)
-            } else {
-                // null: missing point
-                raw += fmt.Sprintf(`{"v":null},`)
-            }
-        }
-        raw += fmt.Sprintf(`]},`)
-        raw += "\n"
-    }
-    raw += `]}`
-    return raw
-}
-
 func (r *RankServer) init_req( w http.ResponseWriter, req *http.Request ) {
     req.ParseForm()
     r.logger.Printf("%T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
