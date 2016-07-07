@@ -201,7 +201,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
         new_sid, ok := (data_headers.(map[interface{}]interface{}))["sid"]
         if ok && (new_sid != "") {
             //fmt.Println("get new sid", new_sid)
-            client.sid = string(new_sid.([]byte))
+            client.sid = new_sid.(string)
         }
     } else {
         log.Fatal("no data_headers in response")

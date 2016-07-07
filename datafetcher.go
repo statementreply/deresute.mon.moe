@@ -44,7 +44,7 @@ func main() {
     log.Print(check)
     new_res_ver, ok := check["data_headers"].(map[interface{}]interface{})["required_res_ver"]
     if ok {
-        s := string(new_res_ver.([]byte))
+        s := new_res_ver.(string)
         client.Set_res_ver(s)
         fmt.Println("Update res_ver to ", s)
         time.Sleep(1.3e9)
