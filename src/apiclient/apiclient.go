@@ -217,7 +217,6 @@ func (client *ApiClient) Set_res_ver(res_ver string) {
 func MsgpackDecode(b []byte, v interface{}) {
     var bh codec.MsgpackHandle
     bh.RawToString = true
-    //bh.WriteExt = true
     //bh.SliceType = reflect.TypeOf([]byte(nil))
     //bh.SliceType = reflect.TypeOf(string(""))
     //bh.MapType = reflect.TypeOf(map[string]string(nil))
@@ -235,7 +234,9 @@ func MsgpackEncode(v interface{}) []byte {
     //codec.BasicHandle{EncodeOptions: codec.EncodeOptions{Canonical: true}}
     var bh codec.MsgpackHandle
     // canonicalize map key order
-    bh.Canonical = true
+    //bh.Canonical = true
+    // server doesn't support str8
+    bh.WriteExt = false
 
     var b []byte
     enc := codec.NewEncoderBytes(&b, &bh)
