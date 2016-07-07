@@ -13,7 +13,6 @@ import (
     "net/http"
     "crypto/tls"
     "gopkg.in/yaml.v2"
-    //"encoding/json"
 )
 
 
@@ -318,40 +317,16 @@ func (r *RankServer) rankData(rankingType int, rank int) string {
     r.updateTimestamp()
     raw := ""
     raw += `{"cols":[{"id":"timestamp","label":"timestamp","type":"datetime"},{"id":"score","label":"120001","type":"number"}],"rows":[`
-    //j_item := make([]map[string][]map[string]interface{}, 0, len(r.list_timestamp))
-    //j_data_col := make([]interface{}, 2)
-    //j_data_col[0] = map[string]string{"id": "timestamp", "label": "timestamp", "type": "date"}
-    //j_data_col[1] = map[string]string{"id": "score", "label": "score", "type": "number"}
     for _, timestamp := range r.list_timestamp {
         //timestamp_i, _ := strconv.Atoi(timestamp)
         score := r.fetchData(timestamp, rankingType, rank)
 
         log.Print("timestamp ", timestamp, " score ", score)
-        /*
-        vv := map[string][]map[string]interface{}{
-            "c": []map[string]interface{}{
-                map[string]interface{}{"v":"new Date("+timestamp+")"},
-                map[string]interface{}{"v":score},
-            },
-        }
-        */
         if score >= 0 {
-            //j_item = append(j_item, vv)
             raw += fmt.Sprintf(`{"c":[{"v":new Date(%s000)},{"v":%d}]},`, timestamp, score)
         }
     }
-    //j_data := map[string]interface{}{"cols": j_data_col, "rows": j_item}
-    //log.Print(j_data)
-
-    /*text, err := json.Marshal(j_data)
-    _ = text*/
-    /*
-    if err != nil {
-        log.Fatal(err)
-    }
-    */
     raw += `]}`
-    //return string(text)
     return raw
 }
 
