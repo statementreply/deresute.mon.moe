@@ -17,3 +17,8 @@ test1: src/apiclient/apiclient.go
 %: %.go
 	source ./go_env.sh; \
 		go build $<
+
+precompile:
+	source ./go_env.sh; \
+	go install apiclient; \
+	go install gopkg.in/yaml.v2
