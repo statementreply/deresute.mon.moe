@@ -3,6 +3,7 @@ import (
     "fmt"
     "time"
     "os"
+    "strconv"
     "path"
     "log"
     "math/rand"
@@ -52,7 +53,11 @@ func main() {
         log.Print(check)
     }
 
-    data := client.Call("/profile/get_profile", map[string]interface{}{"friend_id": 679923520})
+    friend_id := 679923520
+    if len(os.Args) > 1 {
+        friend_id, _ = strconv.Atoi(os.Args[1])
+    }
+    data := client.Call("/profile/get_profile", map[string]interface{}{"friend_id": friend_id})
     yy, _ := yaml.Marshal(data)
     fmt.Println(string(yy))
 }
