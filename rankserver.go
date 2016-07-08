@@ -120,9 +120,13 @@ func (r *RankServer) updateTimestamp() {
     r.mux.Lock()
     r.list_timestamp = make([]string, 0, len(fi))
     // sub: dir name 1467555420
+    filter, _ := regexp.Compile("^\\d+$")
     for _, sub := range fi {
         if sub.IsDir() {
-            r.list_timestamp = append(r.list_timestamp, sub.Name())
+            subdirName := sub.Name()
+            if filter.MatchString(subdirName) {
+                r.list_timestamp = append(r.list_timestamp, sub.Name())
+            }
         }
     }
     sort.Strings(r.list_timestamp)
