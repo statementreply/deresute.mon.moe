@@ -8,6 +8,7 @@ import (
     //"gopkg.in/vmihailenco/msgpack.v2"
     "strings"
     "gopkg.in/yaml.v2"
+    "encoding/hex"
 )
 
 func main() {
@@ -39,13 +40,13 @@ func main() {
     mp := make([]byte, base64.StdEncoding.DecodedLen(len(plain2)))
     n, _ = base64.StdEncoding.Decode(mp, plain2)
     mp = mp[:n]
-    //fmt.Println("mp", mp)
+    fmt.Print("mp is\n", hex.Dump(mp))
     //var content map[string]interface{}
     var content interface{}
     apiclient.MsgpackDecode(mp, &content)
 
     yy, _ := yaml.Marshal(content)
     _ = yy
+    fmt.Printf("%#v\n", content)
     fmt.Println("content", string(yy))
-    //fmt.Printf("%#v\n", content)
 }
