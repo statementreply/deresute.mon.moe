@@ -116,7 +116,10 @@ func (r *RankServer) updateTimestamp() {
         log.Fatal(err)
     }
 
-    fi, _ := dir.Readdir(0)
+    fi, err := dir.Readdir(0)
+    if err != nil {
+        r.logger.Fatal(err)
+    }
     r.mux.Lock()
     r.list_timestamp = make([]string, 0, len(fi))
     // sub: dir name 1467555420
@@ -148,8 +151,14 @@ func (r *RankServer) latestTimestamp() string {
 // true: nonempty; false: empty
 func (r *RankServer) checkDir(timestamp string) bool {
     subdirPath := RANK_CACHE_DIR + timestamp + "/"
-    subdir, _ := os.Open(subdirPath)
-    key, _ := subdir.Readdir(0)
+    subdir, err := os.Open(subdirPath)
+    if err != nil {
+        r.logger.Fatal(err)
+    }
+    key, err := subdir.Readdir(0)
+    if err != nil {
+        r.logger.Fatal(err)
+    }
     if len(key) > 0 {
         return true
     } else {
@@ -165,9 +174,15 @@ func (r *RankServer) checkData(timestamp string) {
     }
     subdirPath := RANK_CACHE_DIR + timestamp + "/"
 
-    subdir, _ := os.Open(subdirPath)
+    subdir, err := os.Open(subdirPath)
+    if err != nil {
+        r.logger.Fatal(err)
+    }
     //log.Print(subdir)
-    key, _ := subdir.Readdir(0)
+    key, err := subdir.Readdir(0)
+    if err != nil {
+        r.logger.Fatal(err)
+    }
     for _, pt := range key {
         rankingType := r.RankingType(pt.Name())
         rank := r.FilenameToRank(pt.Name())
