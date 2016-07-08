@@ -122,11 +122,9 @@ func (r *RankServer) updateTimestamp() {
     // sub: dir name 1467555420
     filter, _ := regexp.Compile("^\\d+$")
     for _, sub := range fi {
-        if sub.IsDir() {
-            subdirName := sub.Name()
-            if filter.MatchString(subdirName) {
-                r.list_timestamp = append(r.list_timestamp, sub.Name())
-            }
+        subdirName := sub.Name()
+        if filter.MatchString(subdirName) {
+            r.list_timestamp = append(r.list_timestamp, sub.Name())
         }
     }
     sort.Strings(r.list_timestamp)
