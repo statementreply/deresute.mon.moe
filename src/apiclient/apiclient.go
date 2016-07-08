@@ -57,7 +57,7 @@ func Unlolfuscate(s string) string {
     var r string
     r = ""
     r_len, _ := strconv.ParseInt(s[:4], 16, 16)
-    fmt.Println("rlen", int(r_len))
+    //fmt.Println("rlen", int(r_len))
     for i := 6; (i < len(s)) && (len(r) < int(r_len)); i += 4 {
         r += string(s[i]-10)
     }
@@ -101,7 +101,7 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
     client.res_ver = res_ver
     client.sid = ""
     client.VIEWER_ID_KEY = VIEWER_ID_KEY
-    fmt.Println(len(VIEWER_ID_KEY))
+    //fmt.Println(len(VIEWER_ID_KEY))
     client.SID_KEY = SID_KEY
     return client
 }
@@ -270,4 +270,5 @@ func Test1() {
     fmt.Println(content2)
     //fmt.Println(mp)
     fmt.Println(mp2)
+    return
 }
