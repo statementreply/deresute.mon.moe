@@ -111,10 +111,10 @@ func (r *RankServer) setHandleFunc() {
 
 func (r *RankServer) updateTimestamp() {
     dir, err := os.Open(RANK_CACHE_DIR)
-    defer dir.Close()
     if err != nil {
         log.Fatal(err)
     }
+    defer dir.Close()
 
     fi, err := dir.Readdir(0)
     if err != nil {
@@ -155,6 +155,7 @@ func (r *RankServer) checkDir(timestamp string) bool {
     if err != nil {
         r.logger.Fatal(err)
     }
+    defer subdir.Close()
     key, err := subdir.Readdir(0)
     if err != nil {
         r.logger.Fatal(err)
@@ -178,6 +179,7 @@ func (r *RankServer) checkData(timestamp string) {
     if err != nil {
         r.logger.Fatal(err)
     }
+    defer subdir.Close()
     //log.Print(subdir)
     key, err := subdir.Readdir(0)
     if err != nil {
