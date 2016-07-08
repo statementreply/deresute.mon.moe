@@ -22,3 +22,7 @@ precompile:
 	source ./go_env.sh; \
 	go install apiclient; \
 	go install gopkg.in/yaml.v2
+
+linksys:
+	ln -s /usr/share/gocode/src/github.com src/ || true
+	ln -s /usr/share/gocode/src/gopkg.in   src/ || true
