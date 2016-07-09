@@ -294,11 +294,11 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
     r.mux_speed.RUnlock()
     if ! ok {
         // initialize keyvalue
-        r.mux.Lock()
+        r.mux_speed.Lock()
         r.speed[timestamp] = make([]map[int]float32, 2)
         r.speed[timestamp][0] = make(map[int]float32)
         r.speed[timestamp][1] = make(map[int]float32)
-        r.mux.Unlock()
+        r.mux_speed.Unlock()
     } else {
         // FIXME: read data
         r.mux.RLock()
@@ -315,9 +315,9 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
     if (cur_score >= 0) && (prev_score >= 0) {
         // both score are valid
         speed := (float32(cur_score - prev_score)) / float32(INTERVAL) * 3600.0;
-        r.mux.Lock()
+        r.mux_speed.Lock()
         r.speed[timestamp][rankingType][rank] = speed
-        r.mux.Unlock()
+        r.mux_speed.Unlock()
         return speed
     } else {
         // one of them is missing data
