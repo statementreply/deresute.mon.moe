@@ -64,6 +64,12 @@ func MakeRankServer() *RankServer {
 		LOG_FILE = confLOG_FILE
 	}
 	log.Print("logfile is ", LOG_FILE)
+	fh, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	r.logger = log.New(fh, "", log.LstdFlags)
+
 	r.keyFile, ok = config["KEY_FILE"]
 	if !ok {
 		r.keyFile = ""
@@ -74,13 +80,8 @@ func MakeRankServer() *RankServer {
 	}
 	r.hostname, ok = config["hostname"]
 	if !ok {
-		log.Fatal("no hostname in config")
+		r.logger.Fatal("no hostname in config")
 	}
-	fh, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-	r.logger = log.New(fh, "", log.LstdFlags)
 
 	if (r.keyFile != "") && (r.certFile != "") {
 		r.logger.Print("use https TLS")
@@ -115,7 +116,7 @@ func (r *RankServer) setHandleFunc() {
 func (r *RankServer) updateTimestamp() {
 	dir, err := os.Open(RANK_CACHE_DIR)
 	if err != nil {
-		log.Fatal(err)
+		r.logger.Fatal(err)
 	}
 	defer dir.Close()
 
@@ -336,7 +337,7 @@ func (r *RankServer) run() {
 		go func() {
 			err := r.tlsServer.ListenAndServeTLS(r.certFile, r.keyFile)
 			if err != nil {
-				log.Fatal(err)
+				r.logger.Fatal(err)
 			}
 		}()
 		//fmt.Println("here")
@@ -344,7 +345,7 @@ func (r *RankServer) run() {
 	//fmt.Println("here+1")
 	err := r.plainServer.ListenAndServe()
 	if err != nil {
-		log.Fatal(err)
+		r.logger.Fatal(err)
 	}
 	fmt.Println("here+1")
 }
