@@ -2,30 +2,29 @@ package apiclient
 
 import (
 	// golang core libs
-	"fmt"
-	"strconv"
-	"strings"
-	//"os"
 	"crypto/cipher"
 	"crypto/md5"
 	crand "crypto/rand"
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/hex"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/big"
 	"math/rand"
 	"net/http"
+	"strconv"
+	"strings"
 	// external libs
 	// depends on rijndael by agl (embedded)
 	"rijndael_wrapper"
 	// msgpack/yaml/json libs
-	// buggy "gopkg.in/vmihailenco/msgpack.v2"
-	// good, deprecated, msgpack "github.com/ugorji/go-msgpack"
+	// msgpack new spec only "gopkg.in/vmihailenco/msgpack.v2"
+	// msgpack old spec      "github.com/ugorji/go-msgpack"
 	// good updated msgpack lib (with a different API)
+	// msgpack both specs supported
 	"github.com/ugorji/go/codec"
-	//"gopkg.in/yaml.v2"
 )
 
 const BASE string = "http://game.starlight-stage.jp"
@@ -102,7 +101,6 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 	client.res_ver = res_ver
 	client.sid = ""
 	client.VIEWER_ID_KEY = VIEWER_ID_KEY
-	//fmt.Println(len(VIEWER_ID_KEY))
 	client.SID_KEY = SID_KEY
 	return client
 }
@@ -217,9 +215,6 @@ func (client *ApiClient) Set_res_ver(res_ver string) {
 func MsgpackDecode(b []byte, v interface{}) {
 	var bh codec.MsgpackHandle
 	bh.RawToString = true
-	//bh.SliceType = reflect.TypeOf([]byte(nil))
-	//bh.SliceType = reflect.TypeOf(string(""))
-	//bh.MapType = reflect.TypeOf(map[string]string(nil))
 	//log.Fatal(fmt.Printf("%V\n%#v\n%t\n%T\n", bh, bh, bh, bh))
 	dec := codec.NewDecoderBytes(b, &bh)
 	err := dec.Decode(v)
@@ -230,8 +225,6 @@ func MsgpackDecode(b []byte, v interface{}) {
 }
 
 func MsgpackEncode(v interface{}) []byte {
-	//codec.EncodeOptions{Canonical: true}
-	//codec.BasicHandle{EncodeOptions: codec.EncodeOptions{Canonical: true}}
 	var bh codec.MsgpackHandle
 	// canonicalize map key order
 	//bh.Canonical = true
