@@ -25,13 +25,14 @@ var LOG_FILE = "rankserver.log"
 var CONFIG_FILE = "rankserver.yaml"
 
 type RankServer struct {
-    data map[string][]map[int]int
-    speed map[string][]map[int]float32
+    data  map[string][]map[int]int     // need mux
+    speed map[string][]map[int]float32 // need mux
     // {"1467555420": 
     //    [{10: 2034} ,{30: 203021} ]
     //  }
-    list_timestamp []string
+    list_timestamp []string  // need mutex?
     // lock for write ops
+    // for both read and write
     mux sync.Mutex
     logger *log.Logger
     keyFile string
@@ -239,6 +240,7 @@ func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) in
 }
 
 func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank int, fileName string) int {
+    // FIXME: read data
     _, ok := r.data[timestamp]
     if ! ok {
         // initialize keyvalue
@@ -248,6 +250,7 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
         r.data[timestamp][1] = make(map[int]int)
         r.mux.Unlock()
     } else {
+        // FIXME: read data
         score, ok := r.data[timestamp][rankingType][rank]
         if ok {
             return score
@@ -276,11 +279,13 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
         r.data[timestamp][rankingType][rank] = 0
         r.mux.Unlock()
     }
+    // FIXME: read data
     return r.data[timestamp][rankingType][rank]
 }
 
 // speed per hour
 func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float32 {
+    // FIXME: read speed
     _, ok := r.speed[timestamp]
     if ! ok {
         // initialize keyvalue
@@ -290,6 +295,7 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
         r.speed[timestamp][1] = make(map[int]float32)
         r.mux.Unlock()
     } else {
+        // FIXME: read data
         val, ok := r.speed[timestamp][rankingType][rank]
         if ok {
             return val
@@ -336,6 +342,7 @@ func (r *RankServer) run() {
 }
 
 func (r *RankServer) dumpData() string {
+    // FIXME: read data
     yy, _ := yaml.Marshal(r.data)
     return string(yy)
 }
@@ -346,6 +353,7 @@ func (r *RankServer) latestData() string {
 }
 
 func (r *RankServer) showData(timestamp string) string {
+    // FIXME: read data
     item, ok := r.data[timestamp]
     if ! ok {
         return ""
