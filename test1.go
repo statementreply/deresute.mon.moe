@@ -1,8 +1,9 @@
 package main
+
 import (
-    "apiclient"
+	"apiclient"
 )
 
 func main() {
-    apiclient.Test1()
+	apiclient.Test1()
 }
