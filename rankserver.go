@@ -403,7 +403,7 @@ func (r *RankServer) rankData_list_f(rankingType int, list_rank []int, dataSourc
     return raw
 }
 
-func (r *RankServer) rankData_list_2(rankingType int, list_rank []int) string {
+func (r *RankServer) rankData_list(rankingType int, list_rank []int) string {
     return r.rankData_list_f(rankingType, list_rank, r.fetchData_i)
 }
 
@@ -437,7 +437,7 @@ func (r *RankServer) preload_c( w http.ResponseWriter, req *http.Request ) {
     function drawLineChart() {
       // Define the chart to be drawn.
       //var data = new google.visualization.DataTable();`)
-    fmt.Fprint(w, "\nvar data_r = new google.visualization.DataTable(", r.rankData_list_2(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
+    fmt.Fprint(w, "\nvar data_r = new google.visualization.DataTable(", r.rankData_list(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
     fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
     fmt.Fprint(w, "\nvar data_speed_12 = new google.visualization.DataTable(", r.speedData_list(0, []int{60001, 120001,}), ")")
     fmt.Fprint(w, "\nvar data_speed_2 = new google.visualization.DataTable(", r.speedData_list(0, []int{2001, 10001, 20001,}), ")")
@@ -490,7 +490,7 @@ func (r *RankServer) preload_qchart( w http.ResponseWriter, req *http.Request, l
       `)
     fmt.Fprint(w, `
     function drawLineChart() {`)
-    fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_2(0, list_rank), ")")
+    fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list(0, list_rank), ")")
     fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list(0, list_rank), ")")
     fmt.Fprint(w, `
       var options = {
