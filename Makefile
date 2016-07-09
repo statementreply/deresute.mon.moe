@@ -1,9 +1,10 @@
-all: prep rankserver
+all: rankserver dumpbody datafetcher
+
+web: prep rankserver
 	./rankserver
 fetch: datafetcher
 	./datafetcher
 
-all: rankserver dumpbody datafetcher
 
 prep:
 	if [ ! -d "data" ]; then \
@@ -16,7 +17,7 @@ test1: src/apiclient/apiclient.go
 
 %: %.go
 	source ./go_env.sh; \
-		go build $<
+		go build -x $<
 
 precompile:
 	source ./go_env.sh; \
