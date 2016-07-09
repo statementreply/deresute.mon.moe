@@ -33,7 +33,8 @@ type RankServer struct {
     list_timestamp []string  // need mutex?
     // lock for write ops
     // for both read and write
-    mux sync.Mutex
+    mux sync.RWMutex
+    mux_speed sync.RWMutex
     logger *log.Logger
     keyFile string
     certFile string
@@ -241,7 +242,9 @@ func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) in
 
 func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank int, fileName string) int {
     // FIXME: read data
+    r.mux.RLock()
     _, ok := r.data[timestamp]
+    r.mux.RUnlock()
     if ! ok {
         // initialize keyvalue
         r.mux.Lock()
@@ -251,7 +254,9 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
         r.mux.Unlock()
     } else {
         // FIXME: read data
+        r.mux.RLock()
         score, ok := r.data[timestamp][rankingType][rank]
+        r.mux.RUnlock()
         if ok {
             return score
         }
@@ -268,25 +273,25 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
     var local_rank_list []map[string]interface{}
     yaml.Unmarshal(content, &local_rank_list)
 
+    var score int
+    score = 0
     if len(local_rank_list) > 0 {
-        rank := local_rank_list[0]["rank"].(int)
-        score := local_rank_list[0]["score"].(int)
-        r.mux.Lock()
-        r.data[timestamp][rankingType][rank] = score
-        r.mux.Unlock()
-    } else {
-        r.mux.Lock()
-        r.data[timestamp][rankingType][rank] = 0
-        r.mux.Unlock()
+        score = local_rank_list[0]["score"].(int)
+        // duplicate
+        //rank := local_rank_list[0]["rank"].(int)
     }
-    // FIXME: read data
-    return r.data[timestamp][rankingType][rank]
+    r.mux.Lock()
+    r.data[timestamp][rankingType][rank] = score
+    r.mux.Unlock()
+    return score
 }
 
 // speed per hour
 func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float32 {
     // FIXME: read speed
+    r.mux_speed.RLock()
     _, ok := r.speed[timestamp]
+    r.mux_speed.RUnlock()
     if ! ok {
         // initialize keyvalue
         r.mux.Lock()
@@ -296,7 +301,9 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
         r.mux.Unlock()
     } else {
         // FIXME: read data
+        r.mux.RLock()
         val, ok := r.speed[timestamp][rankingType][rank]
+        r.mux.RUnlock()
         if ok {
             return val
         }
@@ -343,7 +350,9 @@ func (r *RankServer) run() {
 
 func (r *RankServer) dumpData() string {
     // FIXME: read data
+    r.mux.RLock()
     yy, _ := yaml.Marshal(r.data)
+    r.mux.RUnlock()
     return string(yy)
 }
 
@@ -354,7 +363,9 @@ func (r *RankServer) latestData() string {
 
 func (r *RankServer) showData(timestamp string) string {
     // FIXME: read data
+    r.mux.RLock()
     item, ok := r.data[timestamp]
+    r.mux.RUnlock()
     if ! ok {
         return ""
     }
