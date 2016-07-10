@@ -31,9 +31,11 @@ func main() {
 	data := client.GetProfile(friend_id)
 	yy, _ := yaml.Marshal(data)
 	fmt.Println(string(yy))
-	DumpToFile(data, "user3520")
+	//DumpToFile(data, "user3520")
 
-	client.GetPage(1, 9, "r1.009")
+	//p1 := client.GetPage(1, 9)
+	//DumpToFile(p1, "r1.009.20")
+
 }
 
 func DumpToFile(v interface{}, fileName string) {

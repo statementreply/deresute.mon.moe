@@ -313,8 +313,7 @@ func (client *ApiClient) GetProfile(friend_id int) map[string]interface{} {
 	return client.Call("/profile/get_profile", map[string]interface{}{"friend_id": friend_id})
 }
 
-func (client *ApiClient) GetPage(rankingType int, page int, fileName string) {
+func (client *ApiClient) GetPage(rankingType int, page int) map[string]interface{} {
 	r1 := client.Call("/event/medley/ranking_list", map[string]interface{}{"ranking_type": rankingType, "page": page})
-	yy, _ := yaml.Marshal(r1)
-	ioutil.WriteFile(fileName, yy, 0644)
+	return r1
 }
