@@ -25,6 +25,7 @@ import (
 	// good updated msgpack lib (with a different API)
 	// msgpack both specs supported
 	"github.com/ugorji/go/codec"
+	"gopkg.in/yaml.v2"
 )
 
 const BASE string = "http://game.starlight-stage.jp"
@@ -265,3 +266,10 @@ func Test1() {
 	fmt.Println(mp2)
 	return
 }
+
+func (client *ApiClient) GetPage(rankingType int, page int, fileName string) {
+    r1 := client.Call("/event/medley/ranking_list", map[string]interface{}{"ranking_type": rankingType, "page": page})
+    yy, _ := yaml.Marshal(r1)
+    ioutil.WriteFile(fileName, yy, 0644)
+}
+

@@ -61,4 +61,10 @@ func main() {
 	data := client.Call("/profile/get_profile", map[string]interface{}{"friend_id": friend_id})
 	yy, _ := yaml.Marshal(data)
 	fmt.Println(string(yy))
+
+	client.GetPage(1, 9271, "r1.9271")
+	client.GetPage(2, 23786, "r2.23786")
+
 }
+
+// 9269 23784
