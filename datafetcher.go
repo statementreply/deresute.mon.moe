@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"os"
@@ -24,18 +23,7 @@ var RANK_CACHE_DIR string = BASE + "/data/rank/"
 
 func main() {
 	rand.Seed(time.Now().Unix())
-	secret, _ := ioutil.ReadFile(SECRET_FILE)
-	var secret_dict map[string]interface{}
-	yaml.Unmarshal(secret, &secret_dict)
-	//fmt.Println(secret_dict)
-
-	client := apiclient.NewApiClient(
-		int32(secret_dict["user"].(int)),
-		int32(secret_dict["viewer_id"].(int)),
-		secret_dict["udid"].(string),
-		secret_dict["res_ver"].(string),
-		[]byte(secret_dict["VIEWER_ID_KEY"].(string)),
-		[]byte(secret_dict["SID_KEY"].(string)))
+	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 	sum_tmp := md5.Sum([]byte("All your APIs are belong to us"))
 	args := map[string]interface{}{"campaign_data": "",
 		"campaign_user": 171780,
@@ -62,9 +50,7 @@ func main() {
 	yy, _ := yaml.Marshal(data)
 	fmt.Println(string(yy))
 
-	client.GetPage(1, 9271, "r1.9271")
-	client.GetPage(2, 23786, "r2.23786")
-
+	client.GetPage(1, 9, "r1.009")
 }
 
 // 9269 23784

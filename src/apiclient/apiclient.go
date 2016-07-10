@@ -106,6 +106,27 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 	return client
 }
 
+func NewApiClientFromConfig(configFile string) *ApiClient {
+	secret, err := ioutil.ReadFile(configFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var secret_dict map[string]interface{}
+	err = yaml.Unmarshal(secret, &secret_dict)
+	if err != nil {
+		log.Fatal(err)
+	}
+	//fmt.Println(secret_dict)
+
+	return NewApiClient(
+		int32(secret_dict["user"].(int)),
+		int32(secret_dict["viewer_id"].(int)),
+		secret_dict["udid"].(string),
+		secret_dict["res_ver"].(string),
+		[]byte(secret_dict["VIEWER_ID_KEY"].(string)),
+		[]byte(secret_dict["SID_KEY"].(string)))
+}
+
 func (client *ApiClient) Call(path string, args map[string]interface{}) map[string]interface{} {
 	// Prepare request body
 	// vid_iv is \d{32}
@@ -268,8 +289,7 @@ func Test1() {
 }
 
 func (client *ApiClient) GetPage(rankingType int, page int, fileName string) {
-    r1 := client.Call("/event/medley/ranking_list", map[string]interface{}{"ranking_type": rankingType, "page": page})
-    yy, _ := yaml.Marshal(r1)
-    ioutil.WriteFile(fileName, yy, 0644)
+	r1 := client.Call("/event/medley/ranking_list", map[string]interface{}{"ranking_type": rankingType, "page": page})
+	yy, _ := yaml.Marshal(r1)
+	ioutil.WriteFile(fileName, yy, 0644)
 }
-
