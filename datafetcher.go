@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"path"
@@ -21,18 +22,21 @@ var RANK_CACHE_DIR string = BASE + "/data/rank/"
 func main() {
 	rand.Seed(time.Now().Unix())
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
-
 	client.LoadCheck()
 
 	friend_id := 679923520
 	if len(os.Args) > 1 {
 		friend_id, _ = strconv.Atoi(os.Args[1])
 	}
-	data := client.Call("/profile/get_profile", map[string]interface{}{"friend_id": friend_id})
+	data := client.GetProfile(friend_id)
 	yy, _ := yaml.Marshal(data)
 	fmt.Println(string(yy))
+	DumpToFile(data, "user3520")
 
 	client.GetPage(1, 9, "r1.009")
 }
 
-// 9269 23784
+func DumpToFile(v interface{}, fileName string) {
+	yy, _ := yaml.Marshal(v)
+	ioutil.WriteFile(fileName, yy, 0644)
+}
