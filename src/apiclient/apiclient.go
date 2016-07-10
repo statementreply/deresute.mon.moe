@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 	// external libs
 	// depends on rijndael by agl (embedded)
 	"rijndael_wrapper"
@@ -286,6 +287,26 @@ func Test1() {
 	//fmt.Println(mp)
 	fmt.Println(mp2)
 	return
+}
+
+func (client *ApiClient) LoadCheck() {
+	sum_tmp := md5.Sum([]byte("All your APIs are belong to us"))
+	args := map[string]interface{}{"campaign_data": "",
+		"campaign_user": 171780,
+		"campaign_sign": hex.EncodeToString(sum_tmp[:]),
+		"app_type":      0}
+
+	check := client.Call("/load/check", args)
+	log.Print(check)
+	new_res_ver, ok := check["data_headers"].(map[interface{}]interface{})["required_res_ver"]
+	if ok {
+		s := new_res_ver.(string)
+		client.Set_res_ver(s)
+		fmt.Println("Update res_ver to ", s)
+		time.Sleep(1.3e9) // nanosecond
+		check := client.Call("/load/check", args)
+		log.Print("check again ", check)
+	}
 }
 
 func (client *ApiClient) GetPage(rankingType int, page int, fileName string) {
