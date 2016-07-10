@@ -1,6 +1,8 @@
 package rijndael_wrapper
 
 import (
+	// from https://github.com/agl/pond.git
+	// "github.com/agl/pond/panda/rijndael"
 	"rijndael"
 )
 
