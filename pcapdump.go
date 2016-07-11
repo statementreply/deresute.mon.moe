@@ -91,20 +91,19 @@ func (h *httpStream) run() {
 		// guess: HTTP response
 		for {
 			resp, err := http.ReadResponse(buf, nil)
+			// FIXME: why io.ErrUnexpectedEOF
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
 				return
 			} else if err != nil {
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
 			} else {
-				//bodyBytes := tcpreader.DiscardBytesToEOF(resp.Body)
 				body, err := ioutil.ReadAll(resp.Body)
 				if err != nil {
 					log.Fatal(err)
 				}
-				bodyBytes := len(body)
 				resp.Body.Close()
-				//log.Println("Received response from stream", h.net, h.transport, ":", resp, "with", bodyBytes, "bytes in response body")
-				log.Println("Received response from stream", h.net, h.transport, ":", "with", bodyBytes, "bytes in response body")
+				//bodyBytes := len(body)
+				//log.Println("Received response from stream", h.net, h.transport, ":", "with", bodyBytes, "bytes in response body")
 				list_udid, ok := resp.Header["Udid"]
 				if !ok {
 					// no UDID found
@@ -127,16 +126,13 @@ func (h *httpStream) run() {
 			} else if err != nil {
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
 			} else {
-				//bodyBytes := tcpreader.DiscardBytesToEOF(req.Body)
 				body, err := ioutil.ReadAll(req.Body)
 				if err != nil {
 					log.Fatal(err)
 				}
-				bodyBytes := len(body)
 				req.Body.Close()
-				//log.Println("Received request from stream", h.net, h.transport, ":", req, "with", bodyBytes, "bytes in request body")
-				log.Println("Received request from stream", h.net, h.transport, ":","with", bodyBytes, "bytes in request body")
-				//fmt.Println(hex.Dump(body))
+				//bodyBytes := len(body)
+				//log.Println("Received request from stream", h.net, h.transport, ":","with", bodyBytes, "bytes in request body")
 
 				list_udid, ok := req.Header["Udid"]
 				if !ok {
