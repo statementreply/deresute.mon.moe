@@ -124,7 +124,6 @@ func main() {
 	// Read in packets, pass to assembler.
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	packets := packetSource.Packets()
-	//ticker := time.Tick(time.Minute)
 	for {
 		select {
 		case packet := <-packets:
@@ -141,10 +140,6 @@ func main() {
 			}
 			tcp := packet.TransportLayer().(*layers.TCP)
 			assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packet.Metadata().Timestamp)
-
-		//case <-ticker:
-			// Every minute, flush connections that haven't seen activity in the past 2 minutes.
-			//assembler.FlushOlderThan(time.Now().Add(time.Minute * -2))
 		}
 	}
 }
