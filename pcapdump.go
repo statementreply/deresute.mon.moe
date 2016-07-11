@@ -88,20 +88,14 @@ func (h *httpStream) run() {
 	}
 	//log.Printf("first four bytes is %#v\n", header)
 	if string(header) == "HTTP" {
-		// guess: response
-		//log.Printf("HTTP response")
-		loop := 0
+		// guess: HTTP response
 		for {
-			loop += 1
 			resp, err := http.ReadResponse(buf, nil)
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
-				//log.Printf("loop %s %s %d br1\n", h.net, h.transport, loop)
 				return
 			} else if err != nil {
-				log.Printf("loop %s %s %d br2 %#v\n", h.net, h.transport, loop, err)
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
 			} else {
-				//log.Printf("loop %s %s %d br3\n", h.net, h.transport, loop)
 				//bodyBytes := tcpreader.DiscardBytesToEOF(resp.Body)
 				body, err := ioutil.ReadAll(resp.Body)
 				if err != nil {
@@ -124,20 +118,15 @@ func (h *httpStream) run() {
 			}
 		}
 	} else {
-		// guess: request
-		loop := 0
+		// guess: HTTP request
 		for {
-			loop += 1
 			req, err := http.ReadRequest(buf)
 			if err == io.EOF {
-				//log.Printf("loop %s %s %d br1\n", h.net, h.transport, loop)
 				// We must read until we see an EOF... very important!
 				return
 			} else if err != nil {
-				log.Printf("loop %s %s %d br2\n", h.net, h.transport, loop)
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
 			} else {
-				//log.Printf("loop %s %s %d br3\n", h.net, h.transport, loop)
 				//bodyBytes := tcpreader.DiscardBytesToEOF(req.Body)
 				body, err := ioutil.ReadAll(req.Body)
 				if err != nil {
