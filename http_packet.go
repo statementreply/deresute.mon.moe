@@ -56,20 +56,44 @@ func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream
 
 func (h *httpStream) run() {
 	buf := bufio.NewReader(&h.r)
-	for {
-		req, err := http.ReadRequest(buf)
-		if err == io.EOF {
-			// We must read until we see an EOF... very important!
-			return
-		} else if err != nil {
-			log.Println("Error reading stream", h.net, h.transport, ":", err)
-		} else {
-			bodyBytes := tcpreader.DiscardBytesToEOF(req.Body)
-			req.Body.Close()
-			log.Println("Received request from stream", h.net, h.transport, ":", req, "with", bodyBytes, "bytes in request body")
+	header, err := buf.Peek(4)
+	if err != nil {
+		log.Fatal("cannot peek 4 bytes")
+	}
+	//log.Printf("first four bytes is %#v\n", header)
+	if string(header) == "HTTP" {
+		// guess: response
+		//log.Printf("HTTP response")
+		for {
+			resp, err := http.ReadResponse(buf, nil)
+			if err == io.EOF {
+				return
+			} else if err != nil {
+				log.Println("Error reading stream", h.net, h.transport, ":", err)
+			} else {
+				bodyBytes := tcpreader.DiscardBytesToEOF(resp.Body)
+				resp.Body.Close()
+				log.Println("Received response from stream", h.net, h.transport, ":", resp, "with", bodyBytes, "bytes in response body")
+			}
+		}
+	} else {
+		// guess: request
+		for {
+			req, err := http.ReadRequest(buf)
+			if err == io.EOF {
+				// We must read until we see an EOF... very important!
+				return
+			} else if err != nil {
+				log.Println("Error reading stream", h.net, h.transport, ":", err)
+			} else {
+				bodyBytes := tcpreader.DiscardBytesToEOF(req.Body)
+				req.Body.Close()
+				log.Println("Received request from stream", h.net, h.transport, ":", req, "with", bodyBytes, "bytes in request body")
+			}
 		}
 	}
 }
+
 
 func main() {
 	defer util.Run()()
