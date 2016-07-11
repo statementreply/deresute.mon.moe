@@ -43,6 +43,7 @@ type httpStream struct {
 }
 
 func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream {
+	log.Println("New stream", net, transport)
 	hstream := &httpStream{
 		net:       net,
 		transport: transport,
