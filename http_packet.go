@@ -59,13 +59,16 @@ func (h *httpStream) run() {
 	buf := bufio.NewReader(&h.r)
 	header, err := buf.Peek(4)
 	if err != nil {
-		log.Fatal("cannot peek 4 bytes")
+		log.Fatalf("cannot peek 4 bytes <%s>", string(header))
 	}
 	//log.Printf("first four bytes is %#v\n", header)
 	if string(header) == "HTTP" {
 		// guess: response
 		//log.Printf("HTTP response")
+		loop := 0
 		for {
+			loop += 1
+			log.Printf("loop %s %s %d", h.net, h.transport, loop)
 			resp, err := http.ReadResponse(buf, nil)
 			if err == io.EOF {
 				return
@@ -74,7 +77,10 @@ func (h *httpStream) run() {
 			} else {
 				bodyBytes := tcpreader.DiscardBytesToEOF(resp.Body)
 				resp.Body.Close()
-				log.Println("Received response from stream", h.net, h.transport, ":", resp, "with", bodyBytes, "bytes in response body")
+				_ = bodyBytes
+				//log.Println("Received response from stream", h.net, h.transport, ":", resp, "with", bodyBytes, "bytes in response body")
+				log.Println("Received response from stream", h.net, h.transport, ":", "with", bodyBytes, "bytes in response body")
+
 			}
 		}
 	} else {
@@ -89,7 +95,9 @@ func (h *httpStream) run() {
 			} else {
 				bodyBytes := tcpreader.DiscardBytesToEOF(req.Body)
 				req.Body.Close()
-				log.Println("Received request from stream", h.net, h.transport, ":", req, "with", bodyBytes, "bytes in request body")
+				_ = bodyBytes
+				//log.Println("Received request from stream", h.net, h.transport, ":", req, "with", bodyBytes, "bytes in request body")
+				log.Println("Received request from stream", h.net, h.transport, ":","with", bodyBytes, "bytes in request body")
 			}
 		}
 	}
