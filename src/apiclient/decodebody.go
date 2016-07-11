@@ -37,5 +37,5 @@ func DecodeBody(body []byte, msg_iv string) {
 	yy, _ := yaml.Marshal(content)
 	_ = yy
 	fmt.Printf("%#v\n", content)
-	fmt.Println("content", string(yy))
+	fmt.Println(string(yy))
 }

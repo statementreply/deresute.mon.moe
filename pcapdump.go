@@ -12,10 +12,12 @@
 package main
 
 import (
+	"apiclient"
 	//"bytes"
 	"bufio"
 	//"encoding/hex"
 	"flag"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -93,18 +95,31 @@ func (h *httpStream) run() {
 			loop += 1
 			resp, err := http.ReadResponse(buf, nil)
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
-				log.Printf("loop %s %s %d br1\n", h.net, h.transport, loop)
+				//log.Printf("loop %s %s %d br1\n", h.net, h.transport, loop)
 				return
 			} else if err != nil {
 				log.Printf("loop %s %s %d br2 %#v\n", h.net, h.transport, loop, err)
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
 			} else {
-				log.Printf("loop %s %s %d br3\n", h.net, h.transport, loop)
-				bodyBytes := tcpreader.DiscardBytesToEOF(resp.Body)
+				//log.Printf("loop %s %s %d br3\n", h.net, h.transport, loop)
+				//bodyBytes := tcpreader.DiscardBytesToEOF(resp.Body)
+				body, err := ioutil.ReadAll(resp.Body)
+				if err != nil {
+					log.Fatal(err)
+				}
+				bodyBytes := len(body)
 				resp.Body.Close()
-				_ = bodyBytes
 				//log.Println("Received response from stream", h.net, h.transport, ":", resp, "with", bodyBytes, "bytes in response body")
 				log.Println("Received response from stream", h.net, h.transport, ":", "with", bodyBytes, "bytes in response body")
+				list_udid, ok := resp.Header["Udid"]
+				if !ok {
+					// no UDID found
+				} else {
+					udid := list_udid[0]
+					msg_iv := apiclient.Unlolfuscate(udid)
+					fmt.Println("msg_iv ", msg_iv)
+					apiclient.DecodeBody(body, msg_iv)
+				}
 
 			}
 		}
@@ -115,19 +130,35 @@ func (h *httpStream) run() {
 			loop += 1
 			req, err := http.ReadRequest(buf)
 			if err == io.EOF {
-				log.Printf("loop %s %s %d br1\n", h.net, h.transport, loop)
+				//log.Printf("loop %s %s %d br1\n", h.net, h.transport, loop)
 				// We must read until we see an EOF... very important!
 				return
 			} else if err != nil {
 				log.Printf("loop %s %s %d br2\n", h.net, h.transport, loop)
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
 			} else {
-				log.Printf("loop %s %s %d br3\n", h.net, h.transport, loop)
-				bodyBytes := tcpreader.DiscardBytesToEOF(req.Body)
+				//log.Printf("loop %s %s %d br3\n", h.net, h.transport, loop)
+				//bodyBytes := tcpreader.DiscardBytesToEOF(req.Body)
+				body, err := ioutil.ReadAll(req.Body)
+				if err != nil {
+					log.Fatal(err)
+				}
+				bodyBytes := len(body)
 				req.Body.Close()
-				_ = bodyBytes
 				//log.Println("Received request from stream", h.net, h.transport, ":", req, "with", bodyBytes, "bytes in request body")
 				log.Println("Received request from stream", h.net, h.transport, ":","with", bodyBytes, "bytes in request body")
+				//fmt.Println(hex.Dump(body))
+
+				list_udid, ok := req.Header["Udid"]
+				if !ok {
+					// no UDID found
+				} else {
+					fmt.Println("URL: ", req.Host, " ", req.URL)
+					udid := list_udid[0]
+					msg_iv := apiclient.Unlolfuscate(udid)
+					fmt.Println("msg_iv ", msg_iv)
+					apiclient.DecodeBody(body, msg_iv)
+				}
 			}
 		}
 	}
