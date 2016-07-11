@@ -12,10 +12,14 @@
 package main
 
 import (
+	"bytes"
 	"bufio"
+	"encoding/hex"
 	"flag"
 	"io"
+	"io/ioutil"
 	"log"
+	//"os"
 	"net/http"
 	//"time"
 
@@ -56,10 +60,21 @@ func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream
 }
 
 func (h *httpStream) run() {
-	buf := bufio.NewReader(&h.r)
+	all, err := ioutil.ReadAll(&h.r)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Print(h.net, " ", h.transport, "\n", hex.Dump(all))
+
+	//buf := bufio.NewReader(&h.r)
+	unbuf := bytes.NewReader(all)
+	buf := bufio.NewReader(unbuf)
+
 	header, err := buf.Peek(4)
 	if err != nil {
-		log.Fatalf("cannot peek 4 bytes <%s>", string(header))
+		log.Printf("cannot peek 4 bytes <%s> %s", string(header), err)
+		ioutil.ReadAll(buf)
+		return
 	}
 	//log.Printf("first four bytes is %#v\n", header)
 	if string(header) == "HTTP" {
@@ -68,13 +83,15 @@ func (h *httpStream) run() {
 		loop := 0
 		for {
 			loop += 1
-			log.Printf("loop %s %s %d", h.net, h.transport, loop)
 			resp, err := http.ReadResponse(buf, nil)
 			if err == io.EOF {
+				log.Printf("loop %s %s %d br1", h.net, h.transport, loop)
 				return
 			} else if err != nil {
+				log.Printf("loop %s %s %d br2", h.net, h.transport, loop)
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
 			} else {
+				log.Printf("loop %s %s %d br3", h.net, h.transport, loop)
 				bodyBytes := tcpreader.DiscardBytesToEOF(resp.Body)
 				resp.Body.Close()
 				_ = bodyBytes
@@ -85,14 +102,19 @@ func (h *httpStream) run() {
 		}
 	} else {
 		// guess: request
+		loop := 0
 		for {
+			loop += 1
 			req, err := http.ReadRequest(buf)
 			if err == io.EOF {
+				log.Printf("loop %s %s %d br1", h.net, h.transport, loop)
 				// We must read until we see an EOF... very important!
 				return
 			} else if err != nil {
+				log.Printf("loop %s %s %d br2", h.net, h.transport, loop)
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
 			} else {
+				log.Printf("loop %s %s %d br3", h.net, h.transport, loop)
 				bodyBytes := tcpreader.DiscardBytesToEOF(req.Body)
 				req.Body.Close()
 				_ = bodyBytes
@@ -105,6 +127,7 @@ func (h *httpStream) run() {
 
 
 func main() {
+	//log.SetOutput(os.Stdout)
 	defer util.Run()()
 	var handle *pcap.Handle
 	var err error
