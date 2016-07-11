@@ -21,8 +21,8 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"os"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -31,8 +31,8 @@ import (
 	"github.com/google/gopacket/pcap"
 	"github.com/google/gopacket/tcpassembly"
 	"github.com/google/gopacket/tcpassembly/tcpreader"
-	"util"
 	"gopkg.in/yaml.v2"
+	"util"
 )
 
 var fname = flag.String("r", "", "Filename to read from, overrides -i")
@@ -138,6 +138,10 @@ func (h *httpStream) run() {
 				resp.Body.Close()
 				//bodyBytes := len(body)
 				//log.Println("Received response from stream", h.net, h.transport, ":", "with", bodyBytes, "bytes in response body")
+
+				if req == nil {
+					continue
+				}
 				list_udid, ok := resp.Request.Header["Udid"]
 				if !ok {
 					// no UDID found
@@ -151,7 +155,6 @@ func (h *httpStream) run() {
 					yy, _ := yaml.Marshal(content)
 					fmt.Println(string(yy))
 				}
-
 			}
 		}
 	} else {
