@@ -181,8 +181,6 @@ func main() {
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	packets := packetSource.Packets()
 	for {
-		//select {
-		//case packet := <-packets:
 		packet := <-packets
 			// A nil packet indicates the end of a pcap file.
 			if packet == nil {
@@ -200,7 +198,6 @@ func main() {
 			packetTimestamp := packet.Metadata().Timestamp
 			assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packetTimestamp)
 			assembler.FlushOlderThan(packetTimestamp.Add(time.Minute * -2))
-		//}
 	}
 	log.Print("wait")
 	wg.Wait()
