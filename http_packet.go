@@ -14,7 +14,7 @@ package main
 import (
 	"bytes"
 	"bufio"
-	"encoding/hex"
+	//"encoding/hex"
 	"flag"
 	"io"
 	"io/ioutil"
@@ -64,11 +64,13 @@ func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream
 
 func (h *httpStream) run() {
 	defer wg.Done()
-	all, err := ioutil.ReadAll(&h.r)
+	all, err := ioutil.ReadAll(&(h.r))
+	h.r.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(h.net, " ", h.transport, "\n", hex.Dump(all))
+	//log.Println(h.net, " ", h.transport, "\n", hex.Dump(all))
+	log.Println("Read ", h.net, " ", h.transport, " ", len(all))
 
 	//buf := bufio.NewReader(&h.r)
 	unbuf := bytes.NewReader(all)
@@ -161,11 +163,13 @@ func main() {
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	packets := packetSource.Packets()
 	for {
-		select {
-		case packet := <-packets:
+		//select {
+		//case packet := <-packets:
+		packet := <-packets
 			// A nil packet indicates the end of a pcap file.
 			if packet == nil {
-				return
+				//return
+				break
 			}
 			if *logAllPackets {
 				log.Println(packet)
@@ -176,7 +180,7 @@ func main() {
 			}
 			tcp := packet.TransportLayer().(*layers.TCP)
 			assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packet.Metadata().Timestamp)
-		}
+		//}
 	}
 	log.Print("wait")
 	wg.Wait()
