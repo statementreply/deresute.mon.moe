@@ -23,7 +23,7 @@ import (
 	"log"
 	//"os"
 	"net/http"
-	//"time"
+	"time"
 	"sync"
 
 	"github.com/google/gopacket"
@@ -197,7 +197,9 @@ func main() {
 				continue
 			}
 			tcp := packet.TransportLayer().(*layers.TCP)
-			assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packet.Metadata().Timestamp)
+			packetTimestamp := packet.Metadata().Timestamp
+			assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packetTimestamp)
+			assembler.FlushOlderThan(packetTimestamp.Add(time.Minute * -2))
 		//}
 	}
 	log.Print("wait")
