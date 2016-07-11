@@ -22,6 +22,7 @@ import (
 	//"os"
 	"net/http"
 	//"time"
+	"sync"
 
 	"github.com/google/gopacket"
 	"util"
@@ -34,6 +35,7 @@ import (
 var fname = flag.String("r", "", "Filename to read from, overrides -i")
 var filter = flag.String("f", "tcp", "BPF filter for pcap")
 var logAllPackets = flag.Bool("v", false, "Logs every packet in great detail")
+var wg sync.WaitGroup
 
 // Build a simple HTTP request parser using tcpassembly.StreamFactory and tcpassembly.Stream interfaces
 
@@ -53,6 +55,7 @@ func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream
 		transport: transport,
 		r:         tcpreader.NewReaderStream(),
 	}
+	wg.Add(1)
 	go hstream.run() // Important... we must guarantee that data from the reader stream is read.
 
 	// ReaderStream implements tcpassembly.Stream, so we can return a pointer to it.
@@ -60,11 +63,12 @@ func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream
 }
 
 func (h *httpStream) run() {
+	defer wg.Done()
 	all, err := ioutil.ReadAll(&h.r)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Print(h.net, " ", h.transport, "\n", hex.Dump(all))
+	log.Println(h.net, " ", h.transport, "\n", hex.Dump(all))
 
 	//buf := bufio.NewReader(&h.r)
 	unbuf := bytes.NewReader(all)
@@ -85,13 +89,13 @@ func (h *httpStream) run() {
 			loop += 1
 			resp, err := http.ReadResponse(buf, nil)
 			if err == io.EOF {
-				log.Printf("loop %s %s %d br1", h.net, h.transport, loop)
+				log.Printf("loop %s %s %d br1\n", h.net, h.transport, loop)
 				return
 			} else if err != nil {
-				log.Printf("loop %s %s %d br2", h.net, h.transport, loop)
+				log.Printf("loop %s %s %d br2\n", h.net, h.transport, loop)
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
 			} else {
-				log.Printf("loop %s %s %d br3", h.net, h.transport, loop)
+				log.Printf("loop %s %s %d br3\n", h.net, h.transport, loop)
 				bodyBytes := tcpreader.DiscardBytesToEOF(resp.Body)
 				resp.Body.Close()
 				_ = bodyBytes
@@ -107,14 +111,14 @@ func (h *httpStream) run() {
 			loop += 1
 			req, err := http.ReadRequest(buf)
 			if err == io.EOF {
-				log.Printf("loop %s %s %d br1", h.net, h.transport, loop)
+				log.Printf("loop %s %s %d br1\n", h.net, h.transport, loop)
 				// We must read until we see an EOF... very important!
 				return
 			} else if err != nil {
-				log.Printf("loop %s %s %d br2", h.net, h.transport, loop)
+				log.Printf("loop %s %s %d br2\n", h.net, h.transport, loop)
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
 			} else {
-				log.Printf("loop %s %s %d br3", h.net, h.transport, loop)
+				log.Printf("loop %s %s %d br3\n", h.net, h.transport, loop)
 				bodyBytes := tcpreader.DiscardBytesToEOF(req.Body)
 				req.Body.Close()
 				_ = bodyBytes
@@ -174,4 +178,7 @@ func main() {
 			assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packet.Metadata().Timestamp)
 		}
 	}
+	log.Print("wait")
+	wg.Wait()
+	log.Print("done")
 }
