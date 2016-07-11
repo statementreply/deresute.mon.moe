@@ -67,6 +67,9 @@ func Unlolfuscate(s string) string {
 }
 
 func Decrypt_cbc(s, iv, key []byte) []byte {
+	/*fmt.Println(hex.Dump(s))
+	fmt.Println(hex.Dump(iv))
+	fmt.Println(hex.Dump(key))*/
 	s_len := len(s)
 	s_new := s
 	if s_len%32 != 0 {
@@ -214,6 +217,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	reply = reply[:n]
 
 	plain2 := Decrypt_cbc(reply[:len(reply)-32], msg_iv, reply[len(reply)-32:])
+	//fmt.Println("plain2", hex.Dump(plain2))
 	mp2 := make([]byte, base64.StdEncoding.DecodedLen(len(plain2)))
 	base64.StdEncoding.Decode(mp2, plain2)
 	var content map[string]interface{}
