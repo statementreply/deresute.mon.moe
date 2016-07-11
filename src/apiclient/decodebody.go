@@ -2,13 +2,12 @@ package apiclient
 
 import (
 	"encoding/base64"
-	"fmt"
 	//"gopkg.in/vmihailenco/msgpack.v2"
-	"gopkg.in/yaml.v2"
+	//"gopkg.in/yaml.v2"
 	"strings"
 )
 
-func DecodeBody(body []byte, msg_iv string) {
+func DecodeBody(body []byte, msg_iv string) interface{} {
 	resp_body := body
 	// remove extra tabs
 	resp_body = []byte(strings.Replace(string(resp_body), "\t", "", -1))
@@ -34,8 +33,8 @@ func DecodeBody(body []byte, msg_iv string) {
 	var content interface{}
 	MsgpackDecode(mp, &content)
 
-	yy, _ := yaml.Marshal(content)
-	_ = yy
-	fmt.Printf("%#v\n", content)
-	fmt.Println(string(yy))
+	return content
+	//yy, _ := yaml.Marshal(content)
+	//fmt.Printf("%#v\n", content)
+	//fmt.Println(string(yy))
 }

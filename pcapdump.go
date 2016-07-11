@@ -32,12 +32,38 @@ import (
 	"github.com/google/gopacket/tcpassembly"
 	"github.com/google/gopacket/tcpassembly/tcpreader"
 	"util"
+	"gopkg.in/yaml.v2"
 )
 
 var fname = flag.String("r", "", "Filename to read from, overrides -i")
 var filter = flag.String("f", "tcp", "BPF filter for pcap")
 var logAllPackets = flag.Bool("v", false, "Logs every packet in great detail")
 var wg sync.WaitGroup
+var pendingRequest map[gopacket.Flow]map[gopacket.Flow]*http.Request = make(map[gopacket.Flow]map[gopacket.Flow]*http.Request)
+
+func addRequest(net, transport gopacket.Flow, req *http.Request) {
+	_, ok := pendingRequest[net]
+	if !ok {
+		pendingRequest[net] = make(map[gopacket.Flow]*http.Request)
+	}
+	pendingRequest[net][transport] = req
+}
+
+func matchRequest(net, transport gopacket.Flow) *http.Request {
+	rnet := net.Reverse()
+	rtransport := transport.Reverse()
+	_, ok := pendingRequest[rnet]
+	if !ok {
+		return nil
+	}
+	req, ok := pendingRequest[rnet][rtransport]
+	if !ok {
+		return nil
+	}
+	fmt.Println("matched req ", rnet, rtransport, req)
+	delete(pendingRequest[rnet], rtransport)
+	return req
+}
 
 // Build a simple HTTP request parser using tcpassembly.StreamFactory and tcpassembly.Stream interfaces
 
@@ -90,7 +116,13 @@ func (h *httpStream) run() {
 	if string(header) == "HTTP" {
 		// guess: HTTP response
 		for {
-			resp, err := http.ReadResponse(buf, nil)
+			// FIXME: match response to request
+			req := matchRequest(h.net, h.transport)
+			if req == nil {
+				log.Println("cannot match response to request", h.net, h.transport)
+			}
+			resp, err := http.ReadResponse(buf, req)
+			fmt.Println(resp)
 			// FIXME: why io.ErrUnexpectedEOF
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
 				return
@@ -104,14 +136,18 @@ func (h *httpStream) run() {
 				resp.Body.Close()
 				//bodyBytes := len(body)
 				//log.Println("Received response from stream", h.net, h.transport, ":", "with", bodyBytes, "bytes in response body")
-				list_udid, ok := resp.Header["Udid"]
+				list_udid, ok := resp.Request.Header["Udid"]
 				if !ok {
 					// no UDID found
+					fmt.Println("no UDID found")
 				} else {
+					fmt.Println("Resp URL: ", resp.Request.Host, " ", resp.Request.URL)
 					udid := list_udid[0]
 					msg_iv := apiclient.Unlolfuscate(udid)
 					fmt.Println("msg_iv ", msg_iv)
-					apiclient.DecodeBody(body, msg_iv)
+					content := apiclient.DecodeBody(body, msg_iv)
+					yy, _ := yaml.Marshal(content)
+					fmt.Println(string(yy))
 				}
 
 			}
@@ -126,6 +162,7 @@ func (h *httpStream) run() {
 			} else if err != nil {
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
 			} else {
+				addRequest(h.net, h.transport, req)
 				body, err := ioutil.ReadAll(req.Body)
 				if err != nil {
 					log.Fatal(err)
@@ -138,11 +175,14 @@ func (h *httpStream) run() {
 				if !ok {
 					// no UDID found
 				} else {
-					fmt.Println("URL: ", req.Host, " ", req.URL)
+					fmt.Println("Req URL: ", req.Host, " ", req.URL)
 					udid := list_udid[0]
 					msg_iv := apiclient.Unlolfuscate(udid)
 					fmt.Println("msg_iv ", msg_iv)
-					apiclient.DecodeBody(body, msg_iv)
+					content := apiclient.DecodeBody(body, msg_iv)
+					yy, _ := yaml.Marshal(content)
+					fmt.Println(string(yy))
+
 				}
 			}
 		}
