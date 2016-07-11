@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	//"gopkg.in/vmihailenco/msgpack.v2"
-	"encoding/hex"
 	"gopkg.in/yaml.v2"
 	"strings"
 )
@@ -30,7 +29,7 @@ func DecodeBody(body []byte, msg_iv string) {
 	mp := make([]byte, base64.StdEncoding.DecodedLen(len(plain2)))
 	n, _ = base64.StdEncoding.Decode(mp, plain2)
 	mp = mp[:n]
-	fmt.Print("mp is\n", hex.Dump(mp))
+	//fmt.Print("mp is\n", hex.Dump(mp))
 	//var content map[string]interface{}
 	var content interface{}
 	MsgpackDecode(mp, &content)
