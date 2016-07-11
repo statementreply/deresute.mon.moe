@@ -12,7 +12,7 @@
 package main
 
 import (
-	"bytes"
+	//"bytes"
 	"bufio"
 	//"encoding/hex"
 	"flag"
@@ -64,6 +64,7 @@ func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream
 
 func (h *httpStream) run() {
 	defer wg.Done()
+	/*
 	all, err := ioutil.ReadAll(&(h.r))
 	h.r.Close()
 	if err != nil {
@@ -71,10 +72,11 @@ func (h *httpStream) run() {
 	}
 	//log.Println(h.net, " ", h.transport, "\n", hex.Dump(all))
 	log.Println("Read ", h.net, " ", h.transport, " ", len(all))
-
-	//buf := bufio.NewReader(&h.r)
 	unbuf := bytes.NewReader(all)
 	buf := bufio.NewReader(unbuf)
+	*/
+
+	buf := bufio.NewReader(&h.r)
 
 	header, err := buf.Peek(4)
 	if err != nil {
@@ -90,11 +92,11 @@ func (h *httpStream) run() {
 		for {
 			loop += 1
 			resp, err := http.ReadResponse(buf, nil)
-			if err == io.EOF {
+			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
 				log.Printf("loop %s %s %d br1\n", h.net, h.transport, loop)
 				return
 			} else if err != nil {
-				log.Printf("loop %s %s %d br2\n", h.net, h.transport, loop)
+				log.Printf("loop %s %s %d br2 %#v\n", h.net, h.transport, loop, err)
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
 			} else {
 				log.Printf("loop %s %s %d br3\n", h.net, h.transport, loop)
