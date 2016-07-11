@@ -21,7 +21,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	//"os"
+	"os"
 	"net/http"
 	"sync"
 	"time"
@@ -42,6 +42,7 @@ var wg sync.WaitGroup
 var pendingRequest map[gopacket.Flow]map[gopacket.Flow]*http.Request = make(map[gopacket.Flow]map[gopacket.Flow]*http.Request)
 
 func addRequest(net, transport gopacket.Flow, req *http.Request) {
+	log.Println("ADD", net, transport)
 	_, ok := pendingRequest[net]
 	if !ok {
 		pendingRequest[net] = make(map[gopacket.Flow]*http.Request)
@@ -52,6 +53,7 @@ func addRequest(net, transport gopacket.Flow, req *http.Request) {
 func matchRequest(net, transport gopacket.Flow) *http.Request {
 	rnet := net.Reverse()
 	rtransport := transport.Reverse()
+	log.Println("DEL", rnet, rtransport)
 	_, ok := pendingRequest[rnet]
 	if !ok {
 		return nil
@@ -60,7 +62,7 @@ func matchRequest(net, transport gopacket.Flow) *http.Request {
 	if !ok {
 		return nil
 	}
-	fmt.Println("matched req ", rnet, rtransport, req)
+	log.Println("matched req ", rnet, rtransport, req)
 	delete(pendingRequest[rnet], rtransport)
 	return req
 }
@@ -122,7 +124,7 @@ func (h *httpStream) run() {
 				log.Println("cannot match response to request", h.net, h.transport)
 			}
 			resp, err := http.ReadResponse(buf, req)
-			fmt.Println(resp)
+			//fmt.Println(resp)
 			// FIXME: why io.ErrUnexpectedEOF
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
 				return
@@ -139,12 +141,12 @@ func (h *httpStream) run() {
 				list_udid, ok := resp.Request.Header["Udid"]
 				if !ok {
 					// no UDID found
-					fmt.Println("no UDID found")
+					log.Println("no UDID found")
 				} else {
 					fmt.Println("Resp URL: ", resp.Request.Host, " ", resp.Request.URL)
 					udid := list_udid[0]
 					msg_iv := apiclient.Unlolfuscate(udid)
-					fmt.Println("msg_iv ", msg_iv)
+					//fmt.Println("msg_iv ", msg_iv)
 					content := apiclient.DecodeBody(body, msg_iv)
 					yy, _ := yaml.Marshal(content)
 					fmt.Println(string(yy))
@@ -178,7 +180,7 @@ func (h *httpStream) run() {
 					fmt.Println("Req URL: ", req.Host, " ", req.URL)
 					udid := list_udid[0]
 					msg_iv := apiclient.Unlolfuscate(udid)
-					fmt.Println("msg_iv ", msg_iv)
+					//fmt.Println("msg_iv ", msg_iv)
 					content := apiclient.DecodeBody(body, msg_iv)
 					yy, _ := yaml.Marshal(content)
 					fmt.Println(string(yy))
@@ -190,7 +192,7 @@ func (h *httpStream) run() {
 }
 
 func main() {
-	//log.SetOutput(os.Stdout)
+	log.SetOutput(os.Stderr)
 	defer util.Run()()
 	var handle *pcap.Handle
 	var err error
