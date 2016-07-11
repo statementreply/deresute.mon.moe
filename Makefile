@@ -1,4 +1,4 @@
-all: rankserver dumpbody datafetcher
+all: rankserver dumpbody datafetcher pcapdump
 
 web: prep rankserver
 	./rankserver
@@ -17,7 +17,7 @@ test1: src/apiclient/apiclient.go
 
 %: %.go
 	source ./go_env.sh; \
-		go build -x $<
+		go build -x -i $<
 
 precompile:
 	source ./go_env.sh; \
