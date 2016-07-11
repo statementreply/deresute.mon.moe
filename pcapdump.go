@@ -23,15 +23,15 @@ import (
 	"log"
 	//"os"
 	"net/http"
-	"time"
 	"sync"
+	"time"
 
 	"github.com/google/gopacket"
-	"util"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
 	"github.com/google/gopacket/tcpassembly"
 	"github.com/google/gopacket/tcpassembly/tcpreader"
+	"util"
 )
 
 var fname = flag.String("r", "", "Filename to read from, overrides -i")
@@ -67,15 +67,15 @@ func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream
 func (h *httpStream) run() {
 	defer wg.Done()
 	/*
-	all, err := ioutil.ReadAll(&(h.r))
-	h.r.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	//log.Println(h.net, " ", h.transport, "\n", hex.Dump(all))
-	log.Println("Read ", h.net, " ", h.transport, " ", len(all))
-	unbuf := bytes.NewReader(all)
-	buf := bufio.NewReader(unbuf)
+		all, err := ioutil.ReadAll(&(h.r))
+		h.r.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+		//log.Println(h.net, " ", h.transport, "\n", hex.Dump(all))
+		log.Println("Read ", h.net, " ", h.transport, " ", len(all))
+		unbuf := bytes.NewReader(all)
+		buf := bufio.NewReader(unbuf)
 	*/
 
 	buf := bufio.NewReader(&h.r)
@@ -149,7 +149,6 @@ func (h *httpStream) run() {
 	}
 }
 
-
 func main() {
 	//log.SetOutput(os.Stdout)
 	defer util.Run()()
@@ -182,22 +181,22 @@ func main() {
 	packets := packetSource.Packets()
 	for {
 		packet := <-packets
-			// A nil packet indicates the end of a pcap file.
-			if packet == nil {
-				//return
-				break
-			}
-			if *logAllPackets {
-				log.Println(packet)
-			}
-			if packet.NetworkLayer() == nil || packet.TransportLayer() == nil || packet.TransportLayer().LayerType() != layers.LayerTypeTCP {
-				log.Println("Unusable packet")
-				continue
-			}
-			tcp := packet.TransportLayer().(*layers.TCP)
-			packetTimestamp := packet.Metadata().Timestamp
-			assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packetTimestamp)
-			assembler.FlushOlderThan(packetTimestamp.Add(time.Minute * -2))
+		// A nil packet indicates the end of a pcap file.
+		if packet == nil {
+			//return
+			break
+		}
+		if *logAllPackets {
+			log.Println(packet)
+		}
+		if packet.NetworkLayer() == nil || packet.TransportLayer() == nil || packet.TransportLayer().LayerType() != layers.LayerTypeTCP {
+			log.Println("Unusable packet")
+			continue
+		}
+		tcp := packet.TransportLayer().(*layers.TCP)
+		packetTimestamp := packet.Metadata().Timestamp
+		assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packetTimestamp)
+		assembler.FlushOlderThan(packetTimestamp.Add(time.Minute * -2))
 	}
 	log.Print("wait")
 	wg.Wait()
