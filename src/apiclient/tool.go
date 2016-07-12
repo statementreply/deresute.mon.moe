@@ -1,15 +1,14 @@
 package apiclient
 
 import (
-	"fmt"
-	"math/rand"
-	"strconv"
 	"crypto/cipher"
-	"rijndael_wrapper"
+	"fmt"
 	"github.com/ugorji/go/codec"
 	"log"
+	"math/rand"
+	"rijndael_wrapper"
+	"strconv"
 )
-
 
 func Lolfuscate(s string) string {
 	var r string
@@ -34,7 +33,6 @@ func Unlolfuscate(s string) string {
 	}
 	return r
 }
-
 
 func Decrypt_cbc(s, iv, key []byte) []byte {
 	/*fmt.Println(hex.Dump(s))
