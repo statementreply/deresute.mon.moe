@@ -138,7 +138,7 @@ func NewApiClientFromConfig(configFile string) *ApiClient {
 func (client *ApiClient) Call(path string, args map[string]interface{}) map[string]interface{} {
 	// Prepare request body
 	var body string
-	body = client.EncodeBody3(args)
+	body = client.EncodeBody2(args)
 	// Request body finished
 
 	// Prepare request header

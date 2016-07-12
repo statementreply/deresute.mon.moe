@@ -42,7 +42,7 @@ func (client ApiClient) EncodeBody(args map[string]interface{}) string {
 	return body
 }
 
-func (client ApiClient) EncodeBody2(args map[string]interface{}) string {
+func (client *ApiClient) EncodeBody2(args map[string]interface{}) string {
 	var body string
 	var vid_iv string
 	// vid_iv is \d{32}
