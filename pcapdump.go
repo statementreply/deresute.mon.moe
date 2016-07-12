@@ -44,32 +44,46 @@ var snaplen = flag.Int("s", 1600, "SnapLen for pcap packet capture")
 var filter = flag.String("f", "tcp", "BPF filter for pcap")
 var logAllPackets = flag.Bool("v", false, "Logs every packet in great detail")
 var wg sync.WaitGroup
+// FIXME use lock to prevent concurrent rw
 var pendingRequest map[gopacket.Flow]map[gopacket.Flow]*http.Request = make(map[gopacket.Flow]map[gopacket.Flow]*http.Request)
+var pendingRequestLock sync.RWMutex
 var outputLock sync.Mutex
 
 func addRequest(net, transport gopacket.Flow, req *http.Request) {
 	//log.Println("ADD", net, transport)
+	pendingRequestLock.RLock()
 	_, ok := pendingRequest[net]
+	pendingRequestLock.RUnlock()
 	if !ok {
+		pendingRequestLock.Lock()
 		pendingRequest[net] = make(map[gopacket.Flow]*http.Request)
+		pendingRequestLock.Unlock()
 	}
+	pendingRequestLock.Lock()
 	pendingRequest[net][transport] = req
+	pendingRequestLock.Unlock()
 }
 
 func matchRequest(net, transport gopacket.Flow) *http.Request {
 	rnet := net.Reverse()
 	rtransport := transport.Reverse()
 	//log.Println("DEL", rnet, rtransport)
+	pendingRequestLock.RLock()
 	_, ok := pendingRequest[rnet]
+	pendingRequestLock.RUnlock()
 	if !ok {
 		return nil
 	}
+	pendingRequestLock.RLock()
 	req, ok := pendingRequest[rnet][rtransport]
+	pendingRequestLock.RUnlock()
 	if !ok {
 		return nil
 	}
 	//log.Println("matched req ", rnet, rtransport, req)
+	pendingRequestLock.Lock()
 	delete(pendingRequest[rnet], rtransport)
+	pendingRequestLock.Unlock()
 	return req
 }
 
