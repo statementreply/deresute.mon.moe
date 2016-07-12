@@ -106,7 +106,7 @@ func (h *httpStream) run() {
 		return
 	}
 
-	if string(header) == "HTTP" {  // guess: HTTP response
+	if string(header) == "HTTP" { // guess: HTTP response
 		for {
 			req := matchRequest(h.net, h.transport)
 			resp, err := http.ReadResponse(buf, req)
@@ -119,7 +119,7 @@ func (h *httpStream) run() {
 				printHTTP("Resp", req, resp.Body)
 			}
 		}
-	} else {   // guess: HTTP request
+	} else { // guess: HTTP request
 		for {
 			req, err := http.ReadRequest(buf)
 			if err != nil {
