@@ -1,5 +1,8 @@
 // source code from gopacket examples
 
+// capture from network interface:
+//sudo setcap cap_net_raw,cap_net_admin=eip ./pcapdump
+
 // Copyright 2012 Google, Inc. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style license
@@ -162,7 +165,7 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 	content := apiclient.DecodeBody(body, msg_iv)
 	yy, err := yaml.Marshal(content)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("yaml error", err)
 	}
 
 	outputLock.Lock()
@@ -192,11 +195,11 @@ func main() {
 		log.Fatalf("use ./http_packet -r $filename or ./xxx -i eth0")
 	}
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("pcap error", err)
 	}
 
 	if err := handle.SetBPFFilter(*filter); err != nil {
-		log.Fatal(err)
+		log.Fatal("filter error", err)
 	}
 
 	// Set up assembly

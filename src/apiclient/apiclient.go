@@ -113,12 +113,12 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 func NewApiClientFromConfig(configFile string) *ApiClient {
 	secret, err := ioutil.ReadFile(configFile)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("read config file", err)
 	}
 	var secret_dict map[string]interface{}
 	err = yaml.Unmarshal(secret, &secret_dict)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("parse config file", err)
 	}
 	//fmt.Println(secret_dict)
 
@@ -137,7 +137,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	vid_iv_byte := make([]byte, 16)
 	n, err := crand.Read(vid_iv_byte)
 	if (n != 16) || (err != nil) {
-		log.Fatal(n, err)
+		log.Fatal("rand err", n, err)
 	}
 	var vid_iv_big big.Int
 	vid_iv_big.SetBytes(vid_iv_byte)
@@ -247,7 +247,7 @@ func MsgpackDecode(b []byte, v interface{}) {
 	err := dec.Decode(v)
 	//log.Printf("msgpackDecode\n%s\n", hex.Dump(b))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("msgpack decode", err)
 	}
 }
 
@@ -262,7 +262,7 @@ func MsgpackEncode(v interface{}) []byte {
 	enc := codec.NewEncoderBytes(&b, &bh)
 	err := enc.Encode(v)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("msgpack encode", err)
 	}
 	return b
 }
