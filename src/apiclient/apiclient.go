@@ -139,13 +139,11 @@ func NewApiClientFromConfig(configFile string) *ApiClient {
 
 func (client *ApiClient) Call(path string, args map[string]interface{}) map[string]interface{} {
 	// Prepare request body
-	var body string
-	body = client.EncodeBody(args)
+	body := client.EncodeBody(args)
 	// Request body finished
 
 	// Prepare request header
-	var req *http.Request
-	req = client.MakeRequest(path, body)
+	req := client.MakeRequest(path, body)
 
 	// Do request
 	hclient := &http.Client{}
