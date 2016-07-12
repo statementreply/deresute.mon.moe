@@ -230,7 +230,8 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 			client.sid = new_sid.(string)
 		}
 	} else {
-		log.Fatal("no data_headers in response")
+		// FIXME
+		log.Println("no data_headers in response")
 	}
 	return content
 }
@@ -247,7 +248,8 @@ func MsgpackDecode(b []byte, v interface{}) {
 	err := dec.Decode(v)
 	//log.Printf("msgpackDecode\n%s\n", hex.Dump(b))
 	if err != nil {
-		log.Fatal("msgpack decode", err)
+		// FIXME: ignore error?
+		log.Println("msgpack decode", err)
 	}
 }
 
