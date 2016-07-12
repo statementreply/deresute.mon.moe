@@ -42,7 +42,7 @@ var wg sync.WaitGroup
 var pendingRequest map[gopacket.Flow]map[gopacket.Flow]*http.Request = make(map[gopacket.Flow]map[gopacket.Flow]*http.Request)
 
 func addRequest(net, transport gopacket.Flow, req *http.Request) {
-	log.Println("ADD", net, transport)
+	//log.Println("ADD", net, transport)
 	_, ok := pendingRequest[net]
 	if !ok {
 		pendingRequest[net] = make(map[gopacket.Flow]*http.Request)
@@ -53,7 +53,7 @@ func addRequest(net, transport gopacket.Flow, req *http.Request) {
 func matchRequest(net, transport gopacket.Flow) *http.Request {
 	rnet := net.Reverse()
 	rtransport := transport.Reverse()
-	log.Println("DEL", rnet, rtransport)
+	//log.Println("DEL", rnet, rtransport)
 	_, ok := pendingRequest[rnet]
 	if !ok {
 		return nil
@@ -120,11 +120,11 @@ func (h *httpStream) run() {
 	if string(header) == "HTTP" {
 		// guess: HTTP response
 		for {
-			fmt.Println("loop01")
+			//fmt.Println("loop01")
 			// FIXME: match response to request
 			req := matchRequest(h.net, h.transport)
 			if req == nil {
-				log.Println("cannot match response to request", h.net, h.transport)
+				//log.Println("cannot match response to request", h.net, h.transport)
 			}
 			resp, err := http.ReadResponse(buf, req)
 			//fmt.Println(resp)
@@ -139,10 +139,11 @@ func (h *httpStream) run() {
 				return
 			} else {
 				body, err := ioutil.ReadAll(resp.Body)
-				if err != nil {
-					log.Fatal(err)
-				}
 				resp.Body.Close()
+				if err != nil {
+					log.Println("x1", err)
+					continue
+				}
 				//bodyBytes := len(body)
 				//log.Println("Received response from stream", h.net, h.transport, ":", "with", bodyBytes, "bytes in response body")
 
@@ -152,7 +153,7 @@ func (h *httpStream) run() {
 				list_udid, ok := resp.Request.Header["Udid"]
 				if !ok {
 					// no UDID found
-					log.Println("no UDID found")
+					//log.Println("no UDID found")
 				} else {
 					fmt.Println("Resp URL: ", resp.Request.Host, " ", resp.Request.URL)
 					udid := list_udid[0]
@@ -167,7 +168,7 @@ func (h *httpStream) run() {
 	} else {
 		// guess: HTTP request
 		for {
-			fmt.Println("loop02")
+			//fmt.Println("loop02")
 			req, err := http.ReadRequest(buf)
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
 				// We must read until we see an EOF... very important!
@@ -182,7 +183,7 @@ func (h *httpStream) run() {
 				addRequest(h.net, h.transport, req)
 				body, err := ioutil.ReadAll(req.Body)
 				if err != nil {
-					log.Fatal(err)
+					log.Fatal("x2", err)
 				}
 				req.Body.Close()
 				//bodyBytes := len(body)
@@ -255,6 +256,7 @@ func main() {
 		assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packetTimestamp)
 		assembler.FlushOlderThan(packetTimestamp.Add(time.Minute * -2))
 	}
+	assembler.FlushAll()
 	log.Print("wait", wg)
 	wg.Wait()
 	log.Print("done")
