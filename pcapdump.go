@@ -203,24 +203,31 @@ func main() {
 	// Read in packets, pass to assembler.
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	packets := packetSource.Packets()
+	ticker := time.Tick(time.Minute)
+	PacketLoop:
 	for {
-		packet := <-packets
-		// A nil packet indicates the end of a pcap file.
-		if packet == nil {
-			//return
-			break
+		select {
+		case packet := <-packets:
+			// A nil packet indicates the end of a pcap file.
+			if packet == nil {
+				//return
+				break PacketLoop
+			}
+			if *logAllPackets {
+				log.Println(packet)
+			}
+			if packet.NetworkLayer() == nil || packet.TransportLayer() == nil || packet.TransportLayer().LayerType() != layers.LayerTypeTCP {
+				log.Println("Unusable packet")
+				continue
+			}
+			tcp := packet.TransportLayer().(*layers.TCP)
+			packetTimestamp := packet.Metadata().Timestamp
+			assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packetTimestamp)
+			assembler.FlushOlderThan(packetTimestamp.Add(time.Minute * -2))
+
+		case <-ticker:
+			assembler.FlushOlderThan(time.Now().Add(time.Minute * -2))
 		}
-		if *logAllPackets {
-			log.Println(packet)
-		}
-		if packet.NetworkLayer() == nil || packet.TransportLayer() == nil || packet.TransportLayer().LayerType() != layers.LayerTypeTCP {
-			log.Println("Unusable packet")
-			continue
-		}
-		tcp := packet.TransportLayer().(*layers.TCP)
-		packetTimestamp := packet.Metadata().Timestamp
-		assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packetTimestamp)
-		assembler.FlushOlderThan(packetTimestamp.Add(time.Minute * -2))
 	}
 	// close all connections
 	assembler.FlushAll()
