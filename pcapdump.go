@@ -123,16 +123,7 @@ func (h *httpStream) run() {
 				//log.Println("Error reading stream", h.net, h.transport, ":", err)
 				break
 			} else {
-				body, err := ioutil.ReadAll(resp.Body)
-				resp.Body.Close()
-				if err != nil {
-					log.Println("x1", err)
-					continue
-				}
-				if req == nil {
-					continue
-				}
-				printHTTP("Resp", req, body)
+				printHTTP("Resp", req, resp.Body)
 			}
 		}
 	} else {   // guess: HTTP request
@@ -147,12 +138,7 @@ func (h *httpStream) run() {
 				break
 			} else {
 				addRequest(h.net, h.transport, req)
-				body, err := ioutil.ReadAll(req.Body)
-				if err != nil {
-					log.Fatal("x2", err)
-				}
-				req.Body.Close()
-				printHTTP("Req", req, body)
+				printHTTP("Req", req, req.Body)
 			}
 		}
 	}
@@ -161,7 +147,18 @@ func (h *httpStream) run() {
 	return
 }
 
-func printHTTP(t string, req *http.Request, body []byte) {
+func printHTTP(t string, req *http.Request, bodyReader io.ReadCloser) {
+	body, err := ioutil.ReadAll(bodyReader)
+	bodyReader.Close()
+	if err != nil {
+		log.Println("x2", err)
+		return
+	}
+
+	if req == nil {
+		return
+	}
+
 	Host := req.Host
 	URL := req.URL
 	var udid string
