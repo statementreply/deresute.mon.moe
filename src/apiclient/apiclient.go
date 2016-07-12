@@ -108,7 +108,9 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 	client.udid = udid
 	client.msg_iv = []byte(strings.Replace(client.udid, "-", "", -1))
 	client.res_ver = res_ver
-	client.sid = ""
+	//client.sid = ""
+	// initial sid
+	client.sid = client.viewer_id_str + client.udid
 	client.VIEWER_ID_KEY = VIEWER_ID_KEY
 	client.SID_KEY = SID_KEY
 	return client
@@ -142,14 +144,11 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	// Request body finished
 
 	// Prepare request header
-	var sid string
-	if client.sid != "" {
-		sid = client.sid
-	} else {
-		sid = client.viewer_id_str + client.udid
+	if client.sid == "" {
+		client.sid = client.viewer_id_str + client.udid
 	}
 	param_tmp := sha1.Sum([]byte(client.udid + client.viewer_id_str + path + client.plain))
-	sid_tmp := md5.Sum([]byte(sid + string(client.SID_KEY)))
+	sid_tmp := md5.Sum([]byte(client.sid + string(client.SID_KEY)))
 	device_id_tmp := md5.Sum([]byte("Totally a real Android"))
 	headers := map[string]string{
 		"PARAM":           hex.EncodeToString(param_tmp[:]),
