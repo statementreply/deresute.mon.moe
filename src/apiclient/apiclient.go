@@ -6,7 +6,7 @@ import (
 	"crypto/md5"
 	//crand "crypto/rand"
 	"crypto/sha1"
-	"encoding/base64"
+	//"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
@@ -138,18 +138,7 @@ func NewApiClientFromConfig(configFile string) *ApiClient {
 func (client *ApiClient) Call(path string, args map[string]interface{}) map[string]interface{} {
 	// Prepare request body
 	var body string
-	{
-		vid_iv := gen_vid_iv()
-		//log.Fatal(vid_iv, " ", len(vid_iv))
-		args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
-		mp := MsgpackEncode(args)
-		client.plain = base64.StdEncoding.EncodeToString(mp)
-
-		key := gen_key()
-
-		body_tmp := Encrypt_cbc([]byte(client.plain), client.msg_iv, key)
-		body = base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
-	}
+	body = client.EncodeBody3(args)
 	// Request body finished
 
 	// Prepare request header

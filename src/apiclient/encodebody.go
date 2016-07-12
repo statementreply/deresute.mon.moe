@@ -96,7 +96,7 @@ func gen_key() []byte {
 	return key
 }
 
-func (client ApiClient) EncodeBody3(args map[string]interface{}) string {
+func (client *ApiClient) EncodeBody3(args map[string]interface{}) string {
 	var body string
 	vid_iv := gen_vid_iv()
 	//log.Fatal(vid_iv, " ", len(vid_iv))
