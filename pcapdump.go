@@ -204,7 +204,7 @@ func main() {
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	packets := packetSource.Packets()
 	ticker := time.Tick(time.Minute)
-	PacketLoop:
+PacketLoop:
 	for {
 		select {
 		case packet := <-packets:
