@@ -6,28 +6,9 @@ import (
 	"math/big"
 	"fmt"
 	"encoding/base64"
-	"strings"
+	//"strings"
 )
 
-
-// doesn't work
-func (client *ApiClient) EncodeBody(args map[string]interface{}) string {
-	// Prepare request body
-	vid_iv := gen_vid_iv()
-
-	args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
-
-	mp := MsgpackEncode(args)
-	client.plain = base64.StdEncoding.EncodeToString(mp)
-
-	key := gen_key()
-
-	msg_iv := []byte(strings.Replace(client.udid, "-", "", -1))
-	body_tmp := Encrypt_cbc([]byte(client.plain), msg_iv, key)
-	body := base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
-	// Request body finished
-	return body
-}
 
 func (client *ApiClient) EncodeBody2(args map[string]interface{}) string {
 	var body string
@@ -83,7 +64,8 @@ func gen_key() []byte {
 	return key
 }
 
-func (client *ApiClient) EncodeBody3(args map[string]interface{}) string {
+func (client *ApiClient) EncodeBody(args map[string]interface{}) string {
+	// Prepare request body
 	var body string
 	vid_iv := gen_vid_iv()
 	//log.Fatal(vid_iv, " ", len(vid_iv))
@@ -95,5 +77,6 @@ func (client *ApiClient) EncodeBody3(args map[string]interface{}) string {
 
 	body_tmp := Encrypt_cbc([]byte(client.plain), client.msg_iv, key)
 	body = base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
+	// Request body finished
 	return body
 }

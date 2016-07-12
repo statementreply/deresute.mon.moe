@@ -13,9 +13,9 @@ prep:
 	    ln -s ../deresuteme/data; \
 	fi
 
-dumpbody: src/apiclient/apiclient.go
-datafetcher: src/apiclient/apiclient.go
-test1: src/apiclient/apiclient.go
+dumpbody: src/apiclient/*
+datafetcher: src/apiclient/*
+test1: src/apiclient/*
 
 %: %.go
 	source ./go_env.sh; \
