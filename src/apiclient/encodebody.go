@@ -10,7 +10,8 @@ import (
 )
 
 
-func (client ApiClient) EncodeBody(args map[string]interface{}) string {
+// doesn't work
+func (client *ApiClient) EncodeBody(args map[string]interface{}) string {
 	// Prepare request body
 	// vid_iv is \d{32}
 	vid_iv_byte := make([]byte, 16)
