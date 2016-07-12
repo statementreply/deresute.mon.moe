@@ -70,3 +70,18 @@ func (client ApiClient) EncodeBody2(args map[string]interface{}) string {
 	body = base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
 	return body
 }
+
+func get_vid_iv() string {
+	var vid_iv string
+	// vid_iv is \d{32}
+	vid_iv_byte := make([]byte, 16)
+	n, err := crand.Read(vid_iv_byte)
+	if (n != 16) || (err != nil) {
+		log.Fatal("rand err", n, err)
+	}
+	var vid_iv_big big.Int
+	vid_iv_big.SetBytes(vid_iv_byte)
+	vid_iv_string := fmt.Sprintf("%032d", &vid_iv_big)
+	vid_iv = vid_iv_string[len(vid_iv_string)-32:]
+	return vid_iv
+}
