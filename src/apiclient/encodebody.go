@@ -1,7 +1,7 @@
 package apiclient
 
 import (
-	crand "crypto/rand"
+	"crypto/rand"
 	"encoding/base64"
 	"fmt"
 	"log"
@@ -13,7 +13,7 @@ func gen_vid_iv() string {
 	var vid_iv string
 	// vid_iv is \d{32}
 	vid_iv_byte := make([]byte, 16)
-	n, err := crand.Read(vid_iv_byte)
+	n, err := rand.Read(vid_iv_byte)
 	if (n != 16) || (err != nil) {
 		log.Fatal("rand err", n, err)
 	}
@@ -27,7 +27,7 @@ func gen_vid_iv() string {
 func gen_key() []byte {
 	var key []byte
 	key_tmp := make([]byte, 64)
-	_, _ = crand.Read(key_tmp)
+	_, _ = rand.Read(key_tmp)
 	key = []byte(base64.StdEncoding.EncodeToString(key_tmp))
 	// trim to 32 bytes
 	key = key[:32]
