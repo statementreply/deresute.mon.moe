@@ -117,14 +117,11 @@ func (h *httpStream) run() {
 			resp, err := http.ReadResponse(buf, req)
 			// FIXME: why io.ErrUnexpectedEOF
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
-				h.r.Close()
-				return
+				break
 			} else if err != nil {
 				//log.Printf("%#v\n", err)
 				//log.Println("Error reading stream", h.net, h.transport, ":", err)
-				tcpreader.DiscardBytesToEOF(buf)
-				h.r.Close()
-				return
+				break
 			} else {
 				body, err := ioutil.ReadAll(resp.Body)
 				resp.Body.Close()
@@ -138,19 +135,19 @@ func (h *httpStream) run() {
 				printHTTP("Resp", req, body)
 			}
 		}
+		tcpreader.DiscardBytesToEOF(buf)
+		h.r.Close()
+		return
 	} else {   // guess: HTTP request
 		for {
 			req, err := http.ReadRequest(buf)
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
 				// We must read until we see an EOF... very important!
-				h.r.Close()
-				return
+				break
 			} else if err != nil {
 				//log.Printf("%#v\n", err)
 				//log.Println("Error reading stream", h.net, h.transport, ":", err)
-				tcpreader.DiscardBytesToEOF(buf)
-				h.r.Close()
-				return
+				break
 			} else {
 				addRequest(h.net, h.transport, req)
 				body, err := ioutil.ReadAll(req.Body)
@@ -161,6 +158,9 @@ func (h *httpStream) run() {
 				printHTTP("Req", req, body)
 			}
 		}
+		tcpreader.DiscardBytesToEOF(buf)
+		h.r.Close()
+		return
 	}
 }
 
