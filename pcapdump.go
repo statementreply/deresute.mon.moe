@@ -111,7 +111,7 @@ func (h *httpStream) run() {
 				//log.Printf("Error reading stream %s %s : %#v\n", h.net, h.transport, err)
 				break
 			} else {
-				processHTTP("Resp", req, resp.Body)
+				processHTTP("Resp", req, resp.Body, h)
 			}
 		}
 	} else { // guess: HTTP request
@@ -122,7 +122,7 @@ func (h *httpStream) run() {
 				break
 			} else {
 				addRequest(h.net, h.transport, req)
-				processHTTP("Req", req, req.Body)
+				processHTTP("Req", req, req.Body, h)
 			}
 		}
 	}
@@ -132,7 +132,7 @@ func (h *httpStream) run() {
 	return
 }
 
-func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser) {
+func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpStream) {
 	body, err := ioutil.ReadAll(bodyReader)
 	bodyReader.Close()
 	if err != nil {
@@ -164,11 +164,11 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser) {
 	}
 
 	outputLock.Lock()
-	fmt.Println("==================================")
-	fmt.Println(t+" URL:", Host, URL)
-	fmt.Println("bodylen: ", len(body))
+	fmt.Println("=======================================================")
+	fmt.Println(t+" URL:", Host, URL, h.net, h.transport)
+	//fmt.Println("bodylen: ", len(body))
 	//fmt.Println("msg_iv ", msg_iv)
-	fmt.Println("dumplen: ", len(yy))
+	//fmt.Println("yamllen:", len(yy))
 	fmt.Println(string(yy))
 	outputLock.Unlock()
 }
