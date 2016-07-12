@@ -96,7 +96,6 @@ func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream
 
 func (h *httpStream) run() {
 	defer wg.Done()
-	//defer fmt.Println("WGDONE", h.net, h.transport)
 	buf := bufio.NewReader(&h.r)
 
 	header, err := buf.Peek(4)
@@ -106,7 +105,6 @@ func (h *httpStream) run() {
 		h.r.Close()
 		return
 	}
-	//log.Printf("first four bytes is %#v\n", header)
 
 	if string(header) == "HTTP" {  // guess: HTTP response
 		for {
@@ -115,8 +113,7 @@ func (h *httpStream) run() {
 			// FIXME: why io.ErrUnexpectedEOF
 			// FIXME: ignore io.EOF io.ErrUnexpectedEOF and other errors
 			if err != nil {
-				//log.Printf("%#v\n", err)
-				//log.Println("Error reading stream", h.net, h.transport, ":", err)
+				//log.Printf("Error reading stream %s %s : %#v\n", h.net, h.transport, err)
 				break
 			} else {
 				printHTTP("Resp", req, resp.Body)
@@ -126,8 +123,7 @@ func (h *httpStream) run() {
 		for {
 			req, err := http.ReadRequest(buf)
 			if err != nil {
-				//log.Printf("%#v\n", err)
-				//log.Println("Error reading stream", h.net, h.transport, ":", err)
+				//log.Printf("Error reading stream %s %s : %#v\n", h.net, h.transport, err)
 				break
 			} else {
 				addRequest(h.net, h.transport, req)
