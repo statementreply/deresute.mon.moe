@@ -62,7 +62,7 @@ func matchRequest(net, transport gopacket.Flow) *http.Request {
 	if !ok {
 		return nil
 	}
-	log.Println("matched req ", rnet, rtransport, req)
+	//log.Println("matched req ", rnet, rtransport, req)
 	delete(pendingRequest[rnet], rtransport)
 	return req
 }
