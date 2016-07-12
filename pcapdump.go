@@ -79,13 +79,13 @@ type httpStream struct {
 }
 
 func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream {
-	log.Println("New stream", net, transport)
+	//log.Println("New stream", net, transport)
 	hstream := &httpStream{
 		net:       net,
 		transport: transport,
 		r:         tcpreader.NewReaderStream(),
 	}
-	fmt.Println("WGADD", net, transport)
+	//fmt.Println("WGADD", net, transport)
 	wg.Add(1)
 	go hstream.run() // Important... we must guarantee that data from the reader stream is read.
 
@@ -95,7 +95,7 @@ func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream
 
 func (h *httpStream) run() {
 	defer wg.Done()
-	defer fmt.Println("WGDONE", h.net, h.transport)
+	//defer fmt.Println("WGDONE", h.net, h.transport)
 	/*
 		all, err := ioutil.ReadAll(&(h.r))
 		h.r.Close()
@@ -132,8 +132,8 @@ func (h *httpStream) run() {
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
 				return
 			} else if err != nil {
-				log.Printf("%#v\n", err)
-				log.Println("Error reading stream", h.net, h.transport, ":", err)
+				//log.Printf("%#v\n", err)
+				//log.Println("Error reading stream", h.net, h.transport, ":", err)
 				tcpreader.DiscardBytesToEOF(buf)
 				h.r.Close()
 				return
@@ -155,6 +155,7 @@ func (h *httpStream) run() {
 					// no UDID found
 					//log.Println("no UDID found")
 				} else {
+					fmt.Println("==================================")
 					fmt.Println("Resp URL: ", resp.Request.Host, " ", resp.Request.URL)
 					udid := list_udid[0]
 					msg_iv := apiclient.Unlolfuscate(udid)
@@ -174,8 +175,8 @@ func (h *httpStream) run() {
 				// We must read until we see an EOF... very important!
 				return
 			} else if err != nil {
-				log.Printf("%#v\n", err)
-				log.Println("Error reading stream", h.net, h.transport, ":", err)
+				//log.Printf("%#v\n", err)
+				//log.Println("Error reading stream", h.net, h.transport, ":", err)
 				tcpreader.DiscardBytesToEOF(buf)
 				h.r.Close()
 				return
@@ -257,7 +258,7 @@ func main() {
 		assembler.FlushOlderThan(packetTimestamp.Add(time.Minute * -2))
 	}
 	assembler.FlushAll()
-	log.Print("wait", wg)
+	//log.Print("wait", wg)
 	wg.Wait()
-	log.Print("done")
+	//log.Print("done")
 }
