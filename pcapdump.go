@@ -85,6 +85,7 @@ func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream
 		transport: transport,
 		r:         tcpreader.NewReaderStream(),
 	}
+	fmt.Println("WGADD", net, transport)
 	wg.Add(1)
 	go hstream.run() // Important... we must guarantee that data from the reader stream is read.
 
@@ -94,6 +95,7 @@ func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream
 
 func (h *httpStream) run() {
 	defer wg.Done()
+	defer fmt.Println("WGDONE", h.net, h.transport)
 	/*
 		all, err := ioutil.ReadAll(&(h.r))
 		h.r.Close()
@@ -118,6 +120,7 @@ func (h *httpStream) run() {
 	if string(header) == "HTTP" {
 		// guess: HTTP response
 		for {
+			fmt.Println("loop01")
 			// FIXME: match response to request
 			req := matchRequest(h.net, h.transport)
 			if req == nil {
@@ -129,7 +132,11 @@ func (h *httpStream) run() {
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
 				return
 			} else if err != nil {
+				log.Printf("%#v\n", err)
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
+				tcpreader.DiscardBytesToEOF(buf)
+				h.r.Close()
+				return
 			} else {
 				body, err := ioutil.ReadAll(resp.Body)
 				if err != nil {
@@ -160,12 +167,17 @@ func (h *httpStream) run() {
 	} else {
 		// guess: HTTP request
 		for {
+			fmt.Println("loop02")
 			req, err := http.ReadRequest(buf)
-			if err == io.EOF {
+			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
 				// We must read until we see an EOF... very important!
 				return
 			} else if err != nil {
+				log.Printf("%#v\n", err)
 				log.Println("Error reading stream", h.net, h.transport, ":", err)
+				tcpreader.DiscardBytesToEOF(buf)
+				h.r.Close()
+				return
 			} else {
 				addRequest(h.net, h.transport, req)
 				body, err := ioutil.ReadAll(req.Body)
@@ -243,7 +255,7 @@ func main() {
 		assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packetTimestamp)
 		assembler.FlushOlderThan(packetTimestamp.Add(time.Minute * -2))
 	}
-	log.Print("wait")
+	log.Print("wait", wg)
 	wg.Wait()
 	log.Print("done")
 }
