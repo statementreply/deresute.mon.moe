@@ -1,4 +1,6 @@
 all: rankserver dumpbody datafetcher pcapdump
+clean:
+	rm -fv	rankserver dumpbody datafetcher pcapdump
 
 web: prep rankserver
 	./rankserver
