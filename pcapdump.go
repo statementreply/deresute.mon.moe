@@ -36,6 +36,8 @@ import (
 )
 
 var fname = flag.String("r", "", "Filename to read from, overrides -i")
+var iface = flag.String("i", "", "Interface to get packets from")
+var snaplen = flag.Int("s", 1600, "SnapLen for pcap packet capture")
 var filter = flag.String("f", "tcp", "BPF filter for pcap")
 var logAllPackets = flag.Bool("v", false, "Logs every packet in great detail")
 var wg sync.WaitGroup
@@ -183,8 +185,11 @@ func main() {
 	if *fname != "" {
 		log.Printf("Reading from pcap dump %q", *fname)
 		handle, err = pcap.OpenOffline(*fname)
+	} else if *iface != "" {
+		log.Printf("Starting capture on interface %q", *iface)
+		handle, err = pcap.OpenLive(*iface, int32(*snaplen), true, pcap.BlockForever)
 	} else {
-		log.Fatalf("use ./http_packet -r $filename")
+		log.Fatalf("use ./http_packet -r $filename or ./xxx -i eth0")
 	}
 	if err != nil {
 		log.Fatal(err)
