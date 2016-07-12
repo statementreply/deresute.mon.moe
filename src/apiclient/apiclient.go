@@ -155,7 +155,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 
 
 	mp := MsgpackEncode(args)
-	plain := base64.StdEncoding.EncodeToString(mp)
+	client.plain = base64.StdEncoding.EncodeToString(mp)
 
 	key_tmp := make([]byte, 64)
 	_, _ = crand.Read(key_tmp)
@@ -163,7 +163,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	// trim to 32 bytes
 	key = key[:32]
 
-	body_tmp := Encrypt_cbc([]byte(plain), client.msg_iv, key)
+	body_tmp := Encrypt_cbc([]byte(client.plain), client.msg_iv, key)
 	body := base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
 	// Request body finished
 
@@ -174,7 +174,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	} else {
 		sid = client.viewer_id_str + client.udid
 	}
-	param_tmp := sha1.Sum([]byte(client.udid + client.viewer_id_str + path + plain))
+	param_tmp := sha1.Sum([]byte(client.udid + client.viewer_id_str + path + client.plain))
 	sid_tmp := md5.Sum([]byte(sid + string(client.SID_KEY)))
 	device_id_tmp := md5.Sum([]byte("Totally a real Android"))
 	headers := map[string]string{
