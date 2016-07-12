@@ -101,30 +101,28 @@ func (h *httpStream) run() {
 	header, err := buf.Peek(4)
 	if err != nil {
 		log.Printf("cannot peek 4 bytes <%s> %s", string(header), err)
-	} else {
-		if string(header) == "HTTP" { // guess: HTTP response
-			for {
-				req := matchRequest(h.net, h.transport)
-				resp, err := http.ReadResponse(buf, req)
-				// FIXME: why io.ErrUnexpectedEOF
-				// FIXME: ignore io.EOF io.ErrUnexpectedEOF and other errors
-				if err != nil {
-					//log.Printf("Error reading stream %s %s : %#v\n", h.net, h.transport, err)
-					break
-				} else {
-					printHTTP("Resp", req, resp.Body)
-				}
+	} else if string(header) == "HTTP" { // guess: HTTP response
+		for {
+			req := matchRequest(h.net, h.transport)
+			resp, err := http.ReadResponse(buf, req)
+			// FIXME: why io.ErrUnexpectedEOF
+			// FIXME: ignore io.EOF io.ErrUnexpectedEOF and other errors
+			if err != nil {
+				//log.Printf("Error reading stream %s %s : %#v\n", h.net, h.transport, err)
+				break
+			} else {
+				printHTTP("Resp", req, resp.Body)
 			}
-		} else { // guess: HTTP request
-			for {
-				req, err := http.ReadRequest(buf)
-				if err != nil {
-					//log.Printf("Error reading stream %s %s : %#v\n", h.net, h.transport, err)
-					break
-				} else {
-					addRequest(h.net, h.transport, req)
-					printHTTP("Req", req, req.Body)
-				}
+		}
+	} else { // guess: HTTP request
+		for {
+			req, err := http.ReadRequest(buf)
+			if err != nil {
+				//log.Printf("Error reading stream %s %s : %#v\n", h.net, h.transport, err)
+				break
+			} else {
+				addRequest(h.net, h.transport, req)
+				printHTTP("Req", req, req.Body)
 			}
 		}
 	}
