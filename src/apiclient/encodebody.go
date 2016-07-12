@@ -20,11 +20,7 @@ func (client *ApiClient) EncodeBody(args map[string]interface{}) string {
 	mp := MsgpackEncode(args)
 	plain := base64.StdEncoding.EncodeToString(mp)
 
-	key_tmp := make([]byte, 64)
-	_, _ = crand.Read(key_tmp)
-	key := []byte(base64.StdEncoding.EncodeToString(key_tmp))
-	// trim to 32 bytes
-	key = key[:32]
+	key := gen_key()
 
 	msg_iv := []byte(strings.Replace(client.udid, "-", "", -1))
 	body_tmp := Encrypt_cbc([]byte(plain), msg_iv, key)
