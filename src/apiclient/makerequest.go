@@ -1,12 +1,12 @@
 package apiclient
 
 import (
-	"net/http"
-	"crypto/sha1"
 	"crypto/md5"
-	"fmt"
+	"crypto/sha1"
 	"encoding/hex"
+	"fmt"
 	"io/ioutil"
+	"net/http"
 	"strings"
 )
 
@@ -32,10 +32,10 @@ func (client *ApiClient) MakeRequest(path, body string) *http.Request {
 		"SID":             hex.EncodeToString(sid_tmp[:]),
 		"GRAPHICS_DEVICE_NAME": "3dfx Voodoo2 (TM)",
 		"DEVICE_ID":            hex.EncodeToString(device_id_tmp[:]),
-		"PLATFORM_OS_VERSION":  "Android OS 13.3.7 / API-42 (XYZZ1Y/74726f6c6c)",            "DEVICE":               "2",
-		"Content-Type":         "application/x-www-form-urlencoded", // lies
-		"User-Agent":           "Dalvik/2.1.0 (Linux; U; Android 13.3.7; Nexus 42 Build/XYZZ1Y)",              "Accept-Encoding":      "identity",
-		"Connection":           "close",
+		"PLATFORM_OS_VERSION":  "Android OS 13.3.7 / API-42 (XYZZ1Y/74726f6c6c)", "DEVICE": "2",
+		"Content-Type": "application/x-www-form-urlencoded", // lies
+		"User-Agent":   "Dalvik/2.1.0 (Linux; U; Android 13.3.7; Nexus 42 Build/XYZZ1Y)", "Accept-Encoding": "identity",
+		"Connection": "close",
 	}
 	// Request header ready
 
