@@ -210,18 +210,10 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 
 	// Processing response
 	resp_body, _ := ioutil.ReadAll(resp.Body)
-	reply := make([]byte, base64.StdEncoding.DecodedLen(len(resp_body)))
-	n, _ = base64.StdEncoding.Decode(reply, resp_body)
 
-	// trim NULs
-	reply = reply[:n]
+	//var content map[string]interface{}
+	content := DecodeBody(resp_body, string(msg_iv))
 
-	plain2 := Decrypt_cbc(reply[:len(reply)-32], msg_iv, reply[len(reply)-32:])
-	//fmt.Println("plain2", hex.Dump(plain2))
-	mp2 := make([]byte, base64.StdEncoding.DecodedLen(len(plain2)))
-	base64.StdEncoding.Decode(mp2, plain2)
-	var content map[string]interface{}
-	MsgpackDecode(mp2, &content)
 	data_headers, ok := content["data_headers"]
 	if ok {
 		new_sid, ok := (data_headers.(map[interface{}]interface{}))["sid"]

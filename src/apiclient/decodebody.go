@@ -8,8 +8,9 @@ import (
 	"log"
 )
 
-func DecodeBody(body []byte, msg_iv string) interface{} {
-	var content interface{}
+// Processing response (or request)
+func DecodeBody(body []byte, msg_iv string) map[string]interface{} {
+	var content map[string]interface{}
 	// remove extra tabs
 	body = []byte(strings.Replace(string(body), "\t", "", -1))
 	body = []byte(strings.Replace(string(body), " ", "", -1))
