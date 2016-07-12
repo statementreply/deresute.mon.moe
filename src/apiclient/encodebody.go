@@ -85,3 +85,13 @@ func gen_vid_iv() string {
 	vid_iv = vid_iv_string[len(vid_iv_string)-32:]
 	return vid_iv
 }
+
+func gen_key() []byte {
+	var key []byte
+	key_tmp := make([]byte, 64)
+	_, _ = crand.Read(key_tmp)
+	key = []byte(base64.StdEncoding.EncodeToString(key_tmp))
+	// trim to 32 bytes
+	key = key[:32]
+	return key
+}

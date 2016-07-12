@@ -4,7 +4,7 @@ import (
 	// golang core libs
 	"crypto/cipher"
 	"crypto/md5"
-	crand "crypto/rand"
+	//crand "crypto/rand"
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/hex"
@@ -147,11 +147,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 		mp := MsgpackEncode(args)
 		client.plain = base64.StdEncoding.EncodeToString(mp)
 
-		key_tmp := make([]byte, 64)
-		_, _ = crand.Read(key_tmp)
-		key := []byte(base64.StdEncoding.EncodeToString(key_tmp))
-		// trim to 32 bytes
-		key = key[:32]
+		key := gen_key()
 
 		body_tmp := Encrypt_cbc([]byte(client.plain), client.msg_iv, key)
 		body = base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
