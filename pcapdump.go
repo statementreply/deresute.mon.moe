@@ -158,7 +158,7 @@ func printHTTP(t string, req *http.Request, bodyReader io.ReadCloser) {
 
 	outputLock.Lock()
 	fmt.Println("==================================")
-	fmt.Println(t+" URL: ", Host, " ", URL)
+	fmt.Println(t+" URL:", Host, URL)
 	fmt.Println("bodylen: ", len(body))
 	msg_iv := apiclient.Unlolfuscate(udid)
 	//fmt.Println("msg_iv ", msg_iv)
