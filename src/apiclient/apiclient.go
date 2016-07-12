@@ -40,6 +40,7 @@ type ApiClient struct {
 	res_ver       string
 	VIEWER_ID_KEY []byte
 	SID_KEY       []byte
+	msg_iv        []byte
 }
 
 func Lolfuscate(s string) string {
@@ -103,6 +104,7 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 	client.viewer_id = viewer_id
 	client.viewer_id_str = fmt.Sprintf("%d", viewer_id)
 	client.udid = udid
+	client.msg_iv = []byte(strings.Replace(client.udid, "-", "", -1))
 	client.res_ver = res_ver
 	client.sid = ""
 	client.VIEWER_ID_KEY = VIEWER_ID_KEY
@@ -156,8 +158,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	// trim to 32 bytes
 	key = key[:32]
 
-	msg_iv := []byte(strings.Replace(client.udid, "-", "", -1))
-	body_tmp := Encrypt_cbc([]byte(plain), msg_iv, key)
+	body_tmp := Encrypt_cbc([]byte(plain), client.msg_iv, key)
 	body := base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
 	// Request body finished
 
@@ -212,7 +213,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	resp_body, _ := ioutil.ReadAll(resp.Body)
 
 	//var content map[string]interface{}
-	content := DecodeBody(resp_body, string(msg_iv))
+	content := DecodeBody(resp_body, string(client.msg_iv))
 
 	data_headers, ok := content["data_headers"]
 	if ok {
