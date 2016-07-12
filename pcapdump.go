@@ -97,31 +97,19 @@ func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream
 func (h *httpStream) run() {
 	defer wg.Done()
 	//defer fmt.Println("WGDONE", h.net, h.transport)
-	/*
-		all, err := ioutil.ReadAll(&(h.r))
-		h.r.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-		//log.Println(h.net, " ", h.transport, "\n", hex.Dump(all))
-		log.Println("Read ", h.net, " ", h.transport, " ", len(all))
-		unbuf := bytes.NewReader(all)
-		buf := bufio.NewReader(unbuf)
-	*/
-
 	buf := bufio.NewReader(&h.r)
 
 	header, err := buf.Peek(4)
 	if err != nil {
 		log.Printf("cannot peek 4 bytes <%s> %s", string(header), err)
 		tcpreader.DiscardBytesToEOF(buf)
+		h.r.Close()
 		return
 	}
 	//log.Printf("first four bytes is %#v\n", header)
-	if string(header) == "HTTP" {
-		// guess: HTTP response
+
+	if string(header) == "HTTP" {  // guess: HTTP response
 		for {
-			// FIXME: match response to request
 			req := matchRequest(h.net, h.transport)
 			if req == nil {
 				//log.Println("cannot match response to request", h.net, h.transport)
@@ -129,6 +117,7 @@ func (h *httpStream) run() {
 			resp, err := http.ReadResponse(buf, req)
 			// FIXME: why io.ErrUnexpectedEOF
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
+				h.r.Close()
 				return
 			} else if err != nil {
 				//log.Printf("%#v\n", err)
@@ -149,12 +138,12 @@ func (h *httpStream) run() {
 				printHTTP("Resp", req, body)
 			}
 		}
-	} else {
-		// guess: HTTP request
+	} else {   // guess: HTTP request
 		for {
 			req, err := http.ReadRequest(buf)
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
 				// We must read until we see an EOF... very important!
+				h.r.Close()
 				return
 			} else if err != nil {
 				//log.Printf("%#v\n", err)
