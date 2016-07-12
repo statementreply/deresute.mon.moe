@@ -153,18 +153,21 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 		args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
 	}
 
+	var body string
 
-	mp := MsgpackEncode(args)
-	client.plain = base64.StdEncoding.EncodeToString(mp)
+	{
+		mp := MsgpackEncode(args)
+		client.plain = base64.StdEncoding.EncodeToString(mp)
 
-	key_tmp := make([]byte, 64)
-	_, _ = crand.Read(key_tmp)
-	key := []byte(base64.StdEncoding.EncodeToString(key_tmp))
-	// trim to 32 bytes
-	key = key[:32]
+		key_tmp := make([]byte, 64)
+		_, _ = crand.Read(key_tmp)
+		key := []byte(base64.StdEncoding.EncodeToString(key_tmp))
+		// trim to 32 bytes
+		key = key[:32]
 
-	body_tmp := Encrypt_cbc([]byte(client.plain), client.msg_iv, key)
-	body := base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
+		body_tmp := Encrypt_cbc([]byte(client.plain), client.msg_iv, key)
+		body := base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
+	}
 	// Request body finished
 
 	// Prepare request header
