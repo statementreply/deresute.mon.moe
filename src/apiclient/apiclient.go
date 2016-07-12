@@ -42,7 +42,7 @@ type ApiClient struct {
 	SID_KEY       []byte
 	msg_iv        []byte
 	// holds plaintext temporarily
-	plain         string
+	plain string
 }
 
 func Lolfuscate(s string) string {

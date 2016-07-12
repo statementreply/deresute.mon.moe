@@ -4,8 +4,8 @@ import (
 	"encoding/base64"
 	//"gopkg.in/vmihailenco/msgpack.v2"
 	//"gopkg.in/yaml.v2"
-	"strings"
 	"log"
+	"strings"
 )
 
 // Processing response (or request)

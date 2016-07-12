@@ -2,14 +2,12 @@ package apiclient
 
 import (
 	crand "crypto/rand"
+	"encoding/base64"
+	"fmt"
 	"log"
 	"math/big"
-	"fmt"
-	"encoding/base64"
 	//"strings"
 )
-
-
 
 func gen_vid_iv() string {
 	var vid_iv string
