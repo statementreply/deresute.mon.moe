@@ -135,9 +135,6 @@ func (h *httpStream) run() {
 				printHTTP("Resp", req, body)
 			}
 		}
-		tcpreader.DiscardBytesToEOF(buf)
-		h.r.Close()
-		return
 	} else {   // guess: HTTP request
 		for {
 			req, err := http.ReadRequest(buf)
@@ -158,10 +155,10 @@ func (h *httpStream) run() {
 				printHTTP("Req", req, body)
 			}
 		}
-		tcpreader.DiscardBytesToEOF(buf)
-		h.r.Close()
-		return
 	}
+	tcpreader.DiscardBytesToEOF(buf)
+	h.r.Close()
+	return
 }
 
 func printHTTP(t string, req *http.Request, body []byte) {
