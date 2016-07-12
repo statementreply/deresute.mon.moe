@@ -111,7 +111,7 @@ func (h *httpStream) run() {
 				//log.Printf("Error reading stream %s %s : %#v\n", h.net, h.transport, err)
 				break
 			} else {
-				printHTTP("Resp", req, resp.Body)
+				processHTTP("Resp", req, resp.Body)
 			}
 		}
 	} else { // guess: HTTP request
@@ -122,7 +122,7 @@ func (h *httpStream) run() {
 				break
 			} else {
 				addRequest(h.net, h.transport, req)
-				printHTTP("Req", req, req.Body)
+				processHTTP("Req", req, req.Body)
 			}
 		}
 	}
@@ -132,7 +132,7 @@ func (h *httpStream) run() {
 	return
 }
 
-func printHTTP(t string, req *http.Request, bodyReader io.ReadCloser) {
+func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser) {
 	body, err := ioutil.ReadAll(bodyReader)
 	bodyReader.Close()
 	if err != nil {
