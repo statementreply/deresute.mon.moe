@@ -221,6 +221,7 @@ func main() {
 		assembler.AssembleWithTimestamp(packet.NetworkLayer().NetworkFlow(), tcp, packetTimestamp)
 		assembler.FlushOlderThan(packetTimestamp.Add(time.Minute * -2))
 	}
+	// close all connections
 	assembler.FlushAll()
 	//log.Print("wait", wg)
 	wg.Wait()
