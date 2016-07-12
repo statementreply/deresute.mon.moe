@@ -122,14 +122,12 @@ func (h *httpStream) run() {
 	if string(header) == "HTTP" {
 		// guess: HTTP response
 		for {
-			//fmt.Println("loop01")
 			// FIXME: match response to request
 			req := matchRequest(h.net, h.transport)
 			if req == nil {
 				//log.Println("cannot match response to request", h.net, h.transport)
 			}
 			resp, err := http.ReadResponse(buf, req)
-			//fmt.Println(resp)
 			// FIXME: why io.ErrUnexpectedEOF
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
 				return
@@ -151,10 +149,8 @@ func (h *httpStream) run() {
 					continue
 				}
 				list_udid, ok := resp.Request.Header["Udid"]
-				if !ok {
-					// no UDID found
-					//log.Println("no UDID found")
-				} else {
+				// cannot decrypt without UDID
+				if ok {
 					printHTTP("Resp", resp.Request.Host, resp.Request.URL, body, list_udid[0])
 				}
 			}
@@ -162,7 +158,6 @@ func (h *httpStream) run() {
 	} else {
 		// guess: HTTP request
 		for {
-			//fmt.Println("loop02")
 			req, err := http.ReadRequest(buf)
 			if (err == io.EOF) || (err == io.ErrUnexpectedEOF) {
 				// We must read until we see an EOF... very important!
@@ -182,9 +177,7 @@ func (h *httpStream) run() {
 				req.Body.Close()
 
 				list_udid, ok := req.Header["Udid"]
-				if !ok {
-					// no UDID found
-				} else {
+				if ok {
 					printHTTP("Req", req.Host, req.URL, body, list_udid[0])
 				}
 			}
