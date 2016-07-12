@@ -155,21 +155,7 @@ func (h *httpStream) run() {
 					// no UDID found
 					//log.Println("no UDID found")
 				} else {
-					outputLock.Lock()
-					fmt.Println("==================================")
-					fmt.Println("Resp URL: ", resp.Request.Host, " ", resp.Request.URL)
-					fmt.Println("bodylen: ", len(body))
-					udid := list_udid[0]
-					msg_iv := apiclient.Unlolfuscate(udid)
-					//fmt.Println("msg_iv ", msg_iv)
-					content := apiclient.DecodeBody(body, msg_iv)
-					yy, err := yaml.Marshal(content)
-					if err != nil {
-						log.Fatal(err)
-					}
-					fmt.Println("dumplen: ", len(yy))
-					fmt.Println(string(yy))
-					outputLock.Unlock()
+					printHTTP("Resp", resp.Request.Host, resp.Request.URL, body, list_udid[0])
 				}
 			}
 		}
