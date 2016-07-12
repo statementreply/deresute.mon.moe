@@ -71,7 +71,7 @@ func (client ApiClient) EncodeBody2(args map[string]interface{}) string {
 	return body
 }
 
-func get_vid_iv() string {
+func gen_vid_iv() string {
 	var vid_iv string
 	// vid_iv is \d{32}
 	vid_iv_byte := make([]byte, 16)

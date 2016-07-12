@@ -139,7 +139,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	// Prepare request body
 	var body string
 	{
-		vid_iv := get_vid_iv()
+		vid_iv := gen_vid_iv()
 		//log.Fatal(vid_iv, " ", len(vid_iv))
 		args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
 	}
