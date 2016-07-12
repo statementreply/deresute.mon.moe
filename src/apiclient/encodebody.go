@@ -18,12 +18,12 @@ func (client *ApiClient) EncodeBody(args map[string]interface{}) string {
 	args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
 
 	mp := MsgpackEncode(args)
-	plain := base64.StdEncoding.EncodeToString(mp)
+	client.plain = base64.StdEncoding.EncodeToString(mp)
 
 	key := gen_key()
 
 	msg_iv := []byte(strings.Replace(client.udid, "-", "", -1))
-	body_tmp := Encrypt_cbc([]byte(plain), msg_iv, key)
+	body_tmp := Encrypt_cbc([]byte(client.plain), msg_iv, key)
 	body := base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
 	// Request body finished
 	return body
