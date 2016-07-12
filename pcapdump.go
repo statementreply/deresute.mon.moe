@@ -174,7 +174,9 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 	//fmt.Println("bodylen: ", len(body))
 	//fmt.Println("msg_iv ", msg_iv)
 	//fmt.Println("yamllen:", len(yy))
-	fmt.Println(string(yy))
+	//fmt.Println(string(yy))
+	_ = yy
+	fmt.Println(content)
 	outputLock.Unlock()
 }
 
