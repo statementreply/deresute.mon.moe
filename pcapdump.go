@@ -22,7 +22,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"sync"
 	"time"
@@ -115,7 +114,7 @@ func (h *httpStream) run() {
 	header, err := buf.Peek(4)
 	if err != nil {
 		log.Printf("cannot peek 4 bytes <%s> %s", string(header), err)
-		ioutil.ReadAll(buf)
+		tcpreader.DiscardBytesToEOF(buf)
 		return
 	}
 	//log.Printf("first four bytes is %#v\n", header)
@@ -144,15 +143,10 @@ func (h *httpStream) run() {
 					log.Println("x1", err)
 					continue
 				}
-
 				if req == nil {
 					continue
 				}
-				list_udid, ok := resp.Request.Header["Udid"]
-				// cannot decrypt without UDID
-				if ok {
-					printHTTP("Resp", resp.Request.Host, resp.Request.URL, body, list_udid[0])
-				}
+				printHTTP("Resp", req, body)
 			}
 		}
 	} else {
@@ -175,17 +169,25 @@ func (h *httpStream) run() {
 					log.Fatal("x2", err)
 				}
 				req.Body.Close()
-
-				list_udid, ok := req.Header["Udid"]
-				if ok {
-					printHTTP("Req", req.Host, req.URL, body, list_udid[0])
-				}
+				printHTTP("Req", req, body)
 			}
 		}
 	}
 }
 
-func printHTTP(t string, Host string, URL *url.URL, body []byte, udid string) {
+func printHTTP(t string, req *http.Request, body []byte) {
+	Host := req.Host
+	URL := req.URL
+	var udid string
+	list_udid, ok := req.Header["Udid"]
+	if ok {
+		udid = list_udid[0]
+	} else {
+		// cannot decrypt without UDID
+		// print nothing
+		return
+	}
+
 	outputLock.Lock()
 	fmt.Println("==================================")
 	fmt.Println(t+" URL: ", Host, " ", URL)
