@@ -111,9 +111,6 @@ func (h *httpStream) run() {
 	if string(header) == "HTTP" {  // guess: HTTP response
 		for {
 			req := matchRequest(h.net, h.transport)
-			if req == nil {
-				//log.Println("cannot match response to request", h.net, h.transport)
-			}
 			resp, err := http.ReadResponse(buf, req)
 			// FIXME: why io.ErrUnexpectedEOF
 			// FIXME: ignore io.EOF io.ErrUnexpectedEOF and other errors
