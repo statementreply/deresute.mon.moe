@@ -10,13 +10,12 @@ import (
 
 func DecodeBody(body []byte, msg_iv string) interface{} {
 	var content interface{}
-	resp_body := body
 	// remove extra tabs
-	resp_body = []byte(strings.Replace(string(resp_body), "\t", "", -1))
-	resp_body = []byte(strings.Replace(string(resp_body), " ", "", -1))
+	body = []byte(strings.Replace(string(body), "\t", "", -1))
+	body = []byte(strings.Replace(string(body), " ", "", -1))
 
-	reply := make([]byte, base64.StdEncoding.DecodedLen(len(resp_body)))
-	n, _ := base64.StdEncoding.Decode(reply, resp_body)
+	reply := make([]byte, base64.StdEncoding.DecodedLen(len(body)))
+	n, _ := base64.StdEncoding.Decode(reply, body)
 	// trim to n
 	reply = reply[:n]
 
