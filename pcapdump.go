@@ -44,6 +44,7 @@ var snaplen = flag.Int("s", 1600, "SnapLen for pcap packet capture")
 var filter = flag.String("f", "tcp", "BPF filter for pcap")
 var logAllPackets = flag.Bool("v", false, "Logs every packet in great detail")
 var wg sync.WaitGroup
+
 // FIXME use lock to prevent concurrent rw
 var pendingRequest map[gopacket.Flow]map[gopacket.Flow]*http.Request = make(map[gopacket.Flow]map[gopacket.Flow]*http.Request)
 var pendingRequestLock sync.RWMutex
