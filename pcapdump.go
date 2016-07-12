@@ -22,6 +22,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"sync"
 	"time"
@@ -40,6 +41,7 @@ var filter = flag.String("f", "tcp", "BPF filter for pcap")
 var logAllPackets = flag.Bool("v", false, "Logs every packet in great detail")
 var wg sync.WaitGroup
 var pendingRequest map[gopacket.Flow]map[gopacket.Flow]*http.Request = make(map[gopacket.Flow]map[gopacket.Flow]*http.Request)
+var outputLock sync.Mutex
 
 func addRequest(net, transport gopacket.Flow, req *http.Request) {
 	//log.Println("ADD", net, transport)
@@ -144,8 +146,6 @@ func (h *httpStream) run() {
 					log.Println("x1", err)
 					continue
 				}
-				//bodyBytes := len(body)
-				//log.Println("Received response from stream", h.net, h.transport, ":", "with", bodyBytes, "bytes in response body")
 
 				if req == nil {
 					continue
@@ -155,14 +155,21 @@ func (h *httpStream) run() {
 					// no UDID found
 					//log.Println("no UDID found")
 				} else {
+					outputLock.Lock()
 					fmt.Println("==================================")
 					fmt.Println("Resp URL: ", resp.Request.Host, " ", resp.Request.URL)
+					fmt.Println("bodylen: ", len(body))
 					udid := list_udid[0]
 					msg_iv := apiclient.Unlolfuscate(udid)
 					//fmt.Println("msg_iv ", msg_iv)
 					content := apiclient.DecodeBody(body, msg_iv)
-					yy, _ := yaml.Marshal(content)
+					yy, err := yaml.Marshal(content)
+					if err != nil {
+						log.Fatal(err)
+					}
+					fmt.Println("dumplen: ", len(yy))
 					fmt.Println(string(yy))
+					outputLock.Unlock()
 				}
 			}
 		}
@@ -187,25 +194,33 @@ func (h *httpStream) run() {
 					log.Fatal("x2", err)
 				}
 				req.Body.Close()
-				//bodyBytes := len(body)
-				//log.Println("Received request from stream", h.net, h.transport, ":","with", bodyBytes, "bytes in request body")
 
 				list_udid, ok := req.Header["Udid"]
 				if !ok {
 					// no UDID found
 				} else {
-					fmt.Println("Req URL: ", req.Host, " ", req.URL)
-					udid := list_udid[0]
-					msg_iv := apiclient.Unlolfuscate(udid)
-					//fmt.Println("msg_iv ", msg_iv)
-					content := apiclient.DecodeBody(body, msg_iv)
-					yy, _ := yaml.Marshal(content)
-					fmt.Println(string(yy))
-
+					printHTTP("Req", req.Host, req.URL, body, list_udid[0])
 				}
 			}
 		}
 	}
+}
+
+func printHTTP(t string, Host string, URL *url.URL, body []byte, udid string) {
+	outputLock.Lock()
+	fmt.Println("==================================")
+	fmt.Println(t + " URL: ", Host, " ", URL)
+	fmt.Println("bodylen: ", len(body))
+	msg_iv := apiclient.Unlolfuscate(udid)
+	//fmt.Println("msg_iv ", msg_iv)
+	content := apiclient.DecodeBody(body, msg_iv)
+	yy, err := yaml.Marshal(content)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("dumplen: ", len(yy))
+	fmt.Println(string(yy))
+	outputLock.Unlock()
 }
 
 func main() {
