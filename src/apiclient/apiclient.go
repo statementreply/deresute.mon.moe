@@ -137,6 +137,7 @@ func NewApiClientFromConfig(configFile string) *ApiClient {
 
 func (client *ApiClient) Call(path string, args map[string]interface{}) map[string]interface{} {
 	// Prepare request body
+	var body string
 	{
 		var vid_iv string
 		// vid_iv is \d{32}
@@ -152,9 +153,6 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 		//log.Fatal(vid_iv, " ", len(vid_iv))
 		args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
 	}
-
-	var body string
-
 	{
 		mp := MsgpackEncode(args)
 		client.plain = base64.StdEncoding.EncodeToString(mp)
