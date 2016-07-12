@@ -166,7 +166,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 		key = key[:32]
 
 		body_tmp := Encrypt_cbc([]byte(client.plain), client.msg_iv, key)
-		body := base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
+		body = base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
 	}
 	// Request body finished
 
