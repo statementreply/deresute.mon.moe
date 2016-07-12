@@ -156,17 +156,18 @@ func printHTTP(t string, req *http.Request, bodyReader io.ReadCloser) {
 		return
 	}
 
-	outputLock.Lock()
-	fmt.Println("==================================")
-	fmt.Println(t+" URL:", Host, URL)
-	fmt.Println("bodylen: ", len(body))
 	msg_iv := apiclient.Unlolfuscate(udid)
-	//fmt.Println("msg_iv ", msg_iv)
 	content := apiclient.DecodeBody(body, msg_iv)
 	yy, err := yaml.Marshal(content)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	outputLock.Lock()
+	fmt.Println("==================================")
+	fmt.Println(t+" URL:", Host, URL)
+	fmt.Println("bodylen: ", len(body))
+	//fmt.Println("msg_iv ", msg_iv)
 	fmt.Println("dumplen: ", len(yy))
 	fmt.Println(string(yy))
 	outputLock.Unlock()
