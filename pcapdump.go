@@ -239,7 +239,8 @@ PacketLoop:
 				break PacketLoop
 			}
 			if *logAllPackets {
-				log.Println(packet)
+				//log.Println("logall", packet.Dump())
+				log.Println("logall", packet)
 			}
 			if packet.NetworkLayer() == nil || packet.TransportLayer() == nil || packet.TransportLayer().LayerType() != layers.LayerTypeTCP {
 				log.Println("Unusable packet")
