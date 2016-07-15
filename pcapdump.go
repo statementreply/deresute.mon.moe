@@ -34,7 +34,7 @@ import (
 	"github.com/google/gopacket/pcap"
 	"github.com/google/gopacket/tcpassembly"
 	"github.com/google/gopacket/tcpassembly/tcpreader"
-	"gopkg.in/yaml.v2"
+	//"gopkg.in/yaml.v2"
 	"util"
 )
 
@@ -168,20 +168,22 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 	URL := req.URL
 	var udid string
 	list_udid, ok := req.Header["Udid"]
+	var content map[string]interface{}
 	if ok {
 		udid = list_udid[0]
+		msg_iv := apiclient.Unlolfuscate(udid)
+		content = apiclient.DecodeBody(body, msg_iv)
+		//yy, err := yaml.Marshal(content)
+		//_ = yy
+		if err != nil {
+			log.Fatal("yaml error", err)
+		}
 	} else {
 		// cannot decrypt without UDID
-		// print nothing
-		return
+		// normal http packet
+		// print request
 	}
 
-	msg_iv := apiclient.Unlolfuscate(udid)
-	content := apiclient.DecodeBody(body, msg_iv)
-	yy, err := yaml.Marshal(content)
-	if err != nil {
-		log.Fatal("yaml error", err)
-	}
 
 	outputLock.Lock()
 	fmt.Println("=======================================================")
@@ -190,8 +192,9 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 	//fmt.Println("msg_iv ", msg_iv)
 	//fmt.Println("yamllen:", len(yy))
 	//fmt.Println(string(yy))
-	_ = yy
-	fmt.Println(content)
+	if content != nil {
+		fmt.Println(content)
+	}
 	outputLock.Unlock()
 }
 

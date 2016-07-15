@@ -36,6 +36,11 @@ func main() {
 	//p1 := client.GetPage(1, 9)
 	//DumpToFile(p1, "r1.009.20")
 
+	// m@gic 162
+	d2 := client.GetLiveDetailRanking(162, 1)
+	yy, _ = yaml.Marshal(d2)
+	fmt.Println(string(yy))
+
 }
 
 func DumpToFile(v interface{}, fileName string) {

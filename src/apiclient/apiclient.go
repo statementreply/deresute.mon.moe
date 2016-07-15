@@ -138,3 +138,11 @@ func (client *ApiClient) GetPage(rankingType int, page int) map[string]interface
 	r1 := client.Call("/event/medley/ranking_list", map[string]interface{}{"ranking_type": rankingType, "page": page})
 	return r1
 }
+
+func (client *ApiClient) GetLiveDetailRanking(live_detail_id, page int) map[string]interface{} {
+	return client.Call("/live/get_live_detail_ranking",
+		map[string]interface{}{"live_detail_id": live_detail_id, "page": page})
+}
+
+//Req URL: game.starlight-stage.jp /live/get_live_detail_ranking 192.168.0.3->203.104.249.195 55234->80
+//map[live_detail_id:162 page:1 viewer_id:28577727288451868527518831476546X6+XO8CAOsHM8aDp7/pvhM8RrXdP2ztPtyLaaUqegrU=]

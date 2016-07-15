@@ -19,7 +19,7 @@ func DecodeBody(body []byte, msg_iv string) map[string]interface{} {
 	reply := make([]byte, base64.StdEncoding.DecodedLen(len(body)))
 	n, err := base64.StdEncoding.Decode(reply, body)
 	if err != nil {
-		log.Fatal("base64 Decode", body, err)
+		log.Fatal("base64 Decode", hex.Dump(body), err)
 	}
 	// trim to n
 	reply = reply[:n]
