@@ -2,19 +2,12 @@ package apiclient
 
 import (
 	// golang core libs
-	//"crypto/cipher"
 	"crypto/md5"
-	//crand "crypto/rand"
-	//"crypto/sha1"
-	//"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"log"
-	//"math/big"
-	//"math/rand"
 	"net/http"
-	//"strconv"
 	"strings"
 	"time"
 	// external libs
