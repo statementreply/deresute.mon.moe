@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -41,7 +42,10 @@ func (client *ApiClient) MakeRequest(path, body string) *http.Request {
 
 	// Prepare Request struct
 	// req.body is ReadCloser
-	req, _ = http.NewRequest("POST", BASE+path, ioutil.NopCloser(strings.NewReader(body)))
+	req, err := http.NewRequest("POST", BASE+path, ioutil.NopCloser(strings.NewReader(body)))
+	if err != nil {
+		log.Fatal("http.NewRequset", err)
+	}
 	for k := range headers {
 		req.Header.Set(k, headers[k])
 		// not needed

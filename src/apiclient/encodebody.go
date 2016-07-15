@@ -27,7 +27,10 @@ func gen_vid_iv() string {
 func gen_key() []byte {
 	var key []byte
 	key_tmp := make([]byte, 64)
-	_, _ = rand.Read(key_tmp)
+	n, err := rand.Read(key_tmp)
+	if (err != nil) || (n != 64) {
+		log.Fatal("crypto/rand.Read", err)
+	}
 	key = []byte(base64.StdEncoding.EncodeToString(key_tmp))
 	// trim to 32 bytes
 	key = key[:32]
