@@ -88,7 +88,10 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	resp, _ := hclient.Do(req)
 
 	// Processing response
-	resp_body, _ := ioutil.ReadAll(resp.Body)
+	resp_body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal("Read resp.Body", err)
+	}
 
 	//var content map[string]interface{}
 	content := DecodeBody(resp_body, string(client.msg_iv))
