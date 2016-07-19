@@ -22,6 +22,8 @@ var RANK_CACHE_DIR string = BASE + "/data/rank/"
 // 15min update interval
 // *4 for hour
 var INTERVAL int = 15 * 60 * 4
+// nanoseconds
+var INTERVAL0 time.Duration = 15 * 60 * 1000 * 1000 * 1000
 var LOG_FILE = "rankserver.log"
 var CONFIG_FILE = "rankserver.yaml"
 
@@ -701,9 +703,20 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	for _, rank := range list_rank {
 		border := r.fetchData(timestamp, rankingType, rank)
 		name_rank := map_rank[rank]
-		fmt.Fprintf(w, "%s: %d\n", name_rank, border)
-		if border == -1 {
+		t := r.timestampToTime(timestamp)
+		t_prev := t.Add(-INTERVAL0)
+		timestamp_prev := r.timeToTimestamp(t_prev)
+		border_prev := r.fetchData(timestamp_prev, rankingType, rank)
+		delta := -1
+		if border < 0 {
 			fmt.Fprintf(w, "UPDATING\n")
+			break
+		}
+		if border_prev >= 0 {
+			delta = border - border_prev
+			fmt.Fprintf(w, "%s: %d (+%d)\n", name_rank, border, delta)
+		} else {
+			fmt.Fprintf(w, "%s: %d\n", name_rank, border)
 		}
 	}
 	fmt.Fprint(w, "\n")
