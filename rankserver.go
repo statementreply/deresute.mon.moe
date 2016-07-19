@@ -664,10 +664,10 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "デレステボーダーbotβ ", r.formatTimestamp_short(timestamp), "\n")
 	list_rank := []int{2001, 10001, 20001, 60001, 120001}
 	map_rank := map[int]string{
-		2001: "2千位",
-		10001: "1万位",
-		20001: "2万位",
-		60001: "6万位",
+		2001:   "2千位",
+		10001:  "1万位",
+		20001:  "2万位",
+		60001:  "6万位",
 		120001: "12万位",
 	}
 	rankingType := 0
@@ -675,15 +675,14 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 		border := r.fetchData(timestamp, rankingType, rank)
 		name_rank := map_rank[rank]
 		fmt.Fprintf(w, "%s: %d\n", name_rank, border)
-		if (border == -1) {
+		if border == -1 {
 			fmt.Fprintf(w, "UPDATING\n")
 		}
 	}
 	fmt.Fprint(w, "\n")
-	fmt.Fprint(w, "https://" + r.hostname + "\n")
+	fmt.Fprint(w, "https://"+r.hostname+"\n")
 	fmt.Fprint(w, "#デレステ\n")
 }
-
 
 func (r *RankServer) redirectHandler(w http.ResponseWriter, req *http.Request) {
 	//fmt.Println("url is ", req.URL)

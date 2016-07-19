@@ -184,7 +184,6 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 		// print request
 	}
 
-
 	outputLock.Lock()
 	fmt.Println("=======================================================")
 	fmt.Println(t+" URL:", Host, URL, h.net, h.transport)
