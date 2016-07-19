@@ -9,6 +9,7 @@ use utf8;
 my $config = LoadFile("secret.yaml");
 #print "$config\n";
 my $nt = Net::Twitter->new(
+    "ssl"      => 1,
     "traits"   => ["API::RESTv1_1",],
     "consumer_key"        => $$config{"twitter_consumer_key"},
     "consumer_secret"     => $$config{"twitter_consumer_secret"},
