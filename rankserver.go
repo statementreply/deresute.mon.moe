@@ -290,11 +290,16 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 	if err != nil {
 		// file doesn't exist?
 		// -1 for missing data
+		r.logger.Println(err, "return -1")
 		return -1
 	}
 
 	var local_rank_list []map[string]interface{}
-	yaml.Unmarshal(content, &local_rank_list)
+	err = yaml.Unmarshal(content, &local_rank_list)
+	if err != nil {
+		r.logger.Println("YAML error, return -1", err)
+		return -1
+	}
 
 	var score int
 	score = 0
@@ -302,6 +307,9 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 		score = local_rank_list[0]["score"].(int)
 		// duplicate
 		//rank := local_rank_list[0]["rank"].(int)
+	}
+	if score == 0 {
+		r.logger.Println(timestamp, fileName, "return 0")
 	}
 	r.mux.Lock()
 	r.data[timestamp][rankingType][rank] = score
