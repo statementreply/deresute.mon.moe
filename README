@@ -1,0 +1,9 @@
+TODO
+- event datetime filter
+
+
+Data flow           when to run
+- python main2.py   periodic
+- rankserver.go     alltime    prevent mem leak?
+- twitter.pl        trigger by periodic_twitter.pl
+- periodic_twitter.pl alltime
