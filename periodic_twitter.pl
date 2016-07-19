@@ -3,7 +3,7 @@ use common::sense;
 
 my $cached_status = "";
 
-while (sleep 120) {
+while (1) {
     my $new_status = qx(curl https://deresuteborder.mon.moe/twitter);
     if ($new_status =~ /^\s*$/ or $new_status =~ /UPDATING/) {
         next;
@@ -12,4 +12,5 @@ while (sleep 120) {
         system qw(perl twitter.pl), $new_status;
         $cached_status = $new_status;
     }
+    sleep 120;
 }
