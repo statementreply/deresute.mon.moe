@@ -244,7 +244,7 @@ func (r *RankServer) RankingType(fileName string) int {
 func (r *RankServer) timestampToTime(timestamp string) time.Time {
 	itime, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {
-		log.Println("timestamp format incorrect?", err)
+		r.logger.Println("timestamp format incorrect?", err)
 		itime = 0
 	}
 	t := time.Unix(itime, 0).In(r.tz)
