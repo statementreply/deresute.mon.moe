@@ -650,7 +650,11 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	list_rank := []int{2001, 10001, 20001, 60001, 120001}
 	rankingType := 0
 	for _, rank := range list_rank {
-		fmt.Fprintf(w, "%d: %d\n", rank, r.fetchData(timestamp, rankingType, rank))
+		border := r.fetchData(timestamp, rankingType, rank)
+		fmt.Fprintf(w, "%d: %d\n", rank, border)
+		if (border == -1) {
+			fmt.Fprintf(w, "UPDATING\n")
+		}
 	}
 	fmt.Fprint(w, "\n")
 	fmt.Fprint(w, "https://" + r.hostname + "\n")
