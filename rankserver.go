@@ -246,8 +246,8 @@ func (r *RankServer) formatTimestamp_short(timestamp string) string {
 	return st
 }
 
-func (r *Rankserver) inCurrentEvent(timestamp string) bool {
-	if (timestamp >= r.current_event[0]) && (timestamp <= r.current_evet[1]) {
+func (r *RankServer) inCurrentEvent(timestamp string) bool {
+	if (timestamp >= r.current_event[0]) && (timestamp <= r.current_event[1]) {
 		return true
 	} else {
 		return false
