@@ -44,6 +44,7 @@ type RankServer struct {
 	hostname    string
 	// FIXME
 	current_event []string // start/stop timestamp
+	tz            *time.Location
 }
 
 func MakeRankServer() *RankServer {
@@ -55,6 +56,12 @@ func MakeRankServer() *RankServer {
 	r.tlsServer = nil
 	// FIXME
 	r.current_event = []string{"1468908120", "1469707320"}
+
+	tz, err := time.LoadLocation("Asia/Tokyo")
+	r.tz = tz
+	if err != nil {
+		log.Fatalln(err, "load timezone")
+	}
 
 	content, err := ioutil.ReadFile(CONFIG_FILE)
 	if err != nil {
@@ -230,18 +237,30 @@ func (r *RankServer) RankingType(fileName string) int {
 	}
 }
 
+func (r *RankServer) timestampToTime(timestamp string) time.Time {
+	itime, err := strconv.ParseInt(timestamp, 10, 64)
+	if err != nil {
+		log.Println("timestamp format incorrect?", err)
+		itime = 0
+	}
+	t := time.Unix(itime, 0).In(r.tz)
+	return t
+}
+
+func (r *RankServer) timeToTimestamp(t time.Time) string {
+	itime := t.Unix()
+	timestamp := fmt.Sprintf("%d", itime)
+	return timestamp
+}
+
 func (r *RankServer) formatTimestamp(timestamp string) string {
-	itime, _ := strconv.Atoi(timestamp)
-	jst, _ := time.LoadLocation("Asia/Tokyo")
-	t := time.Unix(int64(itime), 0).In(jst)
+	t := r.timestampToTime(timestamp)
 	st := t.Format(time.RFC3339)
 	return st
 }
 
 func (r *RankServer) formatTimestamp_short(timestamp string) string {
-	itime, _ := strconv.Atoi(timestamp)
-	jst, _ := time.LoadLocation("Asia/Tokyo")
-	t := time.Unix(int64(itime), 0).In(jst)
+	t := r.timestampToTime(timestamp)
 	st := t.Format("01/02 15:04")
 	return st
 }
