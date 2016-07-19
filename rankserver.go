@@ -42,6 +42,8 @@ type RankServer struct {
 	plainServer *http.Server
 	tlsServer   *http.Server
 	hostname    string
+	// FIXME
+	current_event []string // start/stop timestamp
 }
 
 func MakeRankServer() *RankServer {
@@ -51,6 +53,8 @@ func MakeRankServer() *RankServer {
 	//r.list_timestamp doesn't need initialization
 	r.plainServer = nil
 	r.tlsServer = nil
+	// FIXME
+	r.current_event = []string{"1468908120", "1469707320"}
 
 	content, err := ioutil.ReadFile(CONFIG_FILE)
 	if err != nil {
@@ -242,6 +246,14 @@ func (r *RankServer) formatTimestamp_short(timestamp string) string {
 	return st
 }
 
+func (r *Rankserver) inCurrentEvent(timestamp string) bool {
+	if (timestamp >= r.current_event[0]) && (timestamp <= r.current_evet[1]) {
+		return true
+	} else {
+		return false
+	}
+}
+
 func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int {
 	fileName := r.getFilename(timestamp, rankingType, rank)
 	return r.fetchData_internal(timestamp, rankingType, rank, fileName)
@@ -402,6 +414,9 @@ func (r *RankServer) rankData_list_f(rankingType int, list_rank []int, dataSourc
 	raw += `],"rows":[`
 
 	for _, timestamp := range r.list_timestamp {
+		if !r.inCurrentEvent(timestamp) {
+			continue
+		}
 		// time in milliseconds
 		raw += fmt.Sprintf(`{"c":[{"v":new Date(%s000)},`, timestamp)
 		for _, rank := range list_rank {
