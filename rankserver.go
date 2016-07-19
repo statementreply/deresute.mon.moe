@@ -111,6 +111,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/log", r.logHandler)
 	http.HandleFunc("/chart", r.chartHandler)
 	http.HandleFunc("/qchart", r.qchartHandler)
+	http.HandleFunc("/twitter", r.twitterHandler)
 }
 
 func (r *RankServer) updateTimestamp() {
@@ -230,6 +231,14 @@ func (r *RankServer) formatTimestamp(timestamp string) string {
 	jst, _ := time.LoadLocation("Asia/Tokyo")
 	t := time.Unix(int64(itime), 0).In(jst)
 	st := t.Format(time.RFC3339)
+	return st
+}
+
+func (r *RankServer) formatTimestamp_short(timestamp string) string {
+	itime, _ := strconv.Atoi(timestamp)
+	jst, _ := time.LoadLocation("Asia/Tokyo")
+	t := time.Unix(int64(itime), 0).In(jst)
+	st := t.Format("01/02 15:04")
 	return st
 }
 
@@ -632,6 +641,21 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
     </table>
     `)
 }
+
+func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
+	r.checkData("")
+	timestamp := r.latestTimestamp()
+	r.init_req(w, req)
+	fmt.Fprint(w, "デレステボーダーbotβ ", r.formatTimestamp_short(timestamp), "\n")
+	list_rank := []int{2001, 10001, 20001, 60001, 120001}
+	rankingType := 0
+	for _, rank := range list_rank {
+		fmt.Fprintf(w, "%d: %d\n", rank, r.fetchData(timestamp, rankingType, rank))
+	}
+	fmt.Fprint(w, "\n")
+	fmt.Fprint(w, "https://" + r.hostname + "\n")
+}
+
 
 func (r *RankServer) redirectHandler(w http.ResponseWriter, req *http.Request) {
 	//fmt.Println("url is ", req.URL)
