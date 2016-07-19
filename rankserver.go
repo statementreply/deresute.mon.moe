@@ -649,11 +649,11 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "デレステボーダーbotβ ", r.formatTimestamp_short(timestamp), "\n")
 	list_rank := []int{2001, 10001, 20001, 60001, 120001}
 	map_rank := map[int]string{
-		2001: "二千位",
-		10001: "一万位",
-		20001: "二万位",
-		60001: "六万位",
-		120001: "十二万位",
+		2001: "2千位",
+		10001: "1万位",
+		20001: "2万位",
+		60001: "6万位",
+		120001: "12万位",
 	}
 	rankingType := 0
 	for _, rank := range list_rank {
