@@ -17,7 +17,7 @@ my $nt = Net::Twitter->new(
     "access_token_secret" => $$config{"twitter_access_token_secret"},
 );
 
-my $status = "test11";
+my $status = "（テスト）";
 
 if (@ARGV) {
     $status = decode("UTF-8", pop(@ARGV));
@@ -25,7 +25,7 @@ if (@ARGV) {
 
 eval {
     my $result = $nt->update({ status => $status });
-    print "here", $result,"\n";
+    #print "here", $result,"\n";
 };
 
 if ($@) {

@@ -8,3 +8,8 @@ Data flow           when to run
 - rankserver.go     alltime    prevent mem leak?
 - twitter.pl        trigger by periodic_twitter.pl
 - periodic_twitter.pl alltime
+
+
+Other bots:
+https://twitter.com/llborder_update
+https://twitter.com/deresute_border
