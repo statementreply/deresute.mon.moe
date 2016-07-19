@@ -21,7 +21,9 @@ var RANK_CACHE_DIR string = BASE + "/data/rank/"
 
 // 15min update interval
 // *4 for hour
-var INTERVAL int = 15 * 60 * 4
+//var INTERVAL int = 15 * 60 * 4
+var INTERVAL time.Duration = 4 * INTERVAL0
+
 // nanoseconds
 var INTERVAL0 time.Duration = 15 * 60 * 1000 * 1000 * 1000
 var LOG_FILE = "rankserver.log"
@@ -360,13 +362,18 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
 			return val
 		}
 	}
-	timestamp_i, _ := strconv.Atoi(timestamp)
-	prev_timestamp := fmt.Sprintf("%d", timestamp_i-INTERVAL)
+	//timestamp_i, _ := strconv.Atoi(timestamp)
+	//prev_timestamp2 := fmt.Sprintf("%d", timestamp_i-INTERVAL)
+	t_i := r.timestampToTime(timestamp)
+	t_prev := t_i.Add( -INTERVAL )
+	prev_timestamp := r.timeToTimestamp(t_prev)
+
 	cur_score := r.fetchData(timestamp, rankingType, rank)
 	prev_score := r.fetchData(prev_timestamp, rankingType, rank)
 	if (cur_score >= 0) && (prev_score >= 0) {
 		// both score are valid
-		speed := (float32(cur_score - prev_score)) / float32(INTERVAL) * 3600.0
+		// nanoseconds
+		speed := (float32(cur_score - prev_score)) / float32(INTERVAL) * 3600.0 * 1000 * 1000 * 1000
 		r.mux_speed.Lock()
 		r.speed[timestamp][rankingType][rank] = speed
 		r.mux_speed.Unlock()
