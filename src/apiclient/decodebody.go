@@ -7,6 +7,7 @@ import (
 	//"gopkg.in/yaml.v2"
 	"log"
 	"strings"
+	"runtime/debug"
 )
 
 // Processing response (or request)
@@ -38,7 +39,9 @@ func DecodeBody(body []byte, msg_iv string) map[string]interface{} {
 	mp := make([]byte, base64.StdEncoding.DecodedLen(len(plain2)))
 	n, err = base64.StdEncoding.Decode(mp, plain2)
 	if err != nil {
-		log.Fatal("base64 Decode", hex.Dump(plain2), err)
+		log.Println(hex.Dump(plain2))
+		debug.PrintStack()
+		log.Println("base64 Decode", err)
 	}
 	mp = mp[:n]
 	MsgpackDecode(mp, &content)
