@@ -134,8 +134,13 @@ func (client *ApiClient) GetProfile(friend_id int) map[string]interface{} {
 	return client.Call("/profile/get_profile", map[string]interface{}{"friend_id": friend_id})
 }
 
-func (client *ApiClient) GetPage(rankingType int, page int) map[string]interface{} {
+func (client *ApiClient) GetMedleyRanking(rankingType int, page int) map[string]interface{} {
 	r1 := client.Call("/event/medley/ranking_list", map[string]interface{}{"ranking_type": rankingType, "page": page})
+	return r1
+}
+
+func (client *ApiClient) GetAtaponRanking(rankingType int, page int) map[string]interface{} {
+	r1 := client.Call("/event/atapon/ranking_list", map[string]interface{}{"ranking_type": rankingType, "page": page})
 	return r1
 }
 
