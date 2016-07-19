@@ -12,7 +12,7 @@ func RoundTimestamp(in time.Time) time.Time {
 }
 
 func GetLocalTimestamp() string {
-	return TimeToTimestamp(time.Now())
+	return TimeToTimestamp(RoundTimestamp(time.Now()))
 }
 
 func TimeToTimestamp(t time.Time) string {
