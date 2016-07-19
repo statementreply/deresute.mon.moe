@@ -6,8 +6,8 @@ import (
 	//"gopkg.in/vmihailenco/msgpack.v2"
 	//"gopkg.in/yaml.v2"
 	"log"
-	"strings"
 	"runtime/debug"
+	"strings"
 )
 
 // Processing response (or request)
