@@ -1,5 +1,6 @@
 TODO
-- event datetime filter
+- event datetime filter based on sqlite3
+- translate python/perl to go?
 
 
 Data flow           when to run
