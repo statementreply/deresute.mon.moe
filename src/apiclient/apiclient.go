@@ -110,6 +110,17 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	return content
 }
 
+func (client *ApiClient) GetResultCode(content map[string]interface{}) int64 {
+	var result_code int64
+	data_headers, ok := content["data_headers"]
+	if ok {
+		result_code = data_headers.(map[interface{}]interface{})["result_code"].(int64)
+	} else {
+		// FIXME
+	}
+	return result_code
+}
+
 func (client *ApiClient) LoadCheck() {
 	sum_tmp := md5.Sum([]byte("All your APIs are belong to us"))
 	args := map[string]interface{}{"campaign_data": "",

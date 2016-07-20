@@ -208,6 +208,10 @@ func (r *RankServer) checkData(timestamp string) {
 	for _, pt := range key {
 		rankingType := r.RankingType(pt.Name())
 		rank := r.FilenameToRank(pt.Name())
+		if rank == 0 {
+			// lock file
+			continue
+		}
 		r.fetchData(timestamp, rankingType, rank)
 	}
 }
@@ -225,6 +229,9 @@ func (r *RankServer) FilenameToRank(fileName string) int {
 	//log.Print("fileName", fileName)
 	filter, _ := regexp.Compile("r\\d{2}\\.(\\d+)$")
 	submatch := filter.FindStringSubmatch(fileName)
+	if len(submatch) == 0 {
+		return 0
+	}
 	n, _ := strconv.Atoi(submatch[1])
 	//log.Print("fileName", fileName, "n", n, "submatch", submatch)
 	return (n-1)*10 + 1

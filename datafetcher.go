@@ -19,12 +19,8 @@ var RANK_CACHE_DIR string = BASE + "/data/rankbeta/"
 func main() {
 	rand.Seed(time.Now().Unix())
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
-	//fmt.Println(client)
 	client.LoadCheck()
 
-	//p1 := client.GetAtaponRanking(1, 9)
-	//DumpToFile(p1, "r1.009.20")
-	//DumpToStdout(p1)
 	fmt.Println(apiclient.GetLocalTimestamp())
 	fmt.Println(apiclient.RoundTimestamp(time.Now()).String())
 
@@ -33,26 +29,26 @@ func main() {
 		[2]int{1,501},  // pt ranking emblem-1
 		[2]int{1,2001}, // tier 1
 		[2]int{1,5001}, // emblem-2
-		[2]int{1,10001},
-		[2]int{1,20001},
-		[2]int{1,50001},
-		[2]int{1,60001},
-		[2]int{1,100001},
-		[2]int{1,120001},
-		[2]int{1,300001},
-		[2]int{1,500001},
-		[2]int{1,1000001},
-		[2]int{2,1},
-		[2]int{2,5001},
-		[2]int{2,10001},
-		[2]int{2,40001},
-		[2]int{2,50001},
+		[2]int{1,10001},// tier 2
+		[2]int{1,20001},// tier 3
+		[2]int{1,50001},// tier 4-old
+		[2]int{1,60001},// tier 4
+		[2]int{1,100001},// tier 5-old
+		[2]int{1,120001},// tier 5
+		[2]int{1,300001},// tier 6
+		[2]int{1,500001},// tier 7
+		[2]int{1,1000001},// tier 8
+		[2]int{2,1},      // score ranking top
+		[2]int{2,5001},   // tier 1
+		[2]int{2,10001},  // tier 2
+		[2]int{2,40001},  // tier 3
+		[2]int{2,50001},  // tier 4
 	}
+	// extra data points
 	for index := 0; index < 61; index++ {
 		key_point = append(key_point, [2]int{1, index*10000+1})
 		key_point = append(key_point, [2]int{2, index*10000+1})
 	}
-	//GetCache(client, RANK_CACHE_DIR, 0, 51)
 	for _, key := range key_point {
 		fmt.Println(key)
 		GetCache(client, RANK_CACHE_DIR, key[0], RankToPage(key[1]))
@@ -114,6 +110,7 @@ func GetCache(client *apiclient.ApiClient, cache_dir string, ranking_type int, p
 
 func get_page(client *apiclient.ApiClient, ranking_type, page int) ([]interface{}, uint64) {
 	resp := client.GetAtaponRanking(ranking_type, page)
+	fmt.Println(client.GetResultCode(resp))
 	servertime := resp["data_headers"].(map[interface{}]interface{})["servertime"].(uint64)
 	ranking_list := resp["data"].(map[interface{}]interface{})["ranking_list"].([]interface{})
 	return ranking_list, servertime
