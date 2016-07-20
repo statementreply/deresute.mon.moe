@@ -316,6 +316,11 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 		r.logger.Println(err, "return -1")
 		return -1
 	}
+	// potential read/write race
+	if len(content) == 0 {
+		r.logger.Println(fileName, "empty content return -1")
+		return -1
+	}
 
 	var local_rank_list []map[string]interface{}
 	err = yaml.Unmarshal(content, &local_rank_list)
