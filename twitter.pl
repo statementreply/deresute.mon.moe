@@ -23,12 +23,15 @@ if (@ARGV) {
     $status = decode("UTF-8", pop(@ARGV));
 }
 
+my $result;
 eval {
-    my $result = $nt->update({ status => $status });
+    $result = $nt->update({ status => $status });
     #print "here", $result,"\n";
 };
 
 if ($@) {
     print "err: $@\n";
+} else {
+    print "no err: $result\n";
 }
 
