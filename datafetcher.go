@@ -76,6 +76,7 @@ func DumpToFile(v interface{}, fileName string) {
 }
 
 func GetCache(client *apiclient.ApiClient, cache_dir string, ranking_type int, page int) {
+	localtime := float64(time.Now().UnixNano())/1e9
 	local_timestamp := apiclient.GetLocalTimestamp()
 	dirname := cache_dir + local_timestamp + "/"
 	path := dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
@@ -90,6 +91,7 @@ func GetCache(client *apiclient.ApiClient, cache_dir string, ranking_type int, p
 	}
 	time.Sleep(11 * 100 * 1000 * 1000)
 	ranking_list, servertime := get_page(client, ranking_type, page)
+	fmt.Printf("localtime: %f servertime: %d lag: %f\n", localtime, servertime, float64(servertime)-localtime)
 	server_timestamp_i := apiclient.RoundTimestamp(time.Unix(int64(servertime), 0)).Unix()
 	server_timestamp := fmt.Sprintf("%d", server_timestamp_i)
 
@@ -102,7 +104,10 @@ func GetCache(client *apiclient.ApiClient, cache_dir string, ranking_type int, p
 		}
 	}
 	fmt.Println("write to path", path)
+	lockfile := dirname + "lock"
+	ioutil.WriteFile(lockfile, []byte(""), 0644)
 	DumpToFile(ranking_list, path)
+	os.Remove(lockfile)
 	//DumpToStdout(ranking_list)
 	//fmt.Println(ranking_list)
 }
