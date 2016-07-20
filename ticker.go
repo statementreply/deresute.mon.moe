@@ -27,7 +27,7 @@ func main() {
 	for {
 		select {
 		case t := <-ticker.C:
-			fmt.Println(t.String(), _isRunning, lastRun.String())
+			//fmt.Println(t.String(), _isRunning, lastRun.String())
 			q = (time.Duration(t.UnixNano()) - r) / mod
 			if (q > q0) || NeedToRun() {
 				fmt.Println("runCommand", t.String())
@@ -48,6 +48,10 @@ func runCommand() {
 			SetRunning()
 			c.Run()
 			SetFinished()
+			fmt.Println("current:", time.Now().String())
+			lock.Lock()
+			fmt.Println("lastRun:", lastRun.String())
+			lock.Unlock()
 		}
 	}()
 }
