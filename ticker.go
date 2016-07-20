@@ -39,7 +39,7 @@ func main() {
 }
 
 func runCommand() {
-	c := exec.Command("python", "../deresuteme/main2.py")
+	c := exec.Command("timeout", "300", "python", "../deresuteme/main2.py")
 	c.Stdin = nil
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
