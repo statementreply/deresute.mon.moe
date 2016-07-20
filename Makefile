@@ -1,5 +1,5 @@
-all: rankserver dumpbody datafetcher
-extra: pcapdump
+all: rankserver datafetcher ticker
+extra: pcapdump dumpbody
 clean:
 	rm -fv	rankserver dumpbody datafetcher pcapdump
 
