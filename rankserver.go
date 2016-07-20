@@ -309,6 +309,11 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 	}
 
 	//log.Print(fileName)
+	if r.isLocked(fileName) {
+		r.logger.Println("data/rank/... locked, return -1")
+		return -1
+	}
+
 	content, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		// file doesn't exist?
@@ -344,6 +349,18 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 	r.data[timestamp][rankingType][rank] = score
 	r.mux.Unlock()
 	return score
+}
+
+func (r *RankServer) isLocked(fileName string) bool {
+	lockFile := "lock"
+	dirname := path.Base(fileName)
+	lockPath := path.Join(dirname, lockFile)
+	_, err := os.Stat(lockPath)
+	if (err != nil) && (os.IsNotExist(err)) {
+		return false
+	} else {
+		return true
+	}
 }
 
 // speed per hour
