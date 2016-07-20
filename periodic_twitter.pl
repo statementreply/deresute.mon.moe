@@ -12,13 +12,14 @@ while (1) {
         next;
     }
     if ($new_status ne $cached_status) {
+        print scalar(localtime), "\n";
         print "update status: $new_status\n";
         system qw(perl twitter.pl), $new_status;
         $cached_status = $new_status;
         write_file($cache_filename, $cached_status);
     }
 } continue {
-    sleep 120;
+    sleep 60;
 }
 
 sub read_file {
