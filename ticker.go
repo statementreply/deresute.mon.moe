@@ -27,9 +27,10 @@ func main() {
 	for {
 		select {
 		case t := <-ticker.C:
+			fmt.Println(t.String())
 			q = (time.Duration(t.UnixNano()) - r) / mod
 			if (q > q0) || NeedToRun() {
-				fmt.Println(t.String())
+				fmt.Println("runCommand", t.String())
 				q0 = q
 				runCommand()
 			}
