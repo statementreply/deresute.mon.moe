@@ -70,7 +70,6 @@ func SetRunning() {
 func SetFinished() {
 	lock.Lock()
 	_isRunning = false
-	_isRunning = true
 	lock.Unlock()
 }
 
