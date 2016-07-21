@@ -32,7 +32,7 @@ var INTERVAL time.Duration = 4 * INTERVAL0
 var INTERVAL0 time.Duration = 15 * 60 * 1000 * 1000 * 1000
 var LOG_FILE = "rankserver.log"
 var CONFIG_FILE = "rankserver.yaml"
-var CONFIG_FILE_2 = "secret.yaml"
+var SECRET_FILE = "secret.yaml"
 var dirNameFilter = regexp.MustCompile("^\\d+$")
 var fileNameFilter = regexp.MustCompile("r\\d{2}\\.(\\d+)$")
 var rankingTypeFilter = regexp.MustCompile("r01\\.\\d+$")
@@ -123,7 +123,7 @@ func MakeRankServer() *RankServer {
 	}
 	r.setHandleFunc()
 
-	r.client = apiclient.NewApiClientFromConfig(CONFIG_FILE_2)
+	r.client = apiclient.NewApiClientFromConfig(SECRET_FILE)
 	r.client.LoadCheck()
 	rv := r.client.Get_res_ver()
 
@@ -499,7 +499,6 @@ func (r *RankServer) rankData_list_f_e(rankingType int, list_rank []int, dataSou
 	raw += "\n"
 	raw += `],"rows":[`
 
-
 	local_timestamp := r.get_list_timestamp()
 	for _, timestamp := range local_timestamp {
 		if !r.inEvent(timestamp, event) {
@@ -687,7 +686,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<br>デレステイベントボーダー<br><br>")
 	if r.currentEvent != nil {
-		fmt.Fprintf(w, "<br>イベント開催中：%s<br><br>", r.currentEvent.Name())
+		fmt.Fprintf(w, "イベント開催中：%s<br><br>", r.currentEvent.Name())
 	}
 
 	fmt.Fprintf(w, "<a href=\"event\">%s</a><br>\n", "過去のイベント (new)")
