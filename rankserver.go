@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -705,23 +706,44 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	if ok {
 		list_rank = make([]int, 0, len(list_rank_str))
 		for _, v := range list_rank_str {
-			n, _ := strconv.Atoi(v)
-			list_rank = append(list_rank, n)
+			// now v can contain more than one number
+			//fmt.Println("str<"+v+">")
+			subv := strings.Split(v, " ")
+			for _, vv := range subv {
+				n, err := strconv.Atoi(vv)
+				if (err == nil) && (n >= 1) && (n <= 1000001) {
+					list_rank = append(list_rank, n)
+				}
+			}
 		}
 	} else {
 		list_rank = []int{60001, 120001}
 	}
+	var prefill string = "2001 10001 20001 60001 120001"
+	{
+		n_rank := []string{}
+		for _, n := range list_rank {
+			n_rank = append(n_rank, fmt.Sprintf("%d", n))
+			//fmt.Println(n_rank)
+		}
+		prefill = strings.Join(n_rank, " ")
+		//fmt.Println(prefill)
+	}
 	r.preload_qchart(w, req, list_rank)
 	defer r.postload(w, req)
-	fmt.Fprint(w, `
-    uses javascript library from <code>https://www.gstatic.com/charts/loader.js</code><br>`)
 	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "ホームページ")
+	fmt.Fprintf(w,`
+<form action="qchart" method="get">カスタマイズボーダー：<br>
+<input type="text" name="rank" size=35 value="%s"></input>
+<input type="submit" value="更新"></form>
+	`, prefill)
 	fmt.Fprint(w, `
     <table class="columns">
 <tr><td><div id="myLineChart" style="border: 1px solid #ccc"/></td></tr>
 <tr><td><div id="mySpeedChart" style="border: 1px solid #ccc"/></td></tr>
     </table>
     `)
+	fmt.Fprint(w, `javascript library from <code>https://www.gstatic.com/charts/loader.js</code><br>`)
 }
 
 func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
