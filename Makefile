@@ -1,5 +1,5 @@
 all: rankserver datafetcher ticker
-extra: pcapdump dumpbody
+extra: pcapdump dumpbody unlz4
 clean:
 	rm -fv	rankserver dumpbody datafetcher pcapdump
 
@@ -18,6 +18,7 @@ dumpbody: src/apiclient/*
 datafetcher: src/apiclient/*
 test1: src/apiclient/*
 pcapdump: src/apiclient/*
+unlz4: src/resource_mgr/*
 
 %: %.go
 	source ./go_env.sh; \
