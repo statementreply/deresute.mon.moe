@@ -33,6 +33,9 @@ var INTERVAL0 time.Duration = 15 * 60 * 1000 * 1000 * 1000
 var LOG_FILE = "rankserver.log"
 var CONFIG_FILE = "rankserver.yaml"
 var CONFIG_FILE_2 = "secret.yaml"
+var dirNameFilter = regexp.MustCompile("^\\d+$")
+var fileNameFilter = regexp.MustCompile("r\\d{2}\\.(\\d+)$")
+var rankingTypeFilter = regexp.MustCompile("r01\\.\\d+$")
 
 type RankServer struct {
 	data  map[string][]map[int]int     // need mux
@@ -158,10 +161,9 @@ func (r *RankServer) updateTimestamp() {
 	r.mux.Lock()
 	r.list_timestamp = make([]string, 0, len(fi))
 	// sub: dir name 1467555420
-	filter, _ := regexp.Compile("^\\d+$")
 	for _, sub := range fi {
 		subdirName := sub.Name()
-		if filter.MatchString(subdirName) {
+		if dirNameFilter.MatchString(subdirName) {
 			r.list_timestamp = append(r.list_timestamp, sub.Name())
 		}
 	}
@@ -242,8 +244,7 @@ func (r *RankServer) getFilename(timestamp string, rankingType, rank int) string
 
 func (r *RankServer) FilenameToRank(fileName string) int {
 	//log.Print("fileName", fileName)
-	filter, _ := regexp.Compile("r\\d{2}\\.(\\d+)$")
-	submatch := filter.FindStringSubmatch(fileName)
+	submatch := fileNameFilter.FindStringSubmatch(fileName)
 	if len(submatch) == 0 {
 		return 0
 	}
@@ -253,8 +254,7 @@ func (r *RankServer) FilenameToRank(fileName string) int {
 }
 
 func (r *RankServer) RankingType(fileName string) int {
-	filter, _ := regexp.Compile("r01\\.\\d+$")
-	if filter.MatchString(fileName) {
+	if rankingTypeFilter.MatchString(fileName) {
 		// event pt
 		return 0 // r01.xxxxxx
 	} else {
