@@ -126,7 +126,7 @@ func MakeRankServer() *RankServer {
 	rv := r.client.Get_res_ver()
 
 	r.resourceMgr = resource_mgr.NewResourceMgr(rv, RESOURCE_CACHE_DIR)
-	r.resourceMgr.LoadManifest()
+	//r.resourceMgr.LoadManifest()
 	r.resourceMgr.ParseEvent()
 	r.currentEvent = r.resourceMgr.FindCurrentEvent()
 	return r

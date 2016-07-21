@@ -86,7 +86,7 @@ func (r *ResourceMgr) LoadManifest() string {
 		var line []byte
 		line, _, err = bh.ReadLine()
 		field := strings.Split(string(line), ",")
-		log.Println(field)
+		//log.Println(field)
 		if len(field) < 5 {
 			continue
 		}
@@ -103,7 +103,7 @@ func (r *ResourceMgr) LoadManifest() string {
 	}
 	defer db.Close()
 	rows, err := db.Query("select * from manifests;")
-	log.Println(rows)
+	//log.Println(rows)
 	defer rows.Close()
 	if err != nil {
 		log.Fatal("x2", err)
@@ -117,11 +117,11 @@ func (r *ResourceMgr) LoadManifest() string {
 		var decrypt_key []byte
 		err = rows.Scan(&name, &hash, &attr, &category, &decrypt_key)
 		if name == "master.mdb" {
-			log.Println(name, hash, attr, category, decrypt_key)
+			//log.Println(name, hash, attr, category, decrypt_key)
 			master = r.FetchLz4("dl/resources/Generic//" + hash)
 		}
 	}
-	log.Println("master.mdb:", master)
+	//log.Println("master.mdb:", master)
 	return master
 }
 
@@ -147,7 +147,7 @@ func (r *ResourceMgr) ParseEvent() {
 		//log.Println(id, typ, name,
 		//ParseTime(notice_start), event_start, second_half_start, event_end, calc_start, result_start, result_end, limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count)
 		//log.Println(ParseTime(event_start), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end))
-		log.Println(id, typ, name, limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count)
+		//log.Println(id, typ, name, limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count)
 		//ParseTime(notice_start), event_start, second_half_start, event_end, calc_start, result_start, result_end,
 		e := &EventDetail{id, typ, name,
 			ParseTime(notice_start), ParseTime(event_start), ParseTime(second_half_start), ParseTime(event_end), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end),
