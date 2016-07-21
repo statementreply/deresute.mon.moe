@@ -481,8 +481,8 @@ func (r *RankServer) rankData_list_f(rankingType int, list_rank []int, dataSourc
 }
 
 func (r *RankServer) get_list_timestamp() []string {
-	local_timestamp := make([]string, 0)
 	r.mux_timestamp.RLock()
+	local_timestamp := make([]string, len(r.list_timestamp))
 	copy(local_timestamp, r.list_timestamp)
 	r.mux_timestamp.RUnlock()
 	return local_timestamp
