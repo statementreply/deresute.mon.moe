@@ -727,7 +727,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload(w, req)
 	defer r.postload(w, req)
-    fmt.Fprintf(w, `<table class="columns">`)
+	fmt.Fprintf(w, `<table class="columns">`)
 	fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n", "event", "start", "end")
 	for _, e := range r.resourceMgr.EventList {
 		name := e.Name()
@@ -738,7 +738,7 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 		}
 		fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n", name, r.formatTime(e.EventStart()), r.formatTime(e.EventEnd()))
 	}
-    fmt.Fprintf(w, `</table>`)
+	fmt.Fprintf(w, `</table>`)
 }
 
 func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {

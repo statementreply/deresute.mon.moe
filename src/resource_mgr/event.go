@@ -75,4 +75,3 @@ func FindEventById(eventList EventDetailList, id int) *EventDetail {
 	}
 	return nil
 }
-
