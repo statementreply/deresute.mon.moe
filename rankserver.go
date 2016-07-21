@@ -10,12 +10,12 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"resource_mgr"
 	"sort"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-	"resource_mgr"
 )
 
 var BASE string = path.Dir(os.Args[0])
@@ -53,8 +53,8 @@ type RankServer struct {
 	// FIXME
 	current_event []string // start/stop timestamp
 	tz            *time.Location
-	resourceMgr  *resource_mgr.ResourceMgr
-	currentEvent *resource_mgr.EventDetail
+	resourceMgr   *resource_mgr.ResourceMgr
+	currentEvent  *resource_mgr.EventDetail
 }
 
 func MakeRankServer() *RankServer {
@@ -418,7 +418,7 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
 	//timestamp_i, _ := strconv.Atoi(timestamp)
 	//prev_timestamp2 := fmt.Sprintf("%d", timestamp_i-INTERVAL)
 	t_i := r.timestampToTime(timestamp)
-	t_prev := t_i.Add( -INTERVAL )
+	t_prev := t_i.Add(-INTERVAL)
 	prev_timestamp := r.timeToTimestamp(t_prev)
 
 	cur_score := r.fetchData(timestamp, rankingType, rank)
@@ -757,7 +757,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload_qchart(w, req, list_rank)
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "ホームページ")
-	fmt.Fprintf(w,`
+	fmt.Fprintf(w, `
 <form action="qchart" method="get">customized border graph：<br>
 <input type="text" name="rank" size=35 value="%s"></input>
 <input type="submit" value="更新"></form>
@@ -777,7 +777,7 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	title := "デレステボーダーbotβ"
 	if r.currentEvent != nil {
-		 title = r.currentEvent.Name()
+		title = r.currentEvent.Name()
 	}
 	fmt.Fprint(w, title, " ", r.formatTimestamp_short(timestamp), "\n")
 	list_rank := []int{2001, 10001, 20001, 60001, 120001}

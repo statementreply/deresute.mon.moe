@@ -4,17 +4,17 @@ import (
 	"io/ioutil"
 	//"github.com/pierrec/lz4"
 	// depends on github.com/pierrec/xxHash
-	lz4 "github.com/bkaradzic/go-lz4"
 	"bytes"
 	"encoding/binary"
+	lz4 "github.com/bkaradzic/go-lz4"
 	"log"
 )
 
 type lz4Header struct {
-	Magic uint32
+	Magic  uint32
 	Uncomp uint32
-	Comp uint32
-	Unk uint32
+	Comp   uint32
+	Unk    uint32
 }
 
 func Unlz4(fileName string) []byte {

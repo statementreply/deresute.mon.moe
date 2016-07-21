@@ -1,11 +1,11 @@
 package main
 
 import (
-	"time"
 	"fmt"
 	"os"
 	"os/exec"
 	"sync"
+	"time"
 )
 
 var lock sync.Mutex
@@ -55,7 +55,6 @@ func runCommand() {
 		}
 	}()
 }
-
 
 func IsRunning() bool {
 	lock.Lock()

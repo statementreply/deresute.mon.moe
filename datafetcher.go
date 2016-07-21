@@ -7,9 +7,9 @@ import (
 	"os"
 	"path"
 	//"strconv"
-	"time"
 	"apiclient"
 	"gopkg.in/yaml.v2"
+	"time"
 )
 
 var SECRET_FILE string = "secret.yaml"
@@ -25,29 +25,29 @@ func main() {
 	fmt.Println(apiclient.RoundTimestamp(time.Now()).String())
 
 	key_point := [][2]int{
-		[2]int{1,1},
-		[2]int{1,501},  // pt ranking emblem-1
-		[2]int{1,2001}, // tier 1
-		[2]int{1,5001}, // emblem-2
-		[2]int{1,10001},// tier 2
-		[2]int{1,20001},// tier 3
-		[2]int{1,50001},// tier 4-old
-		[2]int{1,60001},// tier 4
-		[2]int{1,100001},// tier 5-old
-		[2]int{1,120001},// tier 5
-		[2]int{1,300001},// tier 6
-		[2]int{1,500001},// tier 7
-		[2]int{1,1000001},// tier 8
-		[2]int{2,1},      // score ranking top
-		[2]int{2,5001},   // tier 1
-		[2]int{2,10001},  // tier 2
-		[2]int{2,40001},  // tier 3
-		[2]int{2,50001},  // tier 4
+		[2]int{1, 1},
+		[2]int{1, 501},     // pt ranking emblem-1
+		[2]int{1, 2001},    // tier 1
+		[2]int{1, 5001},    // emblem-2
+		[2]int{1, 10001},   // tier 2
+		[2]int{1, 20001},   // tier 3
+		[2]int{1, 50001},   // tier 4-old
+		[2]int{1, 60001},   // tier 4
+		[2]int{1, 100001},  // tier 5-old
+		[2]int{1, 120001},  // tier 5
+		[2]int{1, 300001},  // tier 6
+		[2]int{1, 500001},  // tier 7
+		[2]int{1, 1000001}, // tier 8
+		[2]int{2, 1},       // score ranking top
+		[2]int{2, 5001},    // tier 1
+		[2]int{2, 10001},   // tier 2
+		[2]int{2, 40001},   // tier 3
+		[2]int{2, 50001},   // tier 4
 	}
 	// extra data points
 	for index := 0; index < 61; index++ {
-		key_point = append(key_point, [2]int{1, index*10000+1})
-		key_point = append(key_point, [2]int{2, index*10000+1})
+		key_point = append(key_point, [2]int{1, index*10000 + 1})
+		key_point = append(key_point, [2]int{2, index*10000 + 1})
 	}
 	for _, key := range key_point {
 		fmt.Println(key)
@@ -57,7 +57,7 @@ func main() {
 
 func RankToPage(rank int) int {
 	var page int
-	page = ( (rank - 1) / 10) + 1
+	page = ((rank - 1) / 10) + 1
 	return page
 }
 
@@ -72,7 +72,7 @@ func DumpToFile(v interface{}, fileName string) {
 }
 
 func GetCache(client *apiclient.ApiClient, cache_dir string, ranking_type int, page int) {
-	localtime := float64(time.Now().UnixNano())/1e9
+	localtime := float64(time.Now().UnixNano()) / 1e9
 	local_timestamp := apiclient.GetLocalTimestamp()
 	dirname := cache_dir + local_timestamp + "/"
 	path := dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)

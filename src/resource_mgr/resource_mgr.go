@@ -1,31 +1,30 @@
 package resource_mgr
 
 import (
-	"log"
-	"os"
-	"net/http"
-	"path"
-	"io/ioutil"
-	"fmt"
-	"io"
 	"bufio"
-	"strings"
 	"database/sql"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"io"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
+	"path"
+	"strings"
 	"time"
 )
 
 var URLBASE = "http://storage.game.starlight-stage.jp/"
 
 type ResourceMgr struct {
-	res_ver string
+	res_ver   string
 	cache_dir string
-	platform string
-	alvl string
-	slvl string
+	platform  string
+	alvl      string
+	slvl      string
 	EventList []*EventDetail
 }
-
 
 func NewResourceMgr(res_ver string, cache_dir string) *ResourceMgr {
 	r := &ResourceMgr{}
@@ -71,7 +70,6 @@ func (r *ResourceMgr) FetchLz4(loc string) string {
 	return dest
 }
 
-
 func (r *ResourceMgr) LoadManifest() string {
 	base := fmt.Sprintf("dl/%s/", r.res_ver)
 	//content, _ := ioutil.ReadFile(r.Fetch(base + "manifests/all_dbmanifest"))
@@ -88,7 +86,7 @@ func (r *ResourceMgr) LoadManifest() string {
 		line, _, err = bh.ReadLine()
 		field := strings.Split(string(line), ",")
 		log.Println(field)
-		if (len(field) < 5) {
+		if len(field) < 5 {
 			continue
 		}
 		if field[2] == r.platform && field[3] == r.alvl && field[4] == r.slvl {
@@ -126,7 +124,6 @@ func (r *ResourceMgr) LoadManifest() string {
 	return master
 }
 
-
 func (r *ResourceMgr) ParseEvent() {
 	master := r.LoadManifest()
 	db, err := sql.Open("sqlite3", master)
@@ -142,24 +139,24 @@ func (r *ResourceMgr) ParseEvent() {
 		var notice_start, event_start, second_half_start, event_end, calc_start, result_start, result_end string
 		var limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count int
 		err = rows.Scan(&id, &typ,
-		&name,
-		&notice_start, &event_start, &second_half_start,
-		&event_end, &calc_start, &result_start, &result_end,
-		&limit_flag, &bg_type, & bg_id, &login_bonus_type, &login_bonus_count)
+			&name,
+			&notice_start, &event_start, &second_half_start,
+			&event_end, &calc_start, &result_start, &result_end,
+			&limit_flag, &bg_type, &bg_id, &login_bonus_type, &login_bonus_count)
 		//log.Println(id, typ, name,
 		//ParseTime(notice_start), event_start, second_half_start, event_end, calc_start, result_start, result_end, limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count)
 		//log.Println(ParseTime(event_start), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end))
-		log.Println(id, typ, name,limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count)
-		//ParseTime(notice_start), event_start, second_half_start, event_end, calc_start, result_start, result_end, 
+		log.Println(id, typ, name, limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count)
+		//ParseTime(notice_start), event_start, second_half_start, event_end, calc_start, result_start, result_end,
 		e := &EventDetail{id, typ, name,
-		ParseTime(notice_start), ParseTime(event_start), ParseTime(second_half_start), ParseTime(event_end), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end),
-	limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count}
+			ParseTime(notice_start), ParseTime(event_start), ParseTime(second_half_start), ParseTime(event_end), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end),
+			limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count}
 		r.EventList = append(r.EventList, e)
 	}
 }
 
 func ParseTime(tstr string) time.Time {
-	t, err := time.Parse("2006-01-02 15:04:05 -0700 MST", tstr + " +0900 JST")
+	t, err := time.Parse("2006-01-02 15:04:05 -0700 MST", tstr+" +0900 JST")
 	if err != nil {
 		log.Fatal(err)
 	}

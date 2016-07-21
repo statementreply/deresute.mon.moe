@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"resource_mgr"
 	"io/ioutil"
-	"os"
 	"log"
+	"os"
+	"resource_mgr"
 )
 
 func main() {

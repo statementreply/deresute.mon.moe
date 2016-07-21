@@ -1,10 +1,10 @@
 package main
 
 import (
-	"resource_mgr"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
+	"resource_mgr"
 	//"time"
 )
 
