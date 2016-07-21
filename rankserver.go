@@ -684,7 +684,10 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<br>デレステイベントボーダー<br><br>")
 	if r.currentEvent != nil {
-		fmt.Fprintf(w, "イベント開催中：%s<br><br>", r.currentEvent.Name())
+		fmt.Fprintf(w, "イベント開催中：%s<br>", r.currentEvent.Name())
+		if r.currentEvent.LoginBonusType() > 0 {
+			fmt.Fprintf(w, "ログインボーナスがあるので、イベントページにアクセスを忘れないように。<br>")
+		}
 	}
 
 	fmt.Fprintf(w, "<a href=\"event\">%s</a><br>\n", "過去のイベント (new)")

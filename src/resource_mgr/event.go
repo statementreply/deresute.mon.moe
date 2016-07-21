@@ -43,6 +43,14 @@ func (e *EventDetail) ResultEnd() time.Time {
 	return e.result_end
 }
 
+func (e *EventDetail) LoginBonusType() int {
+	return e.login_bonus_type
+}
+
+func (e *EventDetail) LoginBonusCount() int {
+	return e.login_bonus_count
+}
+
 func FindCurrentEvent(eventList []*EventDetail) *EventDetail {
 	now := time.Now()
 	for _, e := range eventList {
