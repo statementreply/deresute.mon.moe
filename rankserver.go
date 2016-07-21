@@ -51,8 +51,6 @@ type RankServer struct {
 	plainServer *http.Server
 	tlsServer   *http.Server
 	hostname    string
-	// FIXME
-	//current_event []string // start/stop timestamp
 	tz            *time.Location
 	resourceMgr   *resource_mgr.ResourceMgr
 	currentEvent  *resource_mgr.EventDetail
@@ -66,8 +64,6 @@ func MakeRankServer() *RankServer {
 	//r.list_timestamp doesn't need initialization
 	r.plainServer = nil
 	r.tlsServer = nil
-	// FIXME
-	//r.current_event = []string{"1468908120", "1469707320"}
 
 	tz, err := time.LoadLocation("Asia/Tokyo")
 	r.tz = tz
@@ -82,13 +78,6 @@ func MakeRankServer() *RankServer {
 	var config map[string]string
 	yaml.Unmarshal(content, &config)
 	fmt.Println(config)
-
-	/*content, err = ioutil.ReadFile(CONFIG_FILE_2)
-	if err != nil {
-		log.Fatal(err)
-	}*/
-	//var config_2 map[string]string
-	//yaml.Unmarshal(content, &config_2)
 
 	confLOG_FILE, ok := config["LOG_FILE"]
 	if ok {
@@ -133,15 +122,8 @@ func MakeRankServer() *RankServer {
 	}
 	r.setHandleFunc()
 
-	//rv, ok := config_2["res_ver"]
-	/*if !ok {
-		log.Println(config_2)
-		log.Fatal("missing res_ver in " + CONFIG_FILE_2)
-	}*/
-
 	r.client = apiclient.NewApiClientFromConfig(CONFIG_FILE_2)
 	r.client.LoadCheck()
-
 	rv := r.client.Get_res_ver()
 
 	r.resourceMgr = resource_mgr.NewResourceMgr(rv, RESOURCE_CACHE_DIR)
@@ -313,14 +295,6 @@ func (r *RankServer) formatTime(t time.Time) string {
 	st := t.Format("2006-01-02 15:04")
 	return st
 }
-
-/*func (r *RankServer) inCurrentEvent(timestamp string) bool {
-	if (timestamp >= r.current_event[0]) && (timestamp <= r.current_event[1]) {
-		return true
-	} else {
-		return false
-	}
-}*/
 
 func (r *RankServer) inEvent(timestamp string, event *resource_mgr.EventDetail) bool {
 	if event == nil {
