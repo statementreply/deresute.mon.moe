@@ -364,9 +364,9 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 	if len(local_rank_list) > 0 {
 		score = local_rank_list[0]["score"].(int)
 	}
-	if score == 0 {
+	/*if score == 0 {
 		r.logger.Println(timestamp, fileName, len(local_rank_list), "return 0", content)
-	}
+	}*/
 	r.mux.Lock()
 	r.data[timestamp][rankingType][rank] = score
 	r.mux.Unlock()
