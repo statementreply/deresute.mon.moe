@@ -313,6 +313,18 @@ func (r *RankServer) inCurrentEvent(timestamp string) bool {
 	}
 }
 
+func (r *RankServer) inEvent(timestamp string, event *resource_mgr.EventDetail) bool {
+	if event == nil {
+		return true
+	}
+	t := r.timestampToTime(timestamp)
+	if (!t.Before(event.EventStart())) && (!t.After(event.ResultEnd())) {
+		return true
+	} else {
+		return false
+	}
+}
+
 func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int {
 	fileName := r.getFilename(timestamp, rankingType, rank)
 	return r.fetchData_internal(timestamp, rankingType, rank, fileName)
@@ -498,6 +510,10 @@ func (r *RankServer) showData(timestamp string) string {
 //  "rows":[{"c":[{"v":"new Date(1467770520)"},{"v":14908}]}]}
 
 func (r *RankServer) rankData_list_f(rankingType int, list_rank []int, dataSource func(string, int, int) interface{}) string {
+	return r.rankData_list_f_e(rankingType, list_rank, dataSource, r.currentEvent)
+}
+
+func (r *RankServer) rankData_list_f_e(rankingType int, list_rank []int, dataSource func(string, int, int) interface{}, event *resource_mgr.EventDetail) string {
 	//log.Print("functional version of rankData_list_f()")
 	r.updateTimestamp()
 	raw := ""
@@ -509,7 +525,7 @@ func (r *RankServer) rankData_list_f(rankingType int, list_rank []int, dataSourc
 	raw += `],"rows":[`
 
 	for _, timestamp := range r.list_timestamp {
-		if !r.inCurrentEvent(timestamp) {
+		if !r.inEvent(timestamp, event) {
 			continue
 		}
 		// time in milliseconds
@@ -547,8 +563,16 @@ func (r *RankServer) rankData_list(rankingType int, list_rank []int) string {
 	return r.rankData_list_f(rankingType, list_rank, r.fetchData_i)
 }
 
+func (r *RankServer) rankData_list_e(rankingType int, list_rank []int, event *resource_mgr.EventDetail) string {
+	return r.rankData_list_f_e(rankingType, list_rank, r.fetchData_i, event)
+}
+
 func (r *RankServer) speedData_list(rankingType int, list_rank []int) string {
 	return r.rankData_list_f(rankingType, list_rank, r.getSpeed_i)
+}
+
+func (r *RankServer) speedData_list_e(rankingType int, list_rank []int, event *resource_mgr.EventDetail) string {
+	return r.rankData_list_f_e(rankingType, list_rank, r.getSpeed_i, event)
 }
 
 func (r *RankServer) init_req(w http.ResponseWriter, req *http.Request) {
@@ -618,7 +642,7 @@ func (r *RankServer) preload_c(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "<body>")
 }
 
-func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, list_rank []int) {
+func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, list_rank []int, event *resource_mgr.EventDetail) {
 	r.init_req(w, req)
 	fmt.Fprint(w, "<!DOCTYPE html>")
 	fmt.Fprint(w, "<head>")
@@ -630,8 +654,8 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, li
       `)
 	fmt.Fprint(w, `
     function drawLineChart() {`)
-	fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list(0, list_rank), ")")
-	fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list(0, list_rank), ")")
+	fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(0, list_rank, event), ")")
+	fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(0, list_rank, event), ")")
 	fmt.Fprint(w, `
       var options = {
         width: 900,
@@ -708,7 +732,7 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 		name := e.Name()
 		if e.Type() == 1 || e.Type() == 3 {
 			// ranking information available
-			name = "<a href=\"\">" + name + "</a>"
+			name = fmt.Sprintf(`<a href="qchart?event=%d">%s</a>`, e.Id(), name)
 		}
 		fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n", name, r.formatTime(e.EventStart()), r.formatTime(e.EventEnd()))
 	}
@@ -766,6 +790,21 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	} else {
 		list_rank = []int{60001, 120001}
 	}
+
+	event_id_str_list, ok := req.Form["event"]
+	event := r.currentEvent
+	if ok {
+		event_id_str := event_id_str_list[0]
+		event_id, err := strconv.Atoi(event_id_str)
+		if err == nil {
+			event = r.resourceMgr.FindEventById(event_id)
+			if event == nil {
+				event = r.currentEvent
+			}
+		} else {
+			r.logger.Println("bad event id", err, event_id_str)
+		}
+	}
 	var prefill string = "2001 10001 20001 60001 120001"
 	{
 		n_rank := []string{}
@@ -776,7 +815,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 		prefill = strings.Join(n_rank, " ")
 		//fmt.Println(prefill)
 	}
-	r.preload_qchart(w, req, list_rank)
+	r.preload_qchart(w, req, list_rank, event)
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "ホームページ")
 	fmt.Fprintf(w, `

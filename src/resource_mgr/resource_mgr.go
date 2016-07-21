@@ -168,3 +168,7 @@ func ParseTime(tstr string) time.Time {
 func (r *ResourceMgr) FindCurrentEvent() *EventDetail {
 	return FindCurrentEvent(r.EventList)
 }
+
+func (r *ResourceMgr) FindEventById(id int) *EventDetail {
+	return FindEventById(r.EventList, id)
+}

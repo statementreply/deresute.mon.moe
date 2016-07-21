@@ -19,6 +19,10 @@ func (e *EventDetail) Name() string {
 	return e.name
 }
 
+func (e *EventDetail) Id() int {
+	return e.id
+}
+
 func (e *EventDetail) EventStart() time.Time {
 	return e.event_start
 }
@@ -63,4 +67,12 @@ func (l EventDetailList) Swap(i, j int) {
 	l[i], l[j] = l[j], l[i]
 }
 
+func FindEventById(eventList EventDetailList, id int) *EventDetail {
+	for _, e := range eventList {
+		if e.Id() == id {
+			return e
+		}
+	}
+	return nil
+}
 
