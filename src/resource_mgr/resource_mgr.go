@@ -10,6 +10,9 @@ import (
 	"io"
 	"bufio"
 	"strings"
+	"database/sql"
+	_ "github.com/mattn/go-sqlite3"
+	"time"
 )
 
 var URLBASE = "http://storage.game.starlight-stage.jp/"
@@ -20,6 +23,34 @@ type ResourceMgr struct {
 	platform string
 	alvl string
 	slvl string
+	EventList []*EventDetail
+}
+
+type EventDetail struct {
+	id, typ int
+	name string
+	notice_start, event_start, second_half_start, event_end, calc_start, result_start, result_end time.Time
+	limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count int
+}
+
+func (e *EventDetail) Type() int {
+	return e.typ
+}
+
+func (e *EventDetail) Name() string {
+	return e.name
+}
+
+func (e *EventDetail) EventStart() time.Time {
+	return e.event_start
+}
+
+func (e *EventDetail) CalcStart() time.Time {
+	return e.calc_start
+}
+
+func (e *EventDetail) ResultStart() time.Time {
+	return e.result_start
 }
 
 func NewResourceMgr(res_ver string, cache_dir string) *ResourceMgr {
@@ -29,6 +60,7 @@ func NewResourceMgr(res_ver string, cache_dir string) *ResourceMgr {
 	r.platform = "Android"
 	r.alvl = "High"
 	r.slvl = "High"
+	r.EventList = make([]*EventDetail, 0)
 	return r
 }
 
@@ -66,7 +98,7 @@ func (r *ResourceMgr) FetchLz4(loc string) string {
 }
 
 
-func (r *ResourceMgr) LoadManifest() {
+func (r *ResourceMgr) LoadManifest() string {
 	base := fmt.Sprintf("dl/%s/", r.res_ver)
 	//content, _ := ioutil.ReadFile(r.Fetch(base + "manifests/all_dbmanifest"))
 	//log.Println(string(content))
@@ -78,7 +110,7 @@ func (r *ResourceMgr) LoadManifest() {
 		var line []byte
 		line, _, err = bh.ReadLine()
 		field := strings.Split(string(line), ",")
-		log.Println(field)
+		//log.Println(field)
 		if (len(field) < 5) {
 			continue
 		}
@@ -87,7 +119,70 @@ func (r *ResourceMgr) LoadManifest() {
 			md5 = field[1]
 		}
 	}
-	pp := r.FetchLz4(base + "manifests/" + manifest_name)
-	log.Println(pp, md5)
-
+	dest := r.FetchLz4(base + "manifests/" + manifest_name)
+	log.Println(dest, md5)
+	db, err := sql.Open("sqlite3", dest)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+	rows, err := db.Query("select * from manifests;")
+	log.Println(rows)
+	defer rows.Close()
+	var master string
+	for rows.Next() {
+		var name string
+		var hash string
+		var attr int
+		var category string
+		var decrypt_key []byte
+		err = rows.Scan(&name, &hash, &attr, &category, &decrypt_key)
+		if name == "master.mdb" {
+			log.Println(name, hash, attr, category, decrypt_key)
+			master = r.FetchLz4("dl/resources/Generic//" + hash)
+		}
+	}
+	log.Println("master.mdb:", master)
+	return master
 }
+
+
+func (r *ResourceMgr) ParseEvent() {
+	master := r.LoadManifest()
+	db, err := sql.Open("sqlite3", master)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+	rows, err := db.Query("select * from event_data;")
+	defer rows.Close()
+	for rows.Next() {
+		var id, typ int
+		var name string
+		var notice_start, event_start, second_half_start, event_end, calc_start, result_start, result_end string
+		var limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count int
+		err = rows.Scan(&id, &typ,
+		&name,
+		&notice_start, &event_start, &second_half_start,
+		&event_end, &calc_start, &result_start, &result_end,
+		&limit_flag, &bg_type, & bg_id, &login_bonus_type, &login_bonus_count)
+		//log.Println(id, typ, name,
+		//ParseTime(notice_start), event_start, second_half_start, event_end, calc_start, result_start, result_end, limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count)
+		//log.Println(ParseTime(event_start), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end))
+		log.Println(id, typ, name,limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count)
+		//ParseTime(notice_start), event_start, second_half_start, event_end, calc_start, result_start, result_end, 
+		e := &EventDetail{id, typ, name,
+		ParseTime(notice_start), ParseTime(event_start), ParseTime(second_half_start), ParseTime(event_end), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end),
+	limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count}
+		r.EventList = append(r.EventList, e)
+	}
+}
+
+func ParseTime(tstr string) time.Time {
+	t, err := time.Parse("2006-01-02 15:04:05 -0700 MST", tstr + " +0900 JST")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return t
+}
+
