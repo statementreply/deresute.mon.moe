@@ -1,5 +1,5 @@
 all: rankserver datafetcher ticker
-extra: pcapdump dumpbody unlz4
+extra: pcapdump dumpbody unlz4 res get_profile test1
 clean:
 	rm -fv	rankserver dumpbody datafetcher pcapdump
 
