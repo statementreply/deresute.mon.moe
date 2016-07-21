@@ -25,4 +25,6 @@ func main() {
 		//log.Println(e)
 		log.Println(e.Name())
 	}
+	currentEvent := resource_mgr.FindCurrentEvent(r.EventList)
+	log.Println(currentEvent.Name())
 }
