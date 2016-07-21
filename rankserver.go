@@ -775,7 +775,11 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	r.checkData("")
 	timestamp := r.latestTimestamp()
 	r.init_req(w, req)
-	fmt.Fprint(w, "デレステボーダーbotβ ", r.formatTimestamp_short(timestamp), "\n")
+	title := "デレステボーダーbotβ"
+	if r.currentEvent != nil {
+		 title = r.currentEvent.Name()
+	}
+	fmt.Fprint(w, title, " ", r.formatTimestamp_short(timestamp), "\n")
 	list_rank := []int{2001, 10001, 20001, 60001, 120001}
 	map_rank := map[int]string{
 		2001:   "2千位",
