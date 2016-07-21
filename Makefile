@@ -20,6 +20,7 @@ test1: src/apiclient/*
 pcapdump: src/apiclient/*
 unlz4: src/resource_mgr/*
 res: src/resource_mgr/*
+rankserver: src/resource_mgr/*
 
 %: %.go
 	source ./go_env.sh; \

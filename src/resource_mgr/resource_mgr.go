@@ -77,6 +77,9 @@ func (r *ResourceMgr) LoadManifest() string {
 	//content, _ := ioutil.ReadFile(r.Fetch(base + "manifests/all_dbmanifest"))
 	//log.Println(string(content))
 	fh, err := os.Open(r.Fetch(base + "manifests/all_dbmanifest"))
+	if err != nil {
+		log.Fatal(err)
+	}
 	bh := bufio.NewReader(fh)
 	var manifest_name string
 	var md5 string
@@ -84,7 +87,7 @@ func (r *ResourceMgr) LoadManifest() string {
 		var line []byte
 		line, _, err = bh.ReadLine()
 		field := strings.Split(string(line), ",")
-		//log.Println(field)
+		log.Println(field)
 		if (len(field) < 5) {
 			continue
 		}
@@ -94,15 +97,18 @@ func (r *ResourceMgr) LoadManifest() string {
 		}
 	}
 	dest := r.FetchLz4(base + "manifests/" + manifest_name)
-	log.Println(dest, md5)
+	log.Println("to open", dest, md5)
 	db, err := sql.Open("sqlite3", dest)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("x1", err)
 	}
 	defer db.Close()
 	rows, err := db.Query("select * from manifests;")
 	log.Println(rows)
 	defer rows.Close()
+	if err != nil {
+		log.Fatal("x2", err)
+	}
 	var master string
 	for rows.Next() {
 		var name string
@@ -160,3 +166,6 @@ func ParseTime(tstr string) time.Time {
 	return t
 }
 
+func (r *ResourceMgr) FindCurrentEvent() *EventDetail {
+	return FindCurrentEvent(r.EventList)
+}

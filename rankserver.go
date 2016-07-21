@@ -15,10 +15,12 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"resource_mgr"
 )
 
 var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
+var RESOURCE_CACHE_DIR string = BASE + "/data/resourcesbeta/"
 
 // 15min update interval
 // *4 for hour
@@ -29,6 +31,7 @@ var INTERVAL time.Duration = 4 * INTERVAL0
 var INTERVAL0 time.Duration = 15 * 60 * 1000 * 1000 * 1000
 var LOG_FILE = "rankserver.log"
 var CONFIG_FILE = "rankserver.yaml"
+var CONFIG_FILE_2 = "secret.yaml"
 
 type RankServer struct {
 	data  map[string][]map[int]int     // need mux
@@ -50,6 +53,8 @@ type RankServer struct {
 	// FIXME
 	current_event []string // start/stop timestamp
 	tz            *time.Location
+	resourceMgr  *resource_mgr.ResourceMgr
+	currentEvent *resource_mgr.EventDetail
 }
 
 func MakeRankServer() *RankServer {
@@ -75,6 +80,14 @@ func MakeRankServer() *RankServer {
 	var config map[string]string
 	yaml.Unmarshal(content, &config)
 	fmt.Println(config)
+
+	content, err = ioutil.ReadFile(CONFIG_FILE_2)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var config_2 map[string]string
+	yaml.Unmarshal(content, &config_2)
+
 	confLOG_FILE, ok := config["LOG_FILE"]
 	if ok {
 		LOG_FILE = confLOG_FILE
@@ -117,6 +130,15 @@ func MakeRankServer() *RankServer {
 		r.plainServer = &http.Server{Addr: ":4001"}
 	}
 	r.setHandleFunc()
+	rv, ok := config_2["res_ver"]
+	if !ok {
+		log.Println(config_2)
+		log.Fatal("missing res_ver in " + CONFIG_FILE_2)
+	}
+	r.resourceMgr = resource_mgr.NewResourceMgr(rv, RESOURCE_CACHE_DIR)
+	r.resourceMgr.LoadManifest()
+	r.resourceMgr.ParseEvent()
+	r.currentEvent = r.resourceMgr.FindCurrentEvent()
 	return r
 }
 
@@ -657,6 +679,9 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload(w, req)
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<br>デレステイベントボーダー<br><br>")
+	if r.currentEvent != nil {
+		fmt.Fprintf(w, "<br>イベント開催中：%s<br><br>", r.currentEvent.Name())
+	}
 
 	fmt.Fprintf(w, "<a href=\"log\">%s</a><br>\n", "過去ボーダー")
 	fmt.Fprintf(w, "<a href=\"qchart?rank=2001&rank=10001&rank=20001&rank=60001&rank=120001\">%s</a><br>\n", "グラフβ+ (new)")
