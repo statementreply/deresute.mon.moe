@@ -26,10 +26,8 @@ var RESOURCE_CACHE_DIR string = BASE + "/data/resourcesbeta/"
 // 15min update interval
 // *4 for hour
 //var INTERVAL int = 15 * 60 * 4
+var INTERVAL0 time.Duration = 15 * time.Minute
 var INTERVAL time.Duration = 4 * INTERVAL0
-
-// nanoseconds
-var INTERVAL0 time.Duration = 15 * 60 * 1000 * 1000 * 1000
 var LOG_FILE = "rankserver.log"
 var CONFIG_FILE = "rankserver.yaml"
 var SECRET_FILE = "secret.yaml"
@@ -416,7 +414,7 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
 	if (cur_score >= 0) && (prev_score >= 0) {
 		// both score are valid
 		// nanoseconds
-		speed := (float32(cur_score - prev_score)) / float32(INTERVAL) * 3600.0 * 1000 * 1000 * 1000
+		speed := (float32(cur_score - prev_score)) / float32(INTERVAL) * float32(time.Hour)
 		r.mux_speed.Lock()
 		r.speed[timestamp][rankingType][rank] = speed
 		r.mux_speed.Unlock()
