@@ -17,7 +17,7 @@ var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rankbeta/"
 
 func main() {
-	rand.Seed(time.Now().Unix())
+	//rand.Seed(time.Now().Unix())
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 	client.LoadCheck()
 

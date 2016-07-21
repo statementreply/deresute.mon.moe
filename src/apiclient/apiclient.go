@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"strings"
 	"time"
@@ -39,6 +40,7 @@ type ApiClient struct {
 }
 
 func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SID_KEY []byte) *ApiClient {
+	rand.Seed(time.Now().UnixNano())
 	client := new(ApiClient)
 	client.user = user
 	client.viewer_id = viewer_id
