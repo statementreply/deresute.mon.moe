@@ -1,7 +1,9 @@
-all: rankserver datafetcher ticker
-extra: pcapdump dumpbody unlz4 res get_profile test1
+MAIN := rankserver datafetcher ticker
+EXTRA := pcapdump dumpbody unlz4 res get_profile test1
+all: ${MAIN}
+extra: ${EXTRA}
 clean:
-	rm -fv	rankserver dumpbody datafetcher pcapdump
+	rm -fv ${MAIN} ${EXTRA}
 
 web: prep rankserver
 	./rankserver
