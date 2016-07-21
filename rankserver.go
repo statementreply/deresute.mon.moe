@@ -145,6 +145,7 @@ func MakeRankServer() *RankServer {
 func (r *RankServer) setHandleFunc() {
 	// for DefaultServeMux
 	http.HandleFunc("/", r.homeHandler)
+	http.HandleFunc("/event", r.eventHandler)
 	http.HandleFunc("/q", r.qHandler)
 	http.HandleFunc("/log", r.logHandler)
 	http.HandleFunc("/chart", r.chartHandler)
@@ -296,6 +297,11 @@ func (r *RankServer) formatTimestamp(timestamp string) string {
 func (r *RankServer) formatTimestamp_short(timestamp string) string {
 	t := r.timestampToTime(timestamp)
 	st := t.Format("01/02 15:04")
+	return st
+}
+
+func (r *RankServer) formatTime(t time.Time) string {
+	st := t.Format("2006-01-02 15:04")
 	return st
 }
 
@@ -691,6 +697,17 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "<pre>")
 	defer fmt.Fprint(w, "</pre>")
 	fmt.Fprint(w, r.latestData())
+}
+
+func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
+	r.preload(w, req)
+	defer r.postload(w, req)
+    fmt.Fprintf(w, `<table class="columns">`)
+	fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n", "event", "start", "end")
+	for _, e := range r.resourceMgr.EventList {
+		fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n", e.Name(), r.formatTime(e.EventStart()), r.formatTime(e.EventEnd()))
+	}
+    fmt.Fprintf(w, `</table>`)
 }
 
 func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {

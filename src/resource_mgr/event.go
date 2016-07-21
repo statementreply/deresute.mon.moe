@@ -23,6 +23,10 @@ func (e *EventDetail) EventStart() time.Time {
 	return e.event_start
 }
 
+func (e *EventDetail) EventEnd() time.Time {
+	return e.event_end
+}
+
 func (e *EventDetail) CalcStart() time.Time {
 	return e.calc_start
 }
@@ -44,3 +48,19 @@ func FindCurrentEvent(eventList []*EventDetail) *EventDetail {
 	}
 	return nil
 }
+
+type EventDetailList []*EventDetail
+
+func (l EventDetailList) Len() int {
+	return len(l)
+}
+
+func (l EventDetailList) Less(i, j int) bool {
+	return l[i].EventStart().Before(l[j].EventStart())
+}
+
+func (l EventDetailList) Swap(i, j int) {
+	l[i], l[j] = l[j], l[i]
+}
+
+

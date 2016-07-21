@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"sort"
 	"strings"
 	"time"
 )
@@ -23,7 +24,7 @@ type ResourceMgr struct {
 	platform  string
 	alvl      string
 	slvl      string
-	EventList []*EventDetail
+	EventList EventDetailList
 }
 
 func NewResourceMgr(res_ver string, cache_dir string) *ResourceMgr {
@@ -153,6 +154,7 @@ func (r *ResourceMgr) ParseEvent() {
 			limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count}
 		r.EventList = append(r.EventList, e)
 	}
+	sort.Sort(r.EventList)
 }
 
 func ParseTime(tstr string) time.Time {
