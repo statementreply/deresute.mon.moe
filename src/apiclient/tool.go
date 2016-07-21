@@ -69,6 +69,10 @@ func (client *ApiClient) Set_res_ver(res_ver string) {
 	client.res_ver = res_ver
 }
 
+func (client *ApiClient) Get_res_ver() string {
+	return client.res_ver
+}
+
 func MsgpackDecode(b []byte, v interface{}) {
 	var bh codec.MsgpackHandle
 	bh.RawToString = true

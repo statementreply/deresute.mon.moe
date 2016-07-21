@@ -1,6 +1,7 @@
 package main
 
 import (
+	"apiclient"
 	"crypto/tls"
 	"fmt"
 	"gopkg.in/yaml.v2"
@@ -55,6 +56,7 @@ type RankServer struct {
 	tz            *time.Location
 	resourceMgr   *resource_mgr.ResourceMgr
 	currentEvent  *resource_mgr.EventDetail
+	client        *apiclient.ApiClient
 }
 
 func MakeRankServer() *RankServer {
@@ -81,12 +83,12 @@ func MakeRankServer() *RankServer {
 	yaml.Unmarshal(content, &config)
 	fmt.Println(config)
 
-	content, err = ioutil.ReadFile(CONFIG_FILE_2)
+	/*content, err = ioutil.ReadFile(CONFIG_FILE_2)
 	if err != nil {
 		log.Fatal(err)
-	}
-	var config_2 map[string]string
-	yaml.Unmarshal(content, &config_2)
+	}*/
+	//var config_2 map[string]string
+	//yaml.Unmarshal(content, &config_2)
 
 	confLOG_FILE, ok := config["LOG_FILE"]
 	if ok {
@@ -130,11 +132,18 @@ func MakeRankServer() *RankServer {
 		r.plainServer = &http.Server{Addr: ":4001"}
 	}
 	r.setHandleFunc()
-	rv, ok := config_2["res_ver"]
-	if !ok {
+
+	//rv, ok := config_2["res_ver"]
+	/*if !ok {
 		log.Println(config_2)
 		log.Fatal("missing res_ver in " + CONFIG_FILE_2)
-	}
+	}*/
+
+	r.client = apiclient.NewApiClientFromConfig(CONFIG_FILE_2)
+	r.client.LoadCheck()
+
+	rv := r.client.Get_res_ver()
+
 	r.resourceMgr = resource_mgr.NewResourceMgr(rv, RESOURCE_CACHE_DIR)
 	r.resourceMgr.LoadManifest()
 	r.resourceMgr.ParseEvent()
