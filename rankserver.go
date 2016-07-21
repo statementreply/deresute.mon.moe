@@ -40,24 +40,21 @@ var rankingTypeFilter = regexp.MustCompile("r01\\.\\d+$")
 type RankServer struct {
 	data  map[string][]map[int]int     // need mux
 	speed map[string][]map[int]float32 // need mux
-	// {"1467555420":
-	//    [{10: 2034} ,{30: 203021} ]
-	//  }
+	// {"1467555420":   [{10: 2034} ,{30: 203021} ]  }
 	list_timestamp []string // need mutex?
-	// lock for write ops
 	// for both read and write
-	mux         sync.RWMutex
-	mux_speed   sync.RWMutex
-	logger      *log.Logger
-	keyFile     string
-	certFile    string
-	plainServer *http.Server
-	tlsServer   *http.Server
-	hostname    string
-	tz            *time.Location
-	resourceMgr   *resource_mgr.ResourceMgr
-	currentEvent  *resource_mgr.EventDetail
-	client        *apiclient.ApiClient
+	mux          sync.RWMutex
+	mux_speed    sync.RWMutex
+	logger       *log.Logger
+	keyFile      string
+	certFile     string
+	plainServer  *http.Server
+	tlsServer    *http.Server
+	hostname     string
+	tz           *time.Location
+	resourceMgr  *resource_mgr.ResourceMgr
+	currentEvent *resource_mgr.EventDetail
+	client       *apiclient.ApiClient
 }
 
 func MakeRankServer() *RankServer {
