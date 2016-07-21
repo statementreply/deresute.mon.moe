@@ -52,7 +52,7 @@ type RankServer struct {
 	tlsServer   *http.Server
 	hostname    string
 	// FIXME
-	current_event []string // start/stop timestamp
+	//current_event []string // start/stop timestamp
 	tz            *time.Location
 	resourceMgr   *resource_mgr.ResourceMgr
 	currentEvent  *resource_mgr.EventDetail
@@ -67,7 +67,7 @@ func MakeRankServer() *RankServer {
 	r.plainServer = nil
 	r.tlsServer = nil
 	// FIXME
-	r.current_event = []string{"1468908120", "1469707320"}
+	//r.current_event = []string{"1468908120", "1469707320"}
 
 	tz, err := time.LoadLocation("Asia/Tokyo")
 	r.tz = tz
@@ -314,13 +314,13 @@ func (r *RankServer) formatTime(t time.Time) string {
 	return st
 }
 
-func (r *RankServer) inCurrentEvent(timestamp string) bool {
+/*func (r *RankServer) inCurrentEvent(timestamp string) bool {
 	if (timestamp >= r.current_event[0]) && (timestamp <= r.current_event[1]) {
 		return true
 	} else {
 		return false
 	}
-}
+}*/
 
 func (r *RankServer) inEvent(timestamp string, event *resource_mgr.EventDetail) bool {
 	if event == nil {
