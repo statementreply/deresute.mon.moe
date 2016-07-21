@@ -365,7 +365,6 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 		}
 	}
 
-	//log.Print(fileName)
 	if r.isLocked(fileName) {
 		r.logger.Println("data/rank/... locked, return -1")
 		return -1
@@ -395,12 +394,9 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 	score = 0
 	if len(local_rank_list) > 0 {
 		score = local_rank_list[0]["score"].(int)
-		// duplicate
-		//rank := local_rank_list[0]["rank"].(int)
 	}
 	if score == 0 {
-		r.logger.Println(timestamp, fileName, len(local_rank_list), "return 0")
-		r.logger.Println(content)
+		r.logger.Println(timestamp, fileName, len(local_rank_list), "return 0", content)
 	}
 	r.mux.Lock()
 	r.data[timestamp][rankingType][rank] = score
@@ -442,8 +438,6 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
 			return val
 		}
 	}
-	//timestamp_i, _ := strconv.Atoi(timestamp)
-	//prev_timestamp2 := fmt.Sprintf("%d", timestamp_i-INTERVAL)
 	t_i := r.timestampToTime(timestamp)
 	t_prev := t_i.Add(-INTERVAL)
 	prev_timestamp := r.timeToTimestamp(t_prev)
@@ -470,16 +464,13 @@ func (r *RankServer) getSpeed_i(timestamp string, rankingType int, rank int) int
 
 func (r *RankServer) run() {
 	if r.tlsServer != nil {
-		//fmt.Println("here-1")
 		go func() {
 			err := r.tlsServer.ListenAndServeTLS(r.certFile, r.keyFile)
 			if err != nil {
 				r.logger.Fatal(err)
 			}
 		}()
-		//fmt.Println("here")
 	}
-	//fmt.Println("here+1")
 	err := r.plainServer.ListenAndServe()
 	if err != nil {
 		r.logger.Fatal(err)
@@ -742,7 +733,6 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 		name := e.Name()
 		if (e.Type() == 1 || e.Type() == 3) && e.EventEnd().After(time.Unix(1467552720, 0)) {
 			// ranking information available
-
 			name = fmt.Sprintf(`<a href="qchart?event=%d">%s</a>`, e.Id(), name)
 		}
 		fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n", name, r.formatTime(e.EventStart()), r.formatTime(e.EventEnd()))
@@ -821,10 +811,8 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 		n_rank := []string{}
 		for _, n := range list_rank {
 			n_rank = append(n_rank, fmt.Sprintf("%d", n))
-			//fmt.Println(n_rank)
 		}
 		prefill = strings.Join(n_rank, " ")
-		//fmt.Println(prefill)
 	}
 	r.preload_qchart(w, req, list_rank, event)
 	defer r.postload(w, req)
@@ -886,10 +874,8 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) redirectHandler(w http.ResponseWriter, req *http.Request) {
-	//fmt.Println("url is ", req.URL)
 	req.URL.Host = r.hostname + ":4002"
 	req.URL.Scheme = "https"
-	//fmt.Println("redirecting to ", req.URL)
 	http.Redirect(w, req, req.URL.String(), http.StatusMovedPermanently)
 }
 
