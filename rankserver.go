@@ -733,7 +733,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "ホームページ")
 	fmt.Fprintf(w,`
-<form action="qchart" method="get">カスタマイズボーダー：<br>
+<form action="qchart" method="get">customized border graph：<br>
 <input type="text" name="rank" size=35 value="%s"></input>
 <input type="submit" value="更新"></form>
 	`, prefill)
