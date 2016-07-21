@@ -109,10 +109,14 @@ func GetCache(client *apiclient.ApiClient, cache_dir string, ranking_type int, p
 }
 
 func get_page(client *apiclient.ApiClient, ranking_type, page int) ([]interface{}, uint64) {
+	var ranking_list []interface{}
 	resp := client.GetAtaponRanking(ranking_type, page)
-	fmt.Println(client.GetResultCode(resp))
 	servertime := resp["data_headers"].(map[interface{}]interface{})["servertime"].(uint64)
-	ranking_list := resp["data"].(map[interface{}]interface{})["ranking_list"].([]interface{})
+	if client.GetResultCode(resp) != 1 {
+		// FIXME if error
+		return ranking_list, servertime
+	}
+	ranking_list = resp["data"].(map[interface{}]interface{})["ranking_list"].([]interface{})
 	return ranking_list, servertime
 }
 
