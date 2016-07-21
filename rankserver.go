@@ -705,7 +705,12 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
     fmt.Fprintf(w, `<table class="columns">`)
 	fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n", "event", "start", "end")
 	for _, e := range r.resourceMgr.EventList {
-		fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n", e.Name(), r.formatTime(e.EventStart()), r.formatTime(e.EventEnd()))
+		name := e.Name()
+		if e.Type() == 1 || e.Type() == 3 {
+			// ranking information available
+			name = "<a href=\"\">" + name + "</a>"
+		}
+		fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n", name, r.formatTime(e.EventStart()), r.formatTime(e.EventEnd()))
 	}
     fmt.Fprintf(w, `</table>`)
 }
