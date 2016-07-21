@@ -45,6 +45,7 @@ type RankServer struct {
 	// for both read and write
 	mux          sync.RWMutex
 	mux_speed    sync.RWMutex
+	mux_timestamp sync.RWMutex
 	logger       *log.Logger
 	keyFile      string
 	certFile     string
@@ -155,7 +156,7 @@ func (r *RankServer) updateTimestamp() {
 	if err != nil {
 		r.logger.Fatal(err)
 	}
-	r.mux.Lock()
+	r.mux_timestamp.Lock()
 	r.list_timestamp = make([]string, 0, len(fi))
 	// sub: dir name 1467555420
 	for _, sub := range fi {
@@ -165,7 +166,7 @@ func (r *RankServer) updateTimestamp() {
 		}
 	}
 	sort.Strings(r.list_timestamp)
-	r.mux.Unlock()
+	r.mux_timestamp.Unlock()
 }
 
 func (r *RankServer) latestTimestamp() string {
@@ -173,8 +174,9 @@ func (r *RankServer) latestTimestamp() string {
 	var latest string
 	latest = ""
 	// skip empty timestamps
-	for ind := len(r.list_timestamp) - 1; ind >= 0; ind-- {
-		latest = r.list_timestamp[ind]
+	local_timestamp := r.get_list_timestamp()
+	for ind := len(local_timestamp) - 1; ind >= 0; ind-- {
+		latest = local_timestamp[ind]
 		if r.checkDir(latest) {
 			break
 		}
@@ -484,6 +486,14 @@ func (r *RankServer) rankData_list_f(rankingType int, list_rank []int, dataSourc
 	return r.rankData_list_f_e(rankingType, list_rank, dataSource, r.currentEvent)
 }
 
+func (r *RankServer) get_list_timestamp() []string {
+	local_timestamp := make([]string, 0)
+	r.mux_timestamp.RLock()
+	copy(local_timestamp, r.list_timestamp)
+	r.mux_timestamp.RUnlock()
+	return local_timestamp
+}
+
 func (r *RankServer) rankData_list_f_e(rankingType int, list_rank []int, dataSource func(string, int, int) interface{}, event *resource_mgr.EventDetail) string {
 	//log.Print("functional version of rankData_list_f()")
 	r.updateTimestamp()
@@ -495,7 +505,9 @@ func (r *RankServer) rankData_list_f_e(rankingType int, list_rank []int, dataSou
 	raw += "\n"
 	raw += `],"rows":[`
 
-	for _, timestamp := range r.list_timestamp {
+
+	local_timestamp := r.get_list_timestamp()
+	for _, timestamp := range local_timestamp {
 		if !r.inEvent(timestamp, event) {
 			continue
 		}
@@ -717,7 +729,9 @@ func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<br>デレステイベントボーダー<br><br>")
 	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "最新ボーダー")
-	for _, timestamp := range r.list_timestamp {
+
+	local_timestamp := r.get_list_timestamp()
+	for _, timestamp := range local_timestamp {
 		fmt.Fprintf(w, "<a href=\"q?t=%s\">%s</a><br>\n", timestamp, r.formatTimestamp(timestamp))
 	}
 }
