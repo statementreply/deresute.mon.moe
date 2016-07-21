@@ -804,6 +804,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, `
     <table class="columns">
 <tr><td><div id="myLineChart" style="border: 1px solid #ccc"/></td></tr>
+<tr><td>時速</td></tr>
 <tr><td><div id="mySpeedChart" style="border: 1px solid #ccc"/></td></tr>
     </table>
     `)
