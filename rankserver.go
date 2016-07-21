@@ -713,7 +713,8 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "<br>イベント開催中：%s<br><br>", r.currentEvent.Name())
 	}
 
-	fmt.Fprintf(w, "<a href=\"log\">%s</a><br>\n", "過去ボーダー")
+	fmt.Fprintf(w, "<a href=\"event\">%s</a><br>\n", "過去のイベント (new)")
+	fmt.Fprintf(w, "<a href=\"log\">%s</a><br>\n", "過去のデータ")
 	fmt.Fprintf(w, "<a href=\"qchart?rank=2001&rank=10001&rank=20001&rank=60001&rank=120001\">%s</a><br>\n", "グラフβ+ (new)")
 	fmt.Fprintf(w, "<a href=\"chart\">%s</a><br>\n", "グラフβ")
 	fmt.Fprintf(w, "<br>%s<br>\n", "最新ボーダー")
