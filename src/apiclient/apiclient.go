@@ -4,6 +4,7 @@ import (
 	// golang core libs
 	"crypto/md5"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -24,6 +25,12 @@ import (
 )
 
 const BASE string = "http://game.starlight-stage.jp"
+var ErrSession = errors.New("session error, (need to restart session)")
+var ErrResource = errors.New("need to update res_ver")
+var ErrOveruse = errors.New("too many requests")
+var ErrData = errors.New("data error str8?")
+var ErrEventClose = errors.New("event closed")
+var ErrUnknown = errors.New("unknown error")
 
 type ApiClient struct {
 	user          int32
@@ -119,19 +126,41 @@ func (client *ApiClient) GetResultCode(content map[string]interface{}) int64 {
 		result_code = data_headers.(map[interface{}]interface{})["result_code"].(int64)
 	} else {
 		// FIXME
+		return -1
 	}
 	return result_code
+}
+
+func (client *ApiClient) ParseResultCode(content map[string]interface{}) error {
+	result_code := client.GetResultCode(content)
+	switch result_code {
+	case 1:
+		return nil
+	case 201: // session error
+		return ErrSession
+	case 13001, 11001:
+		//ERROR_CODE_MEDLEY_CLOSE            //ERROR_CODE_ATAPON_CLOSE
+		return ErrEventClose
+	case 214:
+		return ErrResource
+	case 208:
+		return ErrOveruse
+	case 209:
+		return ErrData
+	default:
+		return ErrUnknown
+	}
 }
 
 func (client *ApiClient) LoadCheck() {
 	sum_tmp := md5.Sum([]byte("All your APIs are belong to us"))
 	args := map[string]interface{}{"campaign_data": "",
-		"campaign_user": 171780,
-		"campaign_sign": hex.EncodeToString(sum_tmp[:]),
-		"app_type":      0}
+	"campaign_user": 171780,
+	"campaign_sign": hex.EncodeToString(sum_tmp[:]),
+	"app_type":      0}
 
 	check := client.Call("/load/check", args)
-	log.Print(check)
+		log.Print(check)
 	new_res_ver, ok := check["data_headers"].(map[interface{}]interface{})["required_res_ver"]
 	if ok {
 		s := new_res_ver.(string)

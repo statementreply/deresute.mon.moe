@@ -127,6 +127,7 @@ func (r *ResourceMgr) LoadManifest() string {
 
 func (r *ResourceMgr) ParseEvent() {
 	master := r.LoadManifest()
+	log.Println("master db is", master)
 	db, err := sql.Open("sqlite3", master)
 	if err != nil {
 		log.Fatal(err)
