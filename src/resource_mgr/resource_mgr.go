@@ -40,12 +40,13 @@ func NewResourceMgr(res_ver string, cache_dir string) *ResourceMgr {
 
 func (r *ResourceMgr) Fetch(loc string) string {
 	dest := r.cache_dir + "/storage/" + loc
+	url := URLBASE + loc
+	log.Println("url is", url)
 	if _, err := os.Stat(dest); err == nil {
 		return dest
 	} else {
 		os.MkdirAll(path.Dir(dest), 0755)
 	}
-	url := URLBASE + loc
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
@@ -60,6 +61,7 @@ func (r *ResourceMgr) Fetch(loc string) string {
 
 func (r *ResourceMgr) FetchLz4(loc string) string {
 	dest := r.cache_dir + "/unlz4/" + loc
+	log.Println("url is", URLBASE + loc)
 	if _, err := os.Stat(dest); err == nil {
 		return dest
 	} else {
