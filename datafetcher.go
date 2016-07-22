@@ -1,13 +1,13 @@
 package main
 
 import (
+	"apiclient"
 	"fmt"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
-	"apiclient"
-	"gopkg.in/yaml.v2"
 	"time"
 )
 

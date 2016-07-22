@@ -25,6 +25,7 @@ import (
 )
 
 const BASE string = "http://game.starlight-stage.jp"
+
 var ErrSession = errors.New("session error, (need to restart session)")
 var ErrResource = errors.New("need to update res_ver")
 var ErrOveruse = errors.New("too many requests")
@@ -155,12 +156,12 @@ func (client *ApiClient) ParseResultCode(content map[string]interface{}) error {
 func (client *ApiClient) LoadCheck() {
 	sum_tmp := md5.Sum([]byte("All your APIs are belong to us"))
 	args := map[string]interface{}{"campaign_data": "",
-	"campaign_user": 171780,
-	"campaign_sign": hex.EncodeToString(sum_tmp[:]),
-	"app_type":      0}
+		"campaign_user": 171780,
+		"campaign_sign": hex.EncodeToString(sum_tmp[:]),
+		"app_type":      0}
 
 	check := client.Call("/load/check", args)
-		log.Print(check)
+	log.Print(check)
 	new_res_ver, ok := check["data_headers"].(map[interface{}]interface{})["required_res_ver"]
 	if ok {
 		s := new_res_ver.(string)

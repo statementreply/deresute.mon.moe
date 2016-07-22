@@ -41,19 +41,19 @@ type RankServer struct {
 	// {"1467555420":   [{10: 2034} ,{30: 203021} ]  }
 	list_timestamp []string // need mutex?
 	// for both read and write
-	mux          sync.RWMutex
-	mux_speed    sync.RWMutex
+	mux           sync.RWMutex
+	mux_speed     sync.RWMutex
 	mux_timestamp sync.RWMutex
-	logger       *log.Logger
-	keyFile      string
-	certFile     string
-	plainServer  *http.Server
-	tlsServer    *http.Server
-	hostname     string
-	tz           *time.Location
-	resourceMgr  *resource_mgr.ResourceMgr
-	currentEvent *resource_mgr.EventDetail
-	client       *apiclient.ApiClient
+	logger        *log.Logger
+	keyFile       string
+	certFile      string
+	plainServer   *http.Server
+	tlsServer     *http.Server
+	hostname      string
+	tz            *time.Location
+	resourceMgr   *resource_mgr.ResourceMgr
+	currentEvent  *resource_mgr.EventDetail
+	client        *apiclient.ApiClient
 }
 
 func MakeRankServer() *RankServer {
