@@ -78,13 +78,25 @@ func main() {
 	}
 }
 
+/*
+func df_main(df *datafetcher.DataFetcher) error {
+	err := df.Run()
+	if err != nil {
+		log.Println(err)
+	}
+	return err
+}
+*/
+
 func runCommand(df *datafetcher.DataFetcher) {
 	if !IsRunning() {
 		SetRunning()
-		err := df_main(df)
+		//err := df_main(df)
+		err := df.Run()
 		SetFinished()
 
 		if err != nil {
+			log.Println(err)
 			if err == apiclient.ErrSession {
 				// run again immediately
 				df.Client.Reset_sid()
@@ -130,12 +142,4 @@ func NeedToRun() bool {
 		ret = true
 	}
 	return ret
-}
-
-func df_main(df *datafetcher.DataFetcher) error {
-	err := df.Run()
-	if err != nil {
-		log.Println(err)
-	}
-	return err
 }
