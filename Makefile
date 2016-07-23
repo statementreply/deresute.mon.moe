@@ -1,4 +1,4 @@
-MAIN := rankserver dfnew ticker
+MAIN := rankserver df ticker
 EXTRA := pcapdump dumpbody unlz4 res get_profile test1
 all: ${MAIN}
 extra: ${EXTRA}
@@ -7,8 +7,8 @@ clean:
 
 web: prep rankserver
 	./rankserver
-fetch: dfnew
-	./dfnew
+fetch: df
+	./df
 
 
 prep:
@@ -17,7 +17,7 @@ prep:
 	fi
 
 dumpbody: src/apiclient/*
-dfnew: src/datafetcher/* src/apiclient/*
+df: src/datafetcher/* src/apiclient/*
 test1: src/apiclient/*
 pcapdump: src/apiclient/*
 unlz4: src/resource_mgr/*
