@@ -44,7 +44,7 @@ func runCommand() {
 	go func() {
 		if !IsRunning() {
 			SetRunning()
-			err := df_main()
+			err := df_main(SECRET_FILE, RANK_CACHE_DIR)
 			SetFinished()
 
 			if err != nil {
@@ -95,9 +95,9 @@ func NeedToRun() bool {
 	return ret
 }
 
-func df_main() error {
+func df_main(secret_file string, rank_cache_dir string) error {
 	log.Println("local-timestamp", datafetcher.GetLocalTimestamp())
-	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
+	client := apiclient.NewApiClientFromConfig(secret_file)
 	key_point := [][2]int{
 		[2]int{1, 1},
 		[2]int{1, 501},     // pt ranking emblem-1
@@ -123,7 +123,7 @@ func df_main() error {
 		key_point = append(key_point, [2]int{1, index*10000 + 1})
 		key_point = append(key_point, [2]int{2, index*10000 + 1})
 	}
-	df := datafetcher.NewDataFetcher(client, key_point, RANK_CACHE_DIR)
+	df := datafetcher.NewDataFetcher(client, key_point, rank_cache_dir)
 	err := df.Run()
 	if err != nil {
 		log.Println(err)
