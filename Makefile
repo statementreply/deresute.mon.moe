@@ -16,14 +16,14 @@ prep:
 	    ln -s ../deresuteme/data; \
 	fi
 
+rankserver: src/resource_mgr/* src/apiclient/*
+dfticker: src/datafetcher/* src/apiclient/*
 dumpbody: src/apiclient/*
 df: src/datafetcher/* src/apiclient/*
-dfticker: src/datafetcher/* src/apiclient/*
 test1: src/apiclient/*
 pcapdump: src/apiclient/*
 unlz4: src/resource_mgr/*
 res: src/resource_mgr/*
-rankserver: src/resource_mgr/*
 get_profile: src/apiclient/*
 
 %: %.go
