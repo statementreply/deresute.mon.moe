@@ -19,7 +19,7 @@ func main() {
 	yaml.Unmarshal(content, &config)
 
 	r := resource_mgr.NewResourceMgr(config["res_ver"], "data/resourcesbeta")
-	r.LoadManifest()
+	r.LoadMaster()
 	r.ParseEvent()
 	for _, e := range r.EventList {
 		//log.Println(e)
@@ -27,4 +27,7 @@ func main() {
 	}
 	currentEvent := resource_mgr.FindCurrentEvent(r.EventList)
 	log.Println(currentEvent.Name())
+
+	//manifest := r.LoadManifest()
+
 }

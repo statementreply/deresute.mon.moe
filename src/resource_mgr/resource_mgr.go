@@ -102,7 +102,12 @@ func (r *ResourceMgr) LoadManifest() string {
 		}
 	}
 	dest := r.FetchLz4(base + "manifests/" + manifest_name)
-	log.Println("to open", dest, md5)
+	return dest
+}
+
+func (r *ResourceMgr) LoadMaster() string {
+	dest := r.LoadManifest()
+	log.Println("to open", dest)
 	db, err := sql.Open("sqlite3", dest)
 	if err != nil {
 		log.Fatal("x1", err)
@@ -132,7 +137,7 @@ func (r *ResourceMgr) LoadManifest() string {
 }
 
 func (r *ResourceMgr) ParseEvent() {
-	master := r.LoadManifest()
+	master := r.LoadMaster()
 	log.Println("master db is", master)
 	db, err := sql.Open("sqlite3", master)
 	if err != nil {
