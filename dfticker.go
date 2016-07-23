@@ -20,6 +20,7 @@ var RANK_CACHE_DIR string = BASE + "/data/rank/"
 var lock sync.Mutex
 var _isRunning bool
 var lastRun = time.Unix(0, 0)
+
 // global const
 var sleepDuration = time.Minute * 2
 
@@ -54,9 +55,6 @@ func main() {
 	}
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 	df := datafetcher.NewDataFetcher(client, key_point, RANK_CACHE_DIR)
-
-
-
 
 	ticker := time.NewTicker(time.Second * 1)
 	var q, q0 time.Duration
