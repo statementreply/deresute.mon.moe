@@ -680,7 +680,7 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
-	r.preload(w, req)
+	r.preload_qchart(w, req, []int{120001}, r.currentEvent)
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<br>デレステイベントボーダー<br><br>")
 	if r.currentEvent != nil {
@@ -693,7 +693,17 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "<a href=\"event\">%s</a><br>\n", "過去のイベント (new)")
 	fmt.Fprintf(w, "<a href=\"log\">%s</a><br>\n", "過去のデータ")
 	fmt.Fprintf(w, "<a href=\"qchart?rank=2001&rank=10001&rank=20001&rank=60001&rank=120001\">%s</a><br>\n", "グラフβ+ (new)")
-	fmt.Fprintf(w, "<a href=\"chart\">%s</a><br>\n", "グラフβ")
+	//fmt.Fprintf(w, "<a href=\"chart\">%s</a><br>\n", "グラフβ")
+	fmt.Fprintf(w, "%s<br>\n", "12万位ボーダーグラフ")
+	// insert graph here
+	fmt.Fprint(w, `
+    <table class="columns">
+<tr><td><div id="myLineChart" style="border: 1px solid #ccc"/></td></tr>
+<tr><td>時速</td></tr>
+<tr><td><div id="mySpeedChart" style="border: 1px solid #ccc"/></td></tr>
+    </table>
+    `)
+
 	fmt.Fprintf(w, "<br>%s<br>\n", "最新ボーダー")
 	r.checkData("")
 	fmt.Fprint(w, "<pre>")
