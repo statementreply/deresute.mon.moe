@@ -38,6 +38,7 @@ type ApiClient struct {
 	user          int32
 	viewer_id     int32
 	viewer_id_str string
+	timezone      string
 	udid          string
 	sid           string
 	res_ver       string
@@ -56,6 +57,7 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 	client.user = user
 	client.viewer_id = viewer_id
 	client.viewer_id_str = fmt.Sprintf("%d", viewer_id)
+	client.timezone = "09:00:00" // version 2.1.0 new
 	client.udid = udid
 	client.msg_iv = []byte(strings.Replace(client.udid, "-", "", -1))
 	client.res_ver = res_ver
@@ -179,8 +181,9 @@ func (client *ApiClient) ParseResultCode(content map[string]interface{}) error {
 
 func (client *ApiClient) LoadCheck() {
 	sum_tmp := md5.Sum([]byte("All your APIs are belong to us"))
-	args := map[string]interface{}{"campaign_data": "",
-		"campaign_user": 171780,
+	args := map[string]interface{}{
+		"campaign_data": "",
+		"campaign_user": 171780, // FIXME
 		"campaign_sign": hex.EncodeToString(sum_tmp[:]),
 		"app_type":      0}
 
