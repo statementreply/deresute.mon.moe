@@ -56,6 +56,7 @@ type RankServer struct {
 	resourceMgr   *resource_mgr.ResourceMgr
 	currentEvent  *resource_mgr.EventDetail
 	client        *apiclient.ApiClient
+	lastCheck     time.Time
 }
 
 func MakeRankServer() *RankServer {
@@ -131,6 +132,7 @@ func MakeRankServer() *RankServer {
 	//r.resourceMgr.LoadManifest()
 	r.resourceMgr.ParseEvent()
 	r.currentEvent = r.resourceMgr.FindCurrentEvent()
+	r.lastCheck = time.Now()
 	return r
 }
 
@@ -204,6 +206,16 @@ func (r *RankServer) checkDir(timestamp string) bool {
 }
 
 func (r *RankServer) checkData(timestamp string) {
+	// check new res_ver
+	if time.Now().Sub(r.lastCheck) >= 6 * time.Hour {
+		r.client.LoadCheck()
+		rv := r.client.Get_res_ver()
+		r.resourceMgr.Set_res_ver(rv)
+		r.resourceMgr.ParseEvent()
+		r.currentEvent = r.resourceMgr.FindCurrentEvent()
+		r.lastCheck = time.Now()
+	}
+
 	r.updateTimestamp()
 	latest := r.latestTimestamp()
 	if timestamp == "" {
