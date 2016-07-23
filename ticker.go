@@ -9,11 +9,13 @@ import (
 )
 
 var lock sync.Mutex
+var wg sync.WaitGroup
 var _isRunning bool
 var lastRun = time.Unix(0, 0)
 var sleepDuration = time.Minute * 2
 
 // python ../deresuteme/main2.py
+// ./df
 func main() {
 	ticker := time.NewTicker(time.Second * 1)
 	var q, q0 time.Duration
@@ -36,14 +38,18 @@ func main() {
 			}
 		}
 	}
+	wg.Wait()
 }
 
 func runCommand() {
-	c := exec.Command("timeout", "300", "python", "../deresuteme/main2.py")
+	//c := exec.Command("timeout", "300", "python", "../deresuteme/main2.py")
+	c := exec.Command("timeout", "300", "./df")
 	c.Stdin = nil
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		if !IsRunning() {
 			SetRunning()
 			c.Run()
