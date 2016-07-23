@@ -47,16 +47,16 @@ type ApiClient struct {
 	SID_KEY       []byte
 
 	// need lock
-	sid           string
-	res_ver       string
+	sid     string
+	res_ver string
 	// true: if LoadCheck was called
 	// false: need to call LoadCheck
-	initialized   bool
+	initialized bool
 
-	lock          sync.RWMutex
+	lock sync.RWMutex
 
 	// for reuse, concurrency safe
-	httpclient    *http.Client
+	httpclient *http.Client
 }
 
 func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SID_KEY []byte) *ApiClient {

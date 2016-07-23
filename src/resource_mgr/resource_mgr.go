@@ -61,7 +61,7 @@ func (r *ResourceMgr) Fetch(loc string) string {
 
 func (r *ResourceMgr) FetchLz4(loc string) string {
 	dest := r.cache_dir + "/unlz4/" + loc
-	log.Println("url is", URLBASE + loc)
+	log.Println("url is", URLBASE+loc)
 	if _, err := os.Stat(dest); err == nil {
 		return dest
 	} else {

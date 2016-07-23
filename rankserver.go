@@ -207,7 +207,7 @@ func (r *RankServer) checkDir(timestamp string) bool {
 
 func (r *RankServer) checkData(timestamp string) {
 	// check new res_ver
-	if time.Now().Sub(r.lastCheck) >= 6 * time.Hour {
+	if time.Now().Sub(r.lastCheck) >= 6*time.Hour {
 		r.client.LoadCheck()
 		rv := r.client.Get_res_ver()
 		r.resourceMgr.Set_res_ver(rv)

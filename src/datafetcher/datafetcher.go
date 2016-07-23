@@ -33,9 +33,8 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_
 	df.rank_cache_dir = rank_cache_dir
 
 	df.Client.LoadCheck()
-    rv := client.Get_res_ver()
-    df.resourceMgr = resource_mgr.NewResourceMgr(rv, resource_cache_dir)
-
+	rv := client.Get_res_ver()
+	df.resourceMgr = resource_mgr.NewResourceMgr(rv, resource_cache_dir)
 
 	//log.Println(GetLocalTimestamp())
 	//log.Println(RoundTimestamp(time.Now()).String())
@@ -45,13 +44,13 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_
 func (df *DataFetcher) Run() error {
 	// handle new res_ver
 	df.Client.LoadCheck()
-    rv := df.Client.Get_res_ver()
-    df.resourceMgr.Set_res_ver(rv)
+	rv := df.Client.Get_res_ver()
+	df.resourceMgr.Set_res_ver(rv)
 
-    df.resourceMgr.ParseEvent()
+	df.resourceMgr.ParseEvent()
 	currentEvent := df.resourceMgr.FindCurrentEvent()
 
-    if currentEvent == nil {
+	if currentEvent == nil {
 		return ErrNoEvent
 	}
 

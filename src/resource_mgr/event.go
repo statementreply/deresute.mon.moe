@@ -5,13 +5,13 @@ import (
 )
 
 type EventDetail struct {
-	id, typ                                    int
-	name                                       string
-	notice_start                               time.Time
-	event_start, second_half_start, event_end  time.Time
-	calc_start, result_start, result_end       time.Time
-	limit_flag, bg_type, bg_id                 int
-	login_bonus_type, login_bonus_count        int
+	id, typ                                   int
+	name                                      string
+	notice_start                              time.Time
+	event_start, second_half_start, event_end time.Time
+	calc_start, result_start, result_end      time.Time
+	limit_flag, bg_type, bg_id                int
+	login_bonus_type, login_bonus_count       int
 }
 
 func (e *EventDetail) Type() int {
@@ -34,7 +34,6 @@ func (e *EventDetail) EventStart() time.Time {
 func (e *EventDetail) SecondHalfStart() time.Time {
 	return e.second_half_start
 }
-
 
 func (e *EventDetail) EventEnd() time.Time {
 	return e.event_end
