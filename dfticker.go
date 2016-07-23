@@ -11,10 +11,12 @@ import (
 	"time"
 )
 
+// parameters
 var SECRET_FILE string = "secret.yaml"
 var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
 
+// global vars
 var lock sync.Mutex
 var _isRunning bool
 var lastRun = time.Unix(0, 0)
@@ -126,6 +128,7 @@ func df_main(client *apiclient.ApiClient, rank_cache_dir string) error {
 		key_point = append(key_point, [2]int{2, index*10000 + 1})
 	}
 	df := datafetcher.NewDataFetcher(client, key_point, rank_cache_dir)
+
 	err := df.Run()
 	if err != nil {
 		log.Println(err)
