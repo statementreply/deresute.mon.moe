@@ -52,6 +52,7 @@ func (df *DataFetcher) Run() error {
 	event_type := 0
     if currentEvent != nil {
         event_type = currentEvent.Type()
+		log.Println("current event type:", event_type)
     } else {
 		return ErrNoEvent
 	}
