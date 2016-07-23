@@ -32,7 +32,7 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_
 
 func (df *DataFetcher) Run() error {
 	for _, key := range df.key_point {
-		log.Println(key)
+		//log.Println("rankingtype:", key[0], "rank:", key[1])
 		err := df.GetCache(key[0], RankToPage(key[1]))
 		if err != nil {
 			//log.Fatal(err)
@@ -59,7 +59,7 @@ func DumpToFile(v interface{}, fileName string) {
 }
 
 func (df *DataFetcher) GetCache(ranking_type int, page int) error {
-	localtime := float64(time.Now().UnixNano()) / 1e9
+	localtime := float64(time.Now().UnixNano()) / 1e9 // for debug
 	local_timestamp := GetLocalTimestamp()
 	dirname := df.rank_cache_dir + local_timestamp + "/"
 	path := dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
@@ -79,11 +79,12 @@ func (df *DataFetcher) GetCache(ranking_type int, page int) error {
 		return err
 	}
 	log.Printf("localtime: %f servertime: %d lag: %f\n", localtime, servertime, float64(servertime)-localtime)
+
 	server_timestamp_i := RoundTimestamp(time.Unix(int64(servertime), 0)).Unix()
 	server_timestamp := fmt.Sprintf("%d", server_timestamp_i)
 
 	if server_timestamp != local_timestamp {
-		log.Println("server:", server_timestamp, "local:", local_timestamp)
+		log.Println("{NOTICE} change to server:", server_timestamp, "local:", local_timestamp)
 		dirname = df.rank_cache_dir + server_timestamp + "/"
 		path = dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
 		if !Exists(dirname) {
@@ -95,8 +96,6 @@ func (df *DataFetcher) GetCache(ranking_type int, page int) error {
 	ioutil.WriteFile(lockfile, []byte(""), 0644)
 	DumpToFile(ranking_list, path)
 	os.Remove(lockfile)
-	//DumpToStdout(ranking_list)
-	//fmt.Println(ranking_list)
 	return nil
 }
 
@@ -105,12 +104,14 @@ func (df *DataFetcher) GetPage(ranking_type, page int) ([]interface{}, uint64, e
 	if !df.client.IsInitialized() {
 		df.client.LoadCheck()
 	}
+	// FIXME atapon/medley
 	resp := df.client.GetAtaponRanking(ranking_type, page)
 	servertime := resp["data_headers"].(map[interface{}]interface{})["servertime"].(uint64)
 	err := df.client.ParseResultCode(resp)
 	if err != nil {
 		return nil, servertime, err
 	}
+	log.Println("get", servertime, ranking_type, page)
 	ranking_list = resp["data"].(map[interface{}]interface{})["ranking_list"].([]interface{})
 	return ranking_list, servertime, err
 }

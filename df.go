@@ -3,7 +3,6 @@ package main
 import (
 	"apiclient"
 	"datafetcher"
-	"fmt"
 	"log"
 	"os"
 	"path"
@@ -12,15 +11,15 @@ import (
 
 var SECRET_FILE string = "secret.yaml"
 var BASE string = path.Dir(os.Args[0])
-var RANK_CACHE_DIR string = BASE + "/data/rankbeta/"
+var RANK_CACHE_DIR string = BASE + "/data/rank/"
 
 func main() {
 	log.Println("dfnew", os.Args[0])
 	//rand.Seed(time.Now().Unix())
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 
-	fmt.Println(datafetcher.GetLocalTimestamp())
-	fmt.Println(datafetcher.RoundTimestamp(time.Now()).String())
+	log.Println(datafetcher.GetLocalTimestamp())
+	log.Println(datafetcher.RoundTimestamp(time.Now()).String())
 
 	key_point := [][2]int{
 		[2]int{1, 1},

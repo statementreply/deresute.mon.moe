@@ -146,12 +146,12 @@ func (client *ApiClient) ParseResultCode(content map[string]interface{}) error {
 	switch r := result_code.(type) {
 	case uint64:
 		// good for now
-		log.Println("result_code is uint64", result_code)
+		//log.Println("result_code is uint64", result_code)
 	case int64:
-		log.Println("result_code is int64", result_code)
 		// convert to uint64
 		if r != 1 {
 			log.Println("result_code is not 1")
+			log.Println("result_code is int64", result_code)
 			result_code = interface{}(uint64(99999)) // ErrUnknown
 		} else {
 			result_code = interface{}(uint64(1))
