@@ -2,21 +2,27 @@ package datafetcher
 
 import (
 	"apiclient"
+	"errors"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"os"
+	"resource_mgr"
 	"time"
 )
 
+var ErrNoEvent = errors.New("no event is running now")
+var ErrEventType = errors.New("current event type has no ranking")
+
 type DataFetcher struct {
 	Client         *apiclient.ApiClient
+	resourceMgr    *resource_mgr.ResourceMgr
 	key_point      [][2]int
 	rank_cache_dir string
 }
 
-func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_dir string) *DataFetcher {
+func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_dir, resource_cache_dir string) *DataFetcher {
 	log.Println("NewDataFetcher()")
 	df := new(DataFetcher)
 
@@ -25,15 +31,34 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_
 	df.key_point = key_point
 	df.rank_cache_dir = rank_cache_dir
 
+	df.Client.LoadCheck()
+    rv := client.Get_res_ver()
+    df.resourceMgr = resource_mgr.NewResourceMgr(rv, resource_cache_dir)
+
+
 	//log.Println(GetLocalTimestamp())
 	//log.Println(RoundTimestamp(time.Now()).String())
 	return df
 }
 
 func (df *DataFetcher) Run() error {
+	// handle new res_ver
+	df.Client.LoadCheck()
+    rv := df.Client.Get_res_ver()
+    df.resourceMgr.Set_res_ver(rv)
+
+    df.resourceMgr.ParseEvent()
+	currentEvent := df.resourceMgr.FindCurrentEvent()
+	event_type := 0
+    if currentEvent != nil {
+        event_type = currentEvent.Type()
+    } else {
+		return ErrNoEvent
+	}
+
 	for _, key := range df.key_point {
 		//log.Println("rankingtype:", key[0], "rank:", key[1])
-		err := df.GetCache(key[0], RankToPage(key[1]))
+		err := df.GetCache(event_type, key[0], RankToPage(key[1]))
 		if err != nil {
 			//log.Fatal(err)
 			return err
@@ -58,7 +83,7 @@ func DumpToFile(v interface{}, fileName string) {
 	ioutil.WriteFile(fileName, yy, 0644)
 }
 
-func (df *DataFetcher) GetCache(ranking_type int, page int) error {
+func (df *DataFetcher) GetCache(event_type, ranking_type int, page int) error {
 	localtime := float64(time.Now().UnixNano()) / 1e9 // for debug
 	local_timestamp := GetLocalTimestamp()
 	dirname := df.rank_cache_dir + local_timestamp + "/"
@@ -74,7 +99,7 @@ func (df *DataFetcher) GetCache(ranking_type int, page int) error {
 		}
 	}
 	time.Sleep(1020 * time.Millisecond)
-	ranking_list, servertime, err := df.GetPage(ranking_type, page)
+	ranking_list, servertime, err := df.GetPage(event_type, ranking_type, page)
 	if err != nil {
 		return err
 	}
@@ -99,13 +124,21 @@ func (df *DataFetcher) GetCache(ranking_type int, page int) error {
 	return nil
 }
 
-func (df *DataFetcher) GetPage(ranking_type, page int) ([]interface{}, uint64, error) {
+func (df *DataFetcher) GetPage(event_type, ranking_type, page int) ([]interface{}, uint64, error) {
 	var ranking_list []interface{}
 	if !df.Client.IsInitialized() {
 		df.Client.LoadCheck()
 	}
-	// FIXME atapon/medley
-	resp := df.Client.GetAtaponRanking(ranking_type, page)
+	// deal with atapon/medley
+	var resp map[string]interface{}
+	if event_type == 1 {
+		resp = df.Client.GetAtaponRanking(ranking_type, page)
+	} else if event_type == 3 {
+		resp = df.Client.GetMedleyRanking(ranking_type, page)
+	} else {
+		return nil, 0, ErrEventType
+	}
+
 	servertime := resp["data_headers"].(map[interface{}]interface{})["servertime"].(uint64)
 	err := df.Client.ParseResultCode(resp)
 	if err != nil {

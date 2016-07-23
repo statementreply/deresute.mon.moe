@@ -15,6 +15,7 @@ import (
 var SECRET_FILE string = "secret.yaml"
 var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
+var RESOURCE_CACHE_DIR string = BASE + "/data/resourcesbeta/"
 
 // global vars
 var lock sync.Mutex
@@ -52,7 +53,7 @@ func main() {
 		key_point = append(key_point, [2]int{2, index*10000 + 1})
 	}
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
-	df := datafetcher.NewDataFetcher(client, key_point, RANK_CACHE_DIR)
+	df := datafetcher.NewDataFetcher(client, key_point, RANK_CACHE_DIR, RESOURCE_CACHE_DIR)
 
 	ticker := time.NewTicker(time.Second * 1)
 	var q, q0 time.Duration

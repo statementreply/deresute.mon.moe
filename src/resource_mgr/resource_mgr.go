@@ -73,6 +73,10 @@ func (r *ResourceMgr) FetchLz4(loc string) string {
 	return dest
 }
 
+func (r *ResourceMgr) Set_res_ver(res_ver string) {
+	r.res_ver = res_ver
+}
+
 func (r *ResourceMgr) LoadManifest() string {
 	base := fmt.Sprintf("dl/%s/", r.res_ver)
 	//content, _ := ioutil.ReadFile(r.Fetch(base + "manifests/all_dbmanifest"))
