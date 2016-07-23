@@ -25,8 +25,8 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_
 	df.key_point = key_point
 	df.rank_cache_dir = rank_cache_dir
 
-	log.Println(apiclient.GetLocalTimestamp())
-	log.Println(apiclient.RoundTimestamp(time.Now()).String())
+	log.Println(GetLocalTimestamp())
+	log.Println(RoundTimestamp(time.Now()).String())
 	return df
 }
 
@@ -60,7 +60,7 @@ func DumpToFile(v interface{}, fileName string) {
 
 func (df *DataFetcher) GetCache(ranking_type int, page int) error {
 	localtime := float64(time.Now().UnixNano()) / 1e9
-	local_timestamp := apiclient.GetLocalTimestamp()
+	local_timestamp := GetLocalTimestamp()
 	dirname := df.rank_cache_dir + local_timestamp + "/"
 	path := dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
 	if Exists(path) {
@@ -79,7 +79,7 @@ func (df *DataFetcher) GetCache(ranking_type int, page int) error {
 		return err
 	}
 	log.Printf("localtime: %f servertime: %d lag: %f\n", localtime, servertime, float64(servertime)-localtime)
-	server_timestamp_i := apiclient.RoundTimestamp(time.Unix(int64(servertime), 0)).Unix()
+	server_timestamp_i := RoundTimestamp(time.Unix(int64(servertime), 0)).Unix()
 	server_timestamp := fmt.Sprintf("%d", server_timestamp_i)
 
 	if server_timestamp != local_timestamp {

@@ -19,8 +19,8 @@ func main() {
 	//rand.Seed(time.Now().Unix())
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 
-	fmt.Println(apiclient.GetLocalTimestamp())
-	fmt.Println(apiclient.RoundTimestamp(time.Now()).String())
+	fmt.Println(datafetcher.GetLocalTimestamp())
+	fmt.Println(datafetcher.RoundTimestamp(time.Now()).String())
 
 	key_point := [][2]int{
 		[2]int{1, 1},
