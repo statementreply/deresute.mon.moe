@@ -18,7 +18,6 @@ func main() {
 	log.Println("dfnew", os.Args[0])
 	//rand.Seed(time.Now().Unix())
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
-	client.LoadCheck()
 
 	fmt.Println(apiclient.GetLocalTimestamp())
 	fmt.Println(apiclient.RoundTimestamp(time.Now()).String())
@@ -49,6 +48,7 @@ func main() {
 		key_point = append(key_point, [2]int{2, index*10000 + 1})
 	}
 	df := datafetcher.NewDataFetcher(client, key_point, RANK_CACHE_DIR)
+	//client.LoadCheck()
 	err := df.Run()
 	if err != nil {
 		log.Println(err)

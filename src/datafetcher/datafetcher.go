@@ -102,6 +102,9 @@ func (df *DataFetcher) GetCache(ranking_type int, page int) error {
 
 func (df *DataFetcher) GetPage(ranking_type, page int) ([]interface{}, uint64, error) {
 	var ranking_list []interface{}
+	if !df.client.IsInitialized() {
+		df.client.LoadCheck()
+	}
 	resp := df.client.GetAtaponRanking(ranking_type, page)
 	servertime := resp["data_headers"].(map[interface{}]interface{})["servertime"].(uint64)
 	err := df.client.ParseResultCode(resp)

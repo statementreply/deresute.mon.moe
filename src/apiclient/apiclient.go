@@ -32,6 +32,7 @@ var ErrOveruse = errors.New("too many requests")
 var ErrData = errors.New("data error str8?")
 var ErrEventClose = errors.New("event closed")
 var ErrUnknown = errors.New("unknown error")
+var ErrDataHeaders = errors.New("no data_headers")
 
 type ApiClient struct {
 	user          int32
@@ -45,6 +46,8 @@ type ApiClient struct {
 	msg_iv        []byte
 	// holds plaintext temporarily
 	plain string
+	// true if LoadCheck was called
+	initialized  bool
 }
 
 func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SID_KEY []byte) *ApiClient {
@@ -61,6 +64,7 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 	client.sid = client.viewer_id_str + client.udid
 	client.VIEWER_ID_KEY = VIEWER_ID_KEY
 	client.SID_KEY = SID_KEY
+	client.initialized = false
 	return client
 }
 
@@ -120,21 +124,41 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	return content
 }
 
-func (client *ApiClient) GetResultCode(content map[string]interface{}) int64 {
-	var result_code int64
+// FIXME result_code can be int64 or uint64?
+func (client *ApiClient) GetResultCode(content map[string]interface{}) (interface{}, error) {
+	var result_code interface{}
 	data_headers, ok := content["data_headers"]
 	if ok {
-		result_code = data_headers.(map[interface{}]interface{})["result_code"].(int64)
+		result_code = data_headers.(map[interface{}]interface{})["result_code"]
 	} else {
-		// FIXME
-		return -1
+		return -1, ErrDataHeaders
 	}
-	return result_code
+	return result_code, nil
 }
 
 func (client *ApiClient) ParseResultCode(content map[string]interface{}) error {
-	result_code := client.GetResultCode(content)
-	switch result_code {
+	result_code, err := client.GetResultCode(content)
+	if err != nil {
+		return err
+	}
+	switch r := result_code.(type) {
+	case uint64:
+		// good for now
+		log.Println("result_code is uint64", result_code)
+	case int64:
+		log.Println("result_code is int64", result_code)
+		// convert to uint64
+		if r != 1 {
+			log.Println("result_code is not 1")
+			result_code = interface{}(uint64(99999)) // ErrUnknown
+		} else {
+			result_code = interface{}(uint64(1))
+		}
+	default:
+		log.Println("result_code is some other type?", result_code)
+		result_code = interface{}(uint64(99999)) // ErrUnknown
+	}
+	switch result_code.(uint64) {
 	case 1:
 		return nil
 	case 201: // session error
@@ -171,6 +195,7 @@ func (client *ApiClient) LoadCheck() {
 		check := client.Call("/load/check", args)
 		log.Print("check again ", check)
 	}
+	client.initialized = true
 }
 
 func (client *ApiClient) GetProfile(friend_id int) map[string]interface{} {
@@ -194,3 +219,7 @@ func (client *ApiClient) GetLiveDetailRanking(live_detail_id, page int) map[stri
 
 //Req URL: game.starlight-stage.jp /live/get_live_detail_ranking 192.168.0.3->203.104.249.195 55234->80
 //map[live_detail_id:162 page:1 viewer_id:28577727288451868527518831476546X6+XO8CAOsHM8aDp7/pvhM8RrXdP2ztPtyLaaUqegrU=]
+
+func (client *ApiClient) IsInitialized() bool {
+	return client.initialized
+}
