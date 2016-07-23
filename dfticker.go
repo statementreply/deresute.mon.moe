@@ -32,18 +32,18 @@ func main() {
 	for {
 		select {
 		case t := <-ticker.C:
+			//log.Println(t.String(), _isRunning, lastRun.String())
 			q = (time.Duration(t.UnixNano()) - r) / mod
 			if (q > q0) || NeedToRun() {
 				fmt.Println("runCommand", t.String())
 				q0 = q
-				runCommand(client)
+				go runCommand(client)
 			}
 		}
 	}
 }
 
 func runCommand(client *apiclient.ApiClient) {
-	go func() {
 		if !IsRunning() {
 			SetRunning()
 			err := df_main(client, RANK_CACHE_DIR)
@@ -64,7 +64,6 @@ func runCommand(client *apiclient.ApiClient) {
 			fmt.Println("lastRun:", lastRun.String())
 			lock.Unlock()
 		}
-	}()
 }
 
 func IsRunning() bool {
