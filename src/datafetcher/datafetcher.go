@@ -25,8 +25,8 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_
 	df.key_point = key_point
 	df.rank_cache_dir = rank_cache_dir
 
-	log.Println(GetLocalTimestamp())
-	log.Println(RoundTimestamp(time.Now()).String())
+	//log.Println(GetLocalTimestamp())
+	//log.Println(RoundTimestamp(time.Now()).String())
 	return df
 }
 
@@ -65,6 +65,7 @@ func (df *DataFetcher) GetCache(ranking_type int, page int) error {
 	path := dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
 	if Exists(path) {
 		// cache hit
+		log.Println("hit", local_timestamp, ranking_type, page)
 		return nil
 	} else {
 		// cache miss

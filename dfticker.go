@@ -21,8 +21,6 @@ var _isRunning bool
 var lastRun = time.Unix(0, 0)
 var sleepDuration = time.Minute * 2
 
-// python ../deresuteme/main2.py
-// ./df
 func main() {
 	ticker := time.NewTicker(time.Second * 1)
 	var q, q0 time.Duration
@@ -49,17 +47,11 @@ func main() {
 }
 
 func runCommand() {
-	//c := exec.Command("timeout", "300", "python", "../deresuteme/main2.py")
-	//c := exec.Command("timeout", "300", "./df")
-	//c.Stdin = nil
-	//c.Stdout = os.Stdout
-	//c.Stderr = os.Stderr
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		if !IsRunning() {
 			SetRunning()
-			//c.Run()
 			df_main()
 			SetFinished()
 			fmt.Println("current:", time.Now().String())
@@ -104,12 +96,12 @@ func NeedToRun() bool {
 
 
 func df_main() {
-	log.Println("dfnew", os.Args[0])
+	//log.Println("dfnew", os.Args[0])
 	//rand.Seed(time.Now().Unix())
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 
-	log.Println(datafetcher.GetLocalTimestamp())
-	log.Println(datafetcher.RoundTimestamp(time.Now()).String())
+	log.Println("local-timestamp", datafetcher.GetLocalTimestamp())
+	//log.Println(datafetcher.RoundTimestamp(time.Now()).String())
 
 	key_point := [][2]int{
 		[2]int{1, 1},
