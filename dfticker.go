@@ -37,33 +37,33 @@ func main() {
 			if (q > q0) || NeedToRun() {
 				fmt.Println("runCommand", t.String())
 				q0 = q
-				go runCommand(client)
+				go runCommand(client, RANK_CACHE_DIR)
 			}
 		}
 	}
 }
 
-func runCommand(client *apiclient.ApiClient) {
-		if !IsRunning() {
-			SetRunning()
-			err := df_main(client, RANK_CACHE_DIR)
-			SetFinished()
+func runCommand(client *apiclient.ApiClient, rank_cache_dir string) {
+	if !IsRunning() {
+		SetRunning()
+		err := df_main(client, rank_cache_dir)
+		SetFinished()
 
-			if err != nil {
-				if err == apiclient.ErrSession {
-					// run again immediately
-					client.Reset_sid()
-					lock.Lock()
-					lastRun = time.Unix(0, 0)
-					lock.Unlock()
-				}
+		if err != nil {
+			if err == apiclient.ErrSession {
+				// run again immediately
+				client.Reset_sid()
+				lock.Lock()
+				lastRun = time.Unix(0, 0)
+				lock.Unlock()
 			}
-
-			fmt.Println("current:", time.Now().String())
-			lock.Lock()
-			fmt.Println("lastRun:", lastRun.String())
-			lock.Unlock()
 		}
+
+		fmt.Println("current:", time.Now().String())
+		lock.Lock()
+		fmt.Println("lastRun:", lastRun.String())
+		lock.Unlock()
+	}
 }
 
 func IsRunning() bool {
