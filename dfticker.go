@@ -48,8 +48,18 @@ func runCommand() {
 		defer wg.Done()
 		if !IsRunning() {
 			SetRunning()
-			df_main()
+			err := df_main()
 			SetFinished()
+
+			if err != nil {
+				if err == apiclient.ErrSession {
+					// run again immediately
+					lock.Lock()
+					lastRun = time.Unix(0, 0)
+					lock.Unlock()
+				}
+			}
+
 			fmt.Println("current:", time.Now().String())
 			lock.Lock()
 			fmt.Println("lastRun:", lastRun.String())
@@ -89,11 +99,9 @@ func NeedToRun() bool {
 	return ret
 }
 
-func df_main() {
-	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
-
+func df_main() error {
 	log.Println("local-timestamp", datafetcher.GetLocalTimestamp())
-
+	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 	key_point := [][2]int{
 		[2]int{1, 1},
 		[2]int{1, 501},     // pt ranking emblem-1
@@ -124,4 +132,5 @@ func df_main() {
 	if err != nil {
 		log.Println(err)
 	}
+	return err
 }
