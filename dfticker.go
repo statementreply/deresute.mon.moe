@@ -1,14 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"sync"
-	"time"
 	"apiclient"
 	"datafetcher"
+	"fmt"
 	"log"
+	"os"
 	"path"
+	"sync"
+	"time"
 )
 
 var SECRET_FILE string = "secret.yaml"
@@ -24,17 +24,13 @@ var sleepDuration = time.Minute * 2
 func main() {
 	ticker := time.NewTicker(time.Second * 1)
 	var q, q0 time.Duration
-	var mod time.Duration
-	var r time.Duration
+	var r, mod time.Duration
 	r = time.Minute * 2
 	mod = time.Minute * 15
-	//r = time.Second * 2
-	//mod = time.Second * 15
 	q0 = (time.Duration(time.Now().UnixNano()) - r) / mod
 	for {
 		select {
 		case t := <-ticker.C:
-			//fmt.Println(t.String(), _isRunning, lastRun.String())
 			q = (time.Duration(t.UnixNano()) - r) / mod
 			if (q > q0) || NeedToRun() {
 				fmt.Println("runCommand", t.String())
@@ -93,15 +89,10 @@ func NeedToRun() bool {
 	return ret
 }
 
-
-
 func df_main() {
-	//log.Println("dfnew", os.Args[0])
-	//rand.Seed(time.Now().Unix())
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 
 	log.Println("local-timestamp", datafetcher.GetLocalTimestamp())
-	//log.Println(datafetcher.RoundTimestamp(time.Now()).String())
 
 	key_point := [][2]int{
 		[2]int{1, 1},
@@ -129,7 +120,6 @@ func df_main() {
 		key_point = append(key_point, [2]int{2, index*10000 + 1})
 	}
 	df := datafetcher.NewDataFetcher(client, key_point, RANK_CACHE_DIR)
-	//client.LoadCheck()
 	err := df.Run()
 	if err != nil {
 		log.Println(err)
