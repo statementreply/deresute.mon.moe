@@ -27,6 +27,11 @@ func (e *EventDetail) EventStart() time.Time {
 	return e.event_start
 }
 
+func (e *EventDetail) SecondHalfStart() time.Time {
+	return e.second_half_start
+}
+
+
 func (e *EventDetail) EventEnd() time.Time {
 	return e.event_end
 }

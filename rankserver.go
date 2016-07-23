@@ -723,14 +723,14 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload(w, req)
 	defer r.postload(w, req)
 	fmt.Fprintf(w, `<table class="columns">`)
-	fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n", "event", "start", "end")
+	fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n", "event", "start", "second-half", "end")
 	for _, e := range r.resourceMgr.EventList {
 		name := e.Name()
 		if (e.Type() == 1 || e.Type() == 3) && e.EventEnd().After(time.Unix(1467552720, 0)) {
 			// ranking information available
 			name = fmt.Sprintf(`<a href="qchart?event=%d">%s</a>`, e.Id(), name)
 		}
-		fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n", name, r.formatTime(e.EventStart()), r.formatTime(e.EventEnd()))
+		fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n", name, r.formatTime(e.EventStart()), r.formatTime(e.SecondHalfStart()), r.formatTime(e.EventEnd()))
 	}
 	fmt.Fprintf(w, `</table>`)
 }
