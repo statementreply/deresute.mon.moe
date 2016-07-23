@@ -27,6 +27,8 @@ func main() {
 	r = time.Minute * 2
 	mod = time.Minute * 15
 	q0 = (time.Duration(time.Now().UnixNano()) - r) / mod
+
+	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 	for {
 		select {
 		case t := <-ticker.C:
@@ -34,22 +36,23 @@ func main() {
 			if (q > q0) || NeedToRun() {
 				fmt.Println("runCommand", t.String())
 				q0 = q
-				runCommand()
+				runCommand(client)
 			}
 		}
 	}
 }
 
-func runCommand() {
+func runCommand(client *apiclient.ApiClient) {
 	go func() {
 		if !IsRunning() {
 			SetRunning()
-			err := df_main(SECRET_FILE, RANK_CACHE_DIR)
+			err := df_main(client, RANK_CACHE_DIR)
 			SetFinished()
 
 			if err != nil {
 				if err == apiclient.ErrSession {
 					// run again immediately
+					client.Reset_sid()
 					lock.Lock()
 					lastRun = time.Unix(0, 0)
 					lock.Unlock()
@@ -95,9 +98,9 @@ func NeedToRun() bool {
 	return ret
 }
 
-func df_main(secret_file string, rank_cache_dir string) error {
+func df_main(client *apiclient.ApiClient, rank_cache_dir string) error {
 	log.Println("local-timestamp", datafetcher.GetLocalTimestamp())
-	client := apiclient.NewApiClientFromConfig(secret_file)
+	//client := apiclient.NewApiClientFromConfig(secret_file)
 	key_point := [][2]int{
 		[2]int{1, 1},
 		[2]int{1, 501},     // pt ranking emblem-1
