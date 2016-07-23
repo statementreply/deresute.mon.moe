@@ -19,6 +19,8 @@ import (
 	"time"
 )
 
+var wg sync.WaitGroup
+
 var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
 var RESOURCE_CACHE_DIR string = BASE + "/data/resourcesbeta/"
@@ -431,17 +433,23 @@ func (r *RankServer) getSpeed_i(timestamp string, rankingType int, rank int) int
 
 func (r *RankServer) run() {
 	if r.tlsServer != nil {
+		wg.Add(1)
 		go func() {
+			defer wg.Done()
 			err := r.tlsServer.ListenAndServeTLS(r.certFile, r.keyFile)
 			if err != nil {
 				r.logger.Fatal(err)
 			}
 		}()
 	}
-	err := r.plainServer.ListenAndServe()
-	if err != nil {
-		r.logger.Fatal(err)
-	}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err := r.plainServer.ListenAndServe()
+		if err != nil {
+			r.logger.Fatal(err)
+		}
+	}()
 	fmt.Println("here+1")
 }
 
@@ -873,4 +881,5 @@ func main() {
 	log.Print("RankServer running")
 	r := MakeRankServer()
 	r.run()
+	wg.Wait()
 }
