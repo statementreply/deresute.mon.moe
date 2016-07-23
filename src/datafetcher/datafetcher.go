@@ -73,10 +73,9 @@ func (df *DataFetcher) GetCache(ranking_type int, page int) error {
 			os.Mkdir(dirname, 0755)
 		}
 	}
-	time.Sleep(11 * 100 * 1000 * 1000)
+	time.Sleep(1020 * time.Millisecond)
 	ranking_list, servertime, err := df.GetPage(ranking_type, page)
 	if err != nil {
-		// FIXME
 		return err
 	}
 	log.Printf("localtime: %f servertime: %d lag: %f\n", localtime, servertime, float64(servertime)-localtime)
