@@ -26,14 +26,14 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_
 	df.key_point = key_point
 	df.rank_cache_dir = rank_cache_dir
 
-	fmt.Println(apiclient.GetLocalTimestamp())
-	fmt.Println(apiclient.RoundTimestamp(time.Now()).String())
+	log.Println(apiclient.GetLocalTimestamp())
+	log.Println(apiclient.RoundTimestamp(time.Now()).String())
 	return df
 }
 
 func (df *DataFetcher) Run() error {
 	for _, key := range df.key_point {
-		fmt.Println(key)
+		log.Println(key)
 		err := df.GetCache(key[0], RankToPage(key[1]))
 		if err != nil {
 			//log.Fatal(err)
@@ -51,7 +51,7 @@ func RankToPage(rank int) int {
 
 func DumpToStdout(v interface{}) {
 	yy, _ := yaml.Marshal(v)
-	fmt.Println(string(yy))
+	log.Println(string(yy))
 }
 
 func DumpToFile(v interface{}, fileName string) {
@@ -79,19 +79,19 @@ func (df *DataFetcher) GetCache(ranking_type int, page int) error {
 		// FIXME
 		return err
 	}
-	fmt.Printf("localtime: %f servertime: %d lag: %f\n", localtime, servertime, float64(servertime)-localtime)
+	log.Printf("localtime: %f servertime: %d lag: %f\n", localtime, servertime, float64(servertime)-localtime)
 	server_timestamp_i := apiclient.RoundTimestamp(time.Unix(int64(servertime), 0)).Unix()
 	server_timestamp := fmt.Sprintf("%d", server_timestamp_i)
 
 	if server_timestamp != local_timestamp {
-		fmt.Println("server:", server_timestamp, "local:", local_timestamp)
+		log.Println("server:", server_timestamp, "local:", local_timestamp)
 		dirname = df.rank_cache_dir + server_timestamp + "/"
 		path = dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
 		if !Exists(dirname) {
 			os.Mkdir(dirname, 0755)
 		}
 	}
-	fmt.Println("write to path", path)
+	log.Println("write to path", path)
 	lockfile := dirname + "lock"
 	ioutil.WriteFile(lockfile, []byte(""), 0644)
 	DumpToFile(ranking_list, path)
