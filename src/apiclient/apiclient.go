@@ -80,6 +80,7 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 }
 
 // initialize sid
+// with lock (!)
 func (client *ApiClient) Reset_sid() {
 	client.lock.Lock()
 	client.sid = client.viewer_id_str + client.udid
@@ -108,6 +109,7 @@ func NewApiClientFromConfig(configFile string) *ApiClient {
 		[]byte(secret_dict["SID_KEY"].(string)))
 }
 
+// with lock(!)
 func (client *ApiClient) Call(path string, args map[string]interface{}) map[string]interface{} {
 	// prevent concurrent calls
 	client.lock.Lock()
@@ -139,6 +141,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 		if ok && (new_sid != "") {
 			//fmt.Println("get new sid", new_sid)
 			client.sid = new_sid.(string)
+			client.initialized = true
 		}
 	} else {
 		// FIXME
@@ -219,7 +222,6 @@ func (client *ApiClient) LoadCheck() {
 		check := client.Call("/load/check", args)
 		log.Print("check again ", check)
 	}
-	client.initialized = true
 }
 
 func (client *ApiClient) GetProfile(friend_id int) map[string]interface{} {
@@ -244,6 +246,10 @@ func (client *ApiClient) GetLiveDetailRanking(live_detail_id, page int) map[stri
 //Req URL: game.starlight-stage.jp /live/get_live_detail_ranking 192.168.0.3->203.104.249.195 55234->80
 //map[live_detail_id:162 page:1 viewer_id:28577727288451868527518831476546X6+XO8CAOsHM8aDp7/pvhM8RrXdP2ztPtyLaaUqegrU=]
 
+// with lock(!)
 func (client *ApiClient) IsInitialized() bool {
-	return client.initialized
+	client.lock.RLock()
+	ret := client.initialized
+	client.lock.RUnlock()
+	return ret
 }

@@ -65,12 +65,14 @@ func Encrypt_cbc(s, iv, key []byte) []byte {
 	return dst
 }
 
+// with lock(!)
 func (client *ApiClient) Set_res_ver(res_ver string) {
 	client.lock.Lock()
 	client.res_ver = res_ver
 	client.lock.Unlock()
 }
 
+// with lock(!)
 func (client *ApiClient) Get_res_ver() string {
 	client.lock.RLock()
 	val := client.res_ver
