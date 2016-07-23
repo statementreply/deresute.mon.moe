@@ -1,5 +1,5 @@
-MAIN := rankserver df ticker dfticker
-EXTRA := pcapdump dumpbody unlz4 res get_profile test1
+MAIN := rankserver dfticker
+EXTRA := pcapdump dumpbody unlz4 res get_profile test1 ticker df
 all: ${MAIN}
 extra: ${EXTRA}
 clean:
