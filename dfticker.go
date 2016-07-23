@@ -20,6 +20,7 @@ var RANK_CACHE_DIR string = BASE + "/data/rank/"
 var lock sync.Mutex
 var _isRunning bool
 var lastRun = time.Unix(0, 0)
+// global const
 var sleepDuration = time.Minute * 2
 
 func main() {
@@ -78,20 +79,9 @@ func main() {
 	}
 }
 
-/*
-func df_main(df *datafetcher.DataFetcher) error {
-	err := df.Run()
-	if err != nil {
-		log.Println(err)
-	}
-	return err
-}
-*/
-
 func runCommand(df *datafetcher.DataFetcher) {
 	if !IsRunning() {
 		SetRunning()
-		//err := df_main(df)
 		err := df.Run()
 		SetFinished()
 
