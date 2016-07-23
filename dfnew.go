@@ -51,4 +51,3 @@ func main() {
 	df := datafetcher.NewDataFetcher(client, key_point, RANK_CACHE_DIR)
 	df.Run()
 }
-

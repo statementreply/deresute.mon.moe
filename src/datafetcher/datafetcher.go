@@ -10,11 +10,10 @@ import (
 	"time"
 )
 
-
 type DataFetcher struct {
-	client    *apiclient.ApiClient
-	key_point [][2]int
-	rank_cache_dir  string
+	client         *apiclient.ApiClient
+	key_point      [][2]int
+	rank_cache_dir string
 }
 
 func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_dir string) *DataFetcher {
