@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 	// external libs
 	// depends on rijndael by agl (embedded)
@@ -48,13 +49,14 @@ type ApiClient struct {
 	// need lock
 	sid           string
 	res_ver       string
-	// holds plaintext temporarily
-	//plain string
-	// true if LoadCheck was called
-	initialized  bool
+	// true: if LoadCheck was called
+	// false: need to call LoadCheck
+	initialized   bool
+
+	lock          sync.RWMutex
 
 	// for reuse, concurrency safe
-	httpclient   *http.Client
+	httpclient    *http.Client
 }
 
 func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SID_KEY []byte) *ApiClient {
@@ -79,8 +81,10 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 
 // initialize sid
 func (client *ApiClient) Reset_sid() {
+	client.lock.Lock()
 	client.sid = client.viewer_id_str + client.udid
 	client.initialized = false
+	client.lock.Unlock()
 }
 
 func NewApiClientFromConfig(configFile string) *ApiClient {
@@ -105,12 +109,16 @@ func NewApiClientFromConfig(configFile string) *ApiClient {
 }
 
 func (client *ApiClient) Call(path string, args map[string]interface{}) map[string]interface{} {
+	// prevent concurrent calls
+	client.lock.Lock()
+	defer client.lock.Unlock()
+
 	// Prepare request body
 	body, plain_tmp := client.EncodeBody(args)
 	// Request body finished
 
 	// Prepare request header
-	req := client.MakeRequest(path, body, plain_tmp)
+	req := client.makeRequest(path, body, plain_tmp)
 
 	// Do request
 	//hclient := &http.Client{}

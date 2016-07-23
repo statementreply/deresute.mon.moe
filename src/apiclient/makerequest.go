@@ -11,11 +11,13 @@ import (
 	"strings"
 )
 
-func (client *ApiClient) MakeRequest(path, body, plain_tmp string) *http.Request {
+// don't export this
+func (client *ApiClient) makeRequest(path, body, plain_tmp string) *http.Request {
 	var req *http.Request
-	if client.sid == "" {
+	// impossible branch
+	/*if client.sid == "" {
 		client.sid = client.viewer_id_str + client.udid
-	}
+	}*/
 	param_tmp := sha1.Sum([]byte(client.udid + client.viewer_id_str + path + plain_tmp))
 	sid_tmp := md5.Sum([]byte(client.sid + string(client.SID_KEY)))
 	device_id_tmp := md5.Sum([]byte("Totally a real Android"))
