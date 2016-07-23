@@ -3,10 +3,17 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"sync"
 	"time"
+	"apiclient"
+	"datafetcher"
+	"log"
+	"path"
 )
+
+var SECRET_FILE string = "secret.yaml"
+var BASE string = path.Dir(os.Args[0])
+var RANK_CACHE_DIR string = BASE + "/data/rank/"
 
 var lock sync.Mutex
 var wg sync.WaitGroup
@@ -43,16 +50,17 @@ func main() {
 
 func runCommand() {
 	//c := exec.Command("timeout", "300", "python", "../deresuteme/main2.py")
-	c := exec.Command("timeout", "300", "./df")
-	c.Stdin = nil
-	c.Stdout = os.Stdout
-	c.Stderr = os.Stderr
+	//c := exec.Command("timeout", "300", "./df")
+	//c.Stdin = nil
+	//c.Stdout = os.Stdout
+	//c.Stderr = os.Stderr
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		if !IsRunning() {
 			SetRunning()
-			c.Run()
+			//c.Run()
+			df_main()
 			SetFinished()
 			fmt.Println("current:", time.Now().String())
 			lock.Lock()
@@ -92,22 +100,10 @@ func NeedToRun() bool {
 	}
 	return ret
 }
-package main
 
-import (
-	"apiclient"
-	"datafetcher"
-	"log"
-	"os"
-	"path"
-	"time"
-)
 
-var SECRET_FILE string = "secret.yaml"
-var BASE string = path.Dir(os.Args[0])
-var RANK_CACHE_DIR string = BASE + "/data/rank/"
 
-func main() {
+func df_main() {
 	log.Println("dfnew", os.Args[0])
 	//rand.Seed(time.Now().Unix())
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
