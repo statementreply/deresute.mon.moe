@@ -18,6 +18,7 @@ type DataFetcher struct {
 }
 
 func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_dir string) *DataFetcher {
+	log.Println("NewDataFetcher()")
 	df := new(DataFetcher)
 
 	df.client = client
@@ -30,14 +31,16 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_
 	return df
 }
 
-func (df *DataFetcher) Run() {
+func (df *DataFetcher) Run() error {
 	for _, key := range df.key_point {
 		fmt.Println(key)
-		err := GetCache(df.client, df.rank_cache_dir, key[0], RankToPage(key[1]))
+		err := df.GetCache(key[0], RankToPage(key[1]))
 		if err != nil {
-			log.Fatal(err)
+			//log.Fatal(err)
+			return err
 		}
 	}
+	return nil
 }
 
 func RankToPage(rank int) int {
@@ -56,10 +59,10 @@ func DumpToFile(v interface{}, fileName string) {
 	ioutil.WriteFile(fileName, yy, 0644)
 }
 
-func GetCache(client *apiclient.ApiClient, cache_dir string, ranking_type int, page int) error {
+func (df *DataFetcher) GetCache(ranking_type int, page int) error {
 	localtime := float64(time.Now().UnixNano()) / 1e9
 	local_timestamp := apiclient.GetLocalTimestamp()
-	dirname := cache_dir + local_timestamp + "/"
+	dirname := df.rank_cache_dir + local_timestamp + "/"
 	path := dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
 	if Exists(path) {
 		// cache hit
@@ -71,7 +74,7 @@ func GetCache(client *apiclient.ApiClient, cache_dir string, ranking_type int, p
 		}
 	}
 	time.Sleep(11 * 100 * 1000 * 1000)
-	ranking_list, servertime, err := get_page(client, ranking_type, page)
+	ranking_list, servertime, err := df.GetPage(ranking_type, page)
 	if err != nil {
 		// FIXME
 		return err
@@ -82,7 +85,7 @@ func GetCache(client *apiclient.ApiClient, cache_dir string, ranking_type int, p
 
 	if server_timestamp != local_timestamp {
 		fmt.Println("server:", server_timestamp, "local:", local_timestamp)
-		dirname = cache_dir + server_timestamp + "/"
+		dirname = df.rank_cache_dir + server_timestamp + "/"
 		path = dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
 		if !Exists(dirname) {
 			os.Mkdir(dirname, 0755)
@@ -98,14 +101,13 @@ func GetCache(client *apiclient.ApiClient, cache_dir string, ranking_type int, p
 	return nil
 }
 
-func get_page(client *apiclient.ApiClient, ranking_type, page int) ([]interface{}, uint64, error) {
+func (df *DataFetcher) GetPage(ranking_type, page int) ([]interface{}, uint64, error) {
 	var ranking_list []interface{}
-	resp := client.GetAtaponRanking(ranking_type, page)
+	resp := df.client.GetAtaponRanking(ranking_type, page)
 	servertime := resp["data_headers"].(map[interface{}]interface{})["servertime"].(uint64)
-	err := client.ParseResultCode(resp)
-	// FIXME if error
+	err := df.client.ParseResultCode(resp)
 	if err != nil {
-		return ranking_list, servertime, err
+		return nil, servertime, err
 	}
 	ranking_list = resp["data"].(map[interface{}]interface{})["ranking_list"].([]interface{})
 	return ranking_list, servertime, err
