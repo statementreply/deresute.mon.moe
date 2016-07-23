@@ -35,21 +35,25 @@ var ErrUnknown = errors.New("unknown error")
 var ErrDataHeaders = errors.New("no data_headers")
 
 type ApiClient struct {
+	// constant after constructor
 	user          int32
 	viewer_id     int32
 	viewer_id_str string
-	timezone      string
 	udid          string
-	sid           string
-	res_ver       string
+	msg_iv        []byte
+	timezone      string
 	VIEWER_ID_KEY []byte
 	SID_KEY       []byte
-	msg_iv        []byte
+
+	// need lock
+	sid           string
+	res_ver       string
 	// holds plaintext temporarily
-	plain string
+	//plain string
 	// true if LoadCheck was called
 	initialized  bool
-	// for reuse
+
+	// for reuse, concurrency safe
 	httpclient   *http.Client
 }
 
@@ -59,18 +63,24 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 	client.user = user
 	client.viewer_id = viewer_id
 	client.viewer_id_str = fmt.Sprintf("%d", viewer_id)
-	client.timezone = "09:00:00" // version 2.1.0 new
 	client.udid = udid
+	client.timezone = "09:00:00" // version 2.1.0 new
+	client.VIEWER_ID_KEY = VIEWER_ID_KEY
+	client.SID_KEY = SID_KEY
+
 	client.msg_iv = []byte(strings.Replace(client.udid, "-", "", -1))
 	client.res_ver = res_ver
 	//client.sid = ""
-	// initial sid
-	client.sid = client.viewer_id_str + client.udid
-	client.VIEWER_ID_KEY = VIEWER_ID_KEY
-	client.SID_KEY = SID_KEY
-	client.initialized = false
+	//client.initialized = false
+	client.Reset_sid()
 	client.httpclient = &http.Client{Timeout: 7 * time.Second}
 	return client
+}
+
+// initialize sid
+func (client *ApiClient) Reset_sid() {
+	client.sid = client.viewer_id_str + client.udid
+	client.initialized = false
 }
 
 func NewApiClientFromConfig(configFile string) *ApiClient {
@@ -96,11 +106,11 @@ func NewApiClientFromConfig(configFile string) *ApiClient {
 
 func (client *ApiClient) Call(path string, args map[string]interface{}) map[string]interface{} {
 	// Prepare request body
-	body := client.EncodeBody(args)
+	body, plain_tmp := client.EncodeBody(args)
 	// Request body finished
 
 	// Prepare request header
-	req := client.MakeRequest(path, body)
+	req := client.MakeRequest(path, body, plain_tmp)
 
 	// Do request
 	//hclient := &http.Client{}

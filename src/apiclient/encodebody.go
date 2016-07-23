@@ -37,7 +37,7 @@ func gen_key() []byte {
 	return key
 }
 
-func (client *ApiClient) EncodeBody(args map[string]interface{}) string {
+func (client *ApiClient) EncodeBody(args map[string]interface{}) (string, string) {
 	// Prepare request body
 	var body string
 	vid_iv := gen_vid_iv()
@@ -45,12 +45,12 @@ func (client *ApiClient) EncodeBody(args map[string]interface{}) string {
 	args["viewer_id"] = vid_iv + base64.StdEncoding.EncodeToString(Encrypt_cbc([]byte(client.viewer_id_str), []byte(vid_iv), client.VIEWER_ID_KEY))
 	args["timezone"] = client.timezone
 	mp := MsgpackEncode(args)
-	client.plain = base64.StdEncoding.EncodeToString(mp)
+	plain_tmp := base64.StdEncoding.EncodeToString(mp)
 
 	key := gen_key()
 
-	body_tmp := Encrypt_cbc([]byte(client.plain), client.msg_iv, key)
+	body_tmp := Encrypt_cbc([]byte(plain_tmp), client.msg_iv, key)
 	body = base64.StdEncoding.EncodeToString([]byte(string(body_tmp) + string(key)))
 	// Request body finished
-	return body
+	return body, plain_tmp
 }
