@@ -16,7 +16,6 @@ var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
 
 var lock sync.Mutex
-var wg sync.WaitGroup
 var _isRunning bool
 var lastRun = time.Unix(0, 0)
 var sleepDuration = time.Minute * 2
@@ -39,13 +38,10 @@ func main() {
 			}
 		}
 	}
-	wg.Wait()
 }
 
 func runCommand() {
-	wg.Add(1)
 	go func() {
-		defer wg.Done()
 		if !IsRunning() {
 			SetRunning()
 			err := df_main()
