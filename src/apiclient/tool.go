@@ -66,11 +66,16 @@ func Encrypt_cbc(s, iv, key []byte) []byte {
 }
 
 func (client *ApiClient) Set_res_ver(res_ver string) {
+	client.lock.Lock()
 	client.res_ver = res_ver
+	client.lock.Unlock()
 }
 
 func (client *ApiClient) Get_res_ver() string {
-	return client.res_ver
+	client.lock.RLock()
+	val := client.res_ver
+	client.lock.RUnlock()
+	return val
 }
 
 func MsgpackDecode(b []byte, v interface{}) {
