@@ -49,6 +49,8 @@ type ApiClient struct {
 	plain string
 	// true if LoadCheck was called
 	initialized  bool
+	// for reuse
+	httpclient   *http.Client
 }
 
 func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SID_KEY []byte) *ApiClient {
@@ -67,6 +69,7 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 	client.VIEWER_ID_KEY = VIEWER_ID_KEY
 	client.SID_KEY = SID_KEY
 	client.initialized = false
+	client.httpclient = &http.Client{Timeout: 7 * time.Second}
 	return client
 }
 
@@ -100,8 +103,8 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	req := client.MakeRequest(path, body)
 
 	// Do request
-	hclient := &http.Client{}
-	resp, _ := hclient.Do(req)
+	//hclient := &http.Client{}
+	resp, _ := client.httpclient.Do(req)
 
 	// Processing response
 	resp_body, err := ioutil.ReadAll(resp.Body)
