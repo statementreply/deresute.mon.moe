@@ -11,7 +11,7 @@ import (
 )
 
 type DataFetcher struct {
-	client         *apiclient.ApiClient
+	Client         *apiclient.ApiClient
 	key_point      [][2]int
 	rank_cache_dir string
 }
@@ -20,7 +20,7 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_
 	log.Println("NewDataFetcher()")
 	df := new(DataFetcher)
 
-	df.client = client
+	df.Client = client
 	//client.LoadCheck()
 	df.key_point = key_point
 	df.rank_cache_dir = rank_cache_dir
@@ -101,13 +101,13 @@ func (df *DataFetcher) GetCache(ranking_type int, page int) error {
 
 func (df *DataFetcher) GetPage(ranking_type, page int) ([]interface{}, uint64, error) {
 	var ranking_list []interface{}
-	if !df.client.IsInitialized() {
-		df.client.LoadCheck()
+	if !df.Client.IsInitialized() {
+		df.Client.LoadCheck()
 	}
 	// FIXME atapon/medley
-	resp := df.client.GetAtaponRanking(ranking_type, page)
+	resp := df.Client.GetAtaponRanking(ranking_type, page)
 	servertime := resp["data_headers"].(map[interface{}]interface{})["servertime"].(uint64)
-	err := df.client.ParseResultCode(resp)
+	err := df.Client.ParseResultCode(resp)
 	if err != nil {
 		return nil, servertime, err
 	}
