@@ -25,9 +25,7 @@ var lastRun = time.Unix(0, 0)
 var sleepDuration = time.Minute * 2
 
 func main() {
-
 	log.Println("local-timestamp", datafetcher.GetLocalTimestamp())
-	//client := apiclient.NewApiClientFromConfig(secret_file)
 	key_point := [][2]int{
 		[2]int{1, 1},
 		[2]int{1, 501},     // pt ranking emblem-1
@@ -82,7 +80,6 @@ func runCommand(df *datafetcher.DataFetcher) {
 		SetRunning()
 		err := df.Run()
 		SetFinished()
-
 		if err != nil {
 			log.Println(err)
 			if err == apiclient.ErrSession {
