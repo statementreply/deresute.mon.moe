@@ -14,6 +14,7 @@ import (
 
 var ErrNoEvent = errors.New("no event is running now")
 var ErrEventType = errors.New("current event type has no ranking")
+var ErrRankingNA = errors.New("current time is not in event/result period")
 
 type DataFetcher struct {
 	Client         *apiclient.ApiClient
@@ -49,17 +50,14 @@ func (df *DataFetcher) Run() error {
 
     df.resourceMgr.ParseEvent()
 	currentEvent := df.resourceMgr.FindCurrentEvent()
-	event_type := 0
-    if currentEvent != nil {
-        event_type = currentEvent.Type()
-		log.Println("current event type:", event_type)
-    } else {
+
+    if currentEvent == nil {
 		return ErrNoEvent
 	}
 
 	for _, key := range df.key_point {
 		//log.Println("rankingtype:", key[0], "rank:", key[1])
-		err := df.GetCache(event_type, key[0], RankToPage(key[1]))
+		err := df.GetCache(currentEvent, key[0], RankToPage(key[1]))
 		if err != nil {
 			//log.Fatal(err)
 			return err
@@ -84,7 +82,16 @@ func DumpToFile(v interface{}, fileName string) {
 	ioutil.WriteFile(fileName, yy, 0644)
 }
 
-func (df *DataFetcher) GetCache(event_type, ranking_type int, page int) error {
+func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_type int, page int) error {
+	event_type := currentEvent.Type()
+	log.Println("current event type:", event_type)
+	if !currentEvent.HasRanking() {
+		return ErrEventType
+	}
+	if !currentEvent.RankingAvailable() {
+		return ErrRankingNA
+	}
+
 	localtime := float64(time.Now().UnixNano()) / 1e9 // for debug
 	local_timestamp := GetLocalTimestamp()
 	dirname := df.rank_cache_dir + local_timestamp + "/"

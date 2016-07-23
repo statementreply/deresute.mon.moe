@@ -5,10 +5,13 @@ import (
 )
 
 type EventDetail struct {
-	id, typ                                                                                       int
-	name                                                                                          string
-	notice_start, event_start, second_half_start, event_end, calc_start, result_start, result_end time.Time
-	limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count                               int
+	id, typ                                    int
+	name                                       string
+	notice_start                               time.Time
+	event_start, second_half_start, event_end  time.Time
+	calc_start, result_start, result_end       time.Time
+	limit_flag, bg_type, bg_id                 int
+	login_bonus_type, login_bonus_count        int
 }
 
 func (e *EventDetail) Type() int {
@@ -23,6 +26,7 @@ func (e *EventDetail) Id() int {
 	return e.id
 }
 
+// not exported: NoticeStart
 func (e *EventDetail) EventStart() time.Time {
 	return e.event_start
 }
@@ -56,10 +60,32 @@ func (e *EventDetail) LoginBonusCount() int {
 	return e.login_bonus_count
 }
 
+func (e *EventDetail) HasRanking() bool {
+	if (e.typ == 1) || (e.typ == 3) {
+		return true
+	} else {
+		return false
+	}
+}
+
+func (e *EventDetail) RankingAvailable() bool {
+	now := time.Now()
+	// now is in [EventStart, EventEnd]
+	//        or [ResultStart, ResultEnd]
+	// allow 20min at end?
+	if !now.Before(e.event_start) && !now.After(e.event_end) {
+		return true
+	} else if !now.Before(e.result_start) && !now.After(e.result_end) {
+		return true
+	} else {
+		return false
+	}
+}
+
 func FindCurrentEvent(eventList []*EventDetail) *EventDetail {
 	now := time.Now()
 	for _, e := range eventList {
-		if !now.Before(e.EventStart()) && !now.After(e.ResultEnd()) {
+		if !now.Before(e.event_start) && !now.After(e.result_end) {
 			return e
 		}
 	}
