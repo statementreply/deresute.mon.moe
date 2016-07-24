@@ -23,7 +23,7 @@ var _isRunning bool
 var lastRun = time.Unix(0, 0)
 
 // global const
-var sleepDuration = time.Minute * 2
+var sleepDuration = time.Minute * 3
 
 func main() {
 	log.Println("local-timestamp", datafetcher.GetLocalTimestamp())
