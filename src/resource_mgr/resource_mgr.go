@@ -273,5 +273,5 @@ func (r *ResourceMgr) FindCurrentEvent() *EventDetail {
 }
 
 func (r *ResourceMgr) FindEventById(id int) *EventDetail {
-	return FindEventById(r.EventList, id)
+	return r.EventList.FindEventById(id)
 }

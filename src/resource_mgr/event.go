@@ -105,8 +105,8 @@ func (l EventDetailList) Swap(i, j int) {
 	l[i], l[j] = l[j], l[i]
 }
 
-func FindEventById(eventList EventDetailList, id int) *EventDetail {
-	for _, e := range eventList {
+func (eventList *EventDetailList) FindEventById(id int) *EventDetail {
+	for _, e := range *eventList {
 		if e.Id() == id {
 			return e
 		}
