@@ -127,7 +127,7 @@ func (r *ResourceMgr) LoadManifest() string {
 
 func (r *ResourceMgr) LoadMaster() string {
 	dest := r.LoadManifest()
-	log.Println("to open", dest)
+	//log.Println("to open", dest)
 	db, err := sql.Open("sqlite3", dest)
 	if err != nil {
 		log.Fatal("x1", err)
@@ -161,7 +161,7 @@ func (r *ResourceMgr) LoadMaster() string {
 
 func (r *ResourceMgr) LoadMusic() {
 	dest := r.LoadManifest()
-	log.Println("to open", dest)
+	//log.Println("to open", dest)
 	db, err := sql.Open("sqlite3", dest)
 	if err != nil {
 		log.Fatal("x1", err)

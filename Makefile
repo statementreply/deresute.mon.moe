@@ -18,7 +18,7 @@ prep:
 	fi
 
 rankserver: src/resource_mgr/* src/apiclient/*
-dfticker: src/datafetcher/* src/apiclient/*
+dfticker: src/datafetcher/* src/apiclient/* src/resource_mgr/*
 dumpbody: src/apiclient/*
 df: src/datafetcher/* src/apiclient/*
 test1: src/apiclient/*

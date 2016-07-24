@@ -56,12 +56,12 @@ func (df *DataFetcher) Run() error {
 
 	for _, key := range df.key_point {
 		//log.Println("rankingtype:", key[0], "rank:", key[1])
-		err := df.GetCache(currentEvent, key[0], RankToPage(key[1]))
+		statusStr, err := df.GetCache(currentEvent, key[0], RankToPage(key[1]))
 		if err != nil {
 			//log.Fatal(err)
 			return err
 		}
-		fmt.Print(".") // progress bar
+		fmt.Print(statusStr) // progress bar
 	}
 	fmt.Print("\n")
 	return nil
@@ -83,14 +83,15 @@ func DumpToFile(v interface{}, fileName string) {
 	ioutil.WriteFile(fileName, yy, 0644)
 }
 
-func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_type int, page int) error {
+// string for hit/miss
+func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_type int, page int) (string, error) {
 	event_type := currentEvent.Type()
 	//log.Println("current event type:", event_type)
 	if !currentEvent.HasRanking() {
-		return ErrEventType
+		return "", ErrEventType
 	}
 	if !currentEvent.RankingAvailable() {
-		return ErrRankingNA
+		return "", ErrRankingNA
 	}
 
 	//localtime := float64(time.Now().UnixNano()) / 1e9 // for debug
@@ -100,7 +101,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	if Exists(path) {
 		// cache hit
 		//log.Println("hit", local_timestamp, ranking_type, page)
-		return nil
+		return "-", nil
 	} else {
 		// cache miss
 		if !Exists(dirname) {
@@ -110,7 +111,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	time.Sleep(1020 * time.Millisecond)
 	ranking_list, servertime, err := df.GetPage(event_type, ranking_type, page)
 	if err != nil {
-		return err
+		return "", err
 	}
 	//log.Printf("localtime: %f servertime: %d lag: %f\n", localtime, servertime, float64(servertime)-localtime)
 
@@ -130,7 +131,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	ioutil.WriteFile(lockfile, []byte(""), 0644)
 	DumpToFile(ranking_list, path)
 	os.Remove(lockfile)
-	return nil
+	return "*", nil
 }
 
 func (df *DataFetcher) GetPage(event_type, ranking_type, page int) ([]interface{}, uint64, error) {
