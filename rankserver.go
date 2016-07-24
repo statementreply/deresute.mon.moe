@@ -665,10 +665,25 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, li
         interpolateNulls: true,
         explorer: {maxZoomIn: 0.1},
     };
+      var options_speed = {
+        width: 900,
+        height: 500,
+        hAxis: {
+            format: 'MM/dd HH:mm',
+            gridlines: {count: 12}
+        },
+        vAxis: {
+            //gridlines: {color: 'none'},
+            minValue: 0
+        },
+        interpolateNulls: false,
+        explorer: {maxZoomIn: 0.1},
+    };
+
     var chart = new google.visualization.LineChart(document.getElementById('myLineChart'));
     var chart_speed = new google.visualization.LineChart(document.getElementById('mySpeedChart'));
     chart.draw(data_rank, options);
-    chart_speed.draw(data_speed, options);
+    chart_speed.draw(data_speed, options_speed);
     }
     `)
 	fmt.Fprint(w, `</script>`)
