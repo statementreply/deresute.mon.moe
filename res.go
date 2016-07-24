@@ -28,6 +28,6 @@ func main() {
 	currentEvent := resource_mgr.FindCurrentEvent(r.EventList)
 	log.Println(currentEvent.Name())
 
-	//manifest := r.LoadManifest()
+	r.LoadMusic()
 
 }
