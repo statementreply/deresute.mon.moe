@@ -28,24 +28,27 @@ func Unlz4(fileName string) []byte {
 	err = binary.Read(br, binary.LittleEndian, &lh)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return nil
 	}
 	log.Println("header", lh.Uncomp, lh)
 	// 1G
 	if lh.Uncomp > 1024 * 1024 * 1024 {
-		log.Fatalln("too large")
+		log.Println("too large")
+		return nil
 	}
 	var dst []byte
 	copy(content[12:16], content[4:8])
 	blk, err := lz4.Decode(dst, content[12:])
 	if err != nil {
-		return []byte("")
+		return nil
 	}
 	//log.Println("blk", len(blk), err)
 	//log.Println("blk", len(blk), cap(blk), len(dst), cap(dst))
 	log.Println("uncomp", lh.Uncomp, len(blk))
 	if int64(len(blk)) != int64(lh.Uncomp) {
-		log.Fatalln("size incorrect")
+		log.Println("size incorrect")
+		return nil
 	}
 	return blk
 
