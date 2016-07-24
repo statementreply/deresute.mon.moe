@@ -212,7 +212,7 @@ func (client *ApiClient) LoadCheck() {
 		"app_type":      0}
 
 	check := client.Call("/load/check", args)
-	log.Print(check)
+	//log.Print(check)
 	new_res_ver, ok := check["data_headers"].(map[interface{}]interface{})["required_res_ver"]
 	if ok {
 		s := new_res_ver.(string)
