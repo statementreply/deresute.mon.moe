@@ -2,6 +2,7 @@ secret.yaml
 rankserver.yaml
 .*.swp
 rankserver
+rankserver.log
 dfticker
 pcapdump
 dumpbody
@@ -11,3 +12,6 @@ get_profile
 test1
 ticker
 df
+pkg/
+src/github.com
+src/gopkg.in
