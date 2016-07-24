@@ -61,7 +61,9 @@ func (df *DataFetcher) Run() error {
 			//log.Fatal(err)
 			return err
 		}
+		fmt.Print(".") // progress bar
 	}
+	fmt.Print("\n")
 	return nil
 }
 
@@ -83,7 +85,7 @@ func DumpToFile(v interface{}, fileName string) {
 
 func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_type int, page int) error {
 	event_type := currentEvent.Type()
-	log.Println("current event type:", event_type)
+	//log.Println("current event type:", event_type)
 	if !currentEvent.HasRanking() {
 		return ErrEventType
 	}
@@ -91,13 +93,13 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 		return ErrRankingNA
 	}
 
-	localtime := float64(time.Now().UnixNano()) / 1e9 // for debug
+	//localtime := float64(time.Now().UnixNano()) / 1e9 // for debug
 	local_timestamp := GetLocalTimestamp()
 	dirname := df.rank_cache_dir + local_timestamp + "/"
 	path := dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
 	if Exists(path) {
 		// cache hit
-		log.Println("hit", local_timestamp, ranking_type, page)
+		//log.Println("hit", local_timestamp, ranking_type, page)
 		return nil
 	} else {
 		// cache miss
@@ -110,7 +112,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	if err != nil {
 		return err
 	}
-	log.Printf("localtime: %f servertime: %d lag: %f\n", localtime, servertime, float64(servertime)-localtime)
+	//log.Printf("localtime: %f servertime: %d lag: %f\n", localtime, servertime, float64(servertime)-localtime)
 
 	server_timestamp_i := RoundTimestamp(time.Unix(int64(servertime), 0)).Unix()
 	server_timestamp := fmt.Sprintf("%d", server_timestamp_i)
@@ -123,7 +125,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 			os.Mkdir(dirname, 0755)
 		}
 	}
-	log.Println("write to path", path)
+	//log.Println("write to path", path)
 	lockfile := dirname + "lock"
 	ioutil.WriteFile(lockfile, []byte(""), 0644)
 	DumpToFile(ranking_list, path)
@@ -151,7 +153,7 @@ func (df *DataFetcher) GetPage(event_type, ranking_type, page int) ([]interface{
 	if err != nil {
 		return nil, servertime, err
 	}
-	log.Println("get", servertime, ranking_type, page)
+	//log.Println("get", servertime, ranking_type, page)
 	ranking_list = resp["data"].(map[interface{}]interface{})["ranking_list"].([]interface{})
 	return ranking_list, servertime, err
 }
