@@ -75,7 +75,7 @@ func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SI
 	//client.sid = ""
 	//client.initialized = false
 	client.Reset_sid()
-	client.httpclient = &http.Client{Timeout: 7 * time.Second}
+	client.httpclient = &http.Client{Timeout: 20 * time.Second}
 	return client
 }
 
