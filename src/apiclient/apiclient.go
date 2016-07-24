@@ -128,8 +128,10 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 
 	// Processing response
 	resp_body, err := ioutil.ReadAll(resp.Body)
+	// FIXME
 	if err != nil {
-		log.Fatal("Read resp.Body", err)
+		log.Println("Read resp.Body", err)
+		return nil
 	}
 
 	//var content map[string]interface{}

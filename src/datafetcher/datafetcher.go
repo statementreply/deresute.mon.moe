@@ -15,6 +15,7 @@ import (
 var ErrNoEvent = errors.New("no event is running now")
 var ErrEventType = errors.New("current event type has no ranking")
 var ErrRankingNA = errors.New("current time is not in event/result period")
+var ErrNoResponse = errors.New("no response received")
 
 type DataFetcher struct {
 	Client         *apiclient.ApiClient
@@ -148,6 +149,10 @@ func (df *DataFetcher) GetPage(event_type, ranking_type, page int) ([]interface{
 	} else {
 		return nil, 0, ErrEventType
 	}
+	if resp == nil {
+		return nil, 0, ErrNoResponse
+	}
+
 
 	servertime := resp["data_headers"].(map[interface{}]interface{})["servertime"].(uint64)
 	err := df.Client.ParseResultCode(resp)

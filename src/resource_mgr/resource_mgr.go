@@ -55,7 +55,8 @@ func (r *ResourceMgr) Fetch(loc string) (string, error) {
 	time.Sleep(500 * time.Millisecond)
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println("http.Get", err)
+		return "", ErrNotOK
 	}
 	if resp.StatusCode != http.StatusOK {
 		log.Println(resp.Status)
@@ -63,7 +64,8 @@ func (r *ResourceMgr) Fetch(loc string) (string, error) {
 	}
 	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println("read resp-body", err)
+		return "", ErrNotOK
 	}
 	ioutil.WriteFile(dest, content, 0644)
 	return dest, nil
@@ -100,7 +102,8 @@ func (r *ResourceMgr) LoadManifest() string {
 	}
 	fh, err := os.Open(list)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("load manifest",err)
+		return ""
 	}
 	bh := bufio.NewReader(fh)
 	var manifest_name string
@@ -130,14 +133,16 @@ func (r *ResourceMgr) LoadMaster() string {
 	//log.Println("to open", dest)
 	db, err := sql.Open("sqlite3", dest)
 	if err != nil {
-		log.Fatal("x1", err)
+		log.Println("x1", err)
+		return ""
 	}
 	defer db.Close()
 	rows, err := db.Query("select * from manifests;")
 	//log.Println(rows)
 	defer rows.Close()
 	if err != nil {
-		log.Fatal("x2", err)
+		log.Println("x2", err)
+		return ""
 	}
 	var master string
 	for rows.Next() {
@@ -232,7 +237,8 @@ func (r *ResourceMgr) ParseEvent() {
 	log.Println("master db is", master)
 	db, err := sql.Open("sqlite3", master)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("open masterdb", err)
+		return
 	}
 	defer db.Close()
 	rows, err := db.Query("select * from event_data;")
@@ -263,7 +269,8 @@ func (r *ResourceMgr) ParseEvent() {
 func ParseTime(tstr string) time.Time {
 	t, err := time.Parse("2006-01-02 15:04:05 -0700 MST", tstr+" +0900 JST")
 	if err != nil {
-		log.Fatal(err)
+		log.Println("time parse",err)
+		return time.Unix(0,0)
 	}
 	return t
 }
