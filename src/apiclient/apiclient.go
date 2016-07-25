@@ -37,6 +37,7 @@ var ErrDataHeaders = errors.New("no data_headers")
 
 type ApiClient struct {
 	// constant after constructor
+	app_ver       string
 	user          int32
 	viewer_id     int32
 	viewer_id_str string
@@ -59,9 +60,10 @@ type ApiClient struct {
 	httpclient *http.Client
 }
 
-func NewApiClient(user, viewer_id int32, udid, res_ver string, VIEWER_ID_KEY, SID_KEY []byte) *ApiClient {
+func NewApiClient(user, viewer_id int32, udid, app_ver, res_ver string, VIEWER_ID_KEY, SID_KEY []byte) *ApiClient {
 	rand.Seed(time.Now().UnixNano())
 	client := new(ApiClient)
+	client.app_ver = app_ver
 	client.user = user
 	client.viewer_id = viewer_id
 	client.viewer_id_str = fmt.Sprintf("%d", viewer_id)
@@ -104,6 +106,7 @@ func NewApiClientFromConfig(configFile string) *ApiClient {
 		int32(secret_dict["user"].(int)),
 		int32(secret_dict["viewer_id"].(int)),
 		secret_dict["udid"].(string),
+		secret_dict["app_ver"].(string),
 		secret_dict["res_ver"].(string),
 		[]byte(secret_dict["VIEWER_ID_KEY"].(string)),
 		[]byte(secret_dict["SID_KEY"].(string)))

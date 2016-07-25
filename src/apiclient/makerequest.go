@@ -27,8 +27,7 @@ func (client *ApiClient) makeRequest(path, body, plain_tmp string) *http.Request
 		"USER_ID":         Lolfuscate(fmt.Sprintf("%d", client.user)),
 		"CARRIER":         "google",
 		"UDID":            Lolfuscate(client.udid),
-		// FIXME
-		"APP_VER":         "2.1.0",
+		"APP_VER":         client.app_ver,
 		"RES_VER":         client.res_ver,
 		"IP_ADDRESS":      "127.0.0.1",
 		"DEVICE_NAME":     "Nexus 42",
