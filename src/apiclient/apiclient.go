@@ -204,6 +204,7 @@ func (client *ApiClient) ParseResultCode(content map[string]interface{}) error {
 	case 209:
 		return ErrData
 	default:
+		log.Println("response body:", content)
 		return ErrUnknown
 	}
 }

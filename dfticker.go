@@ -83,9 +83,12 @@ func runCommand(df *datafetcher.DataFetcher) {
 		SetFinished()
 		if err != nil {
 			log.Println(err)
+			// reset unconditionally
+			if err != nil {
+				df.Client.Reset_sid()
+			}
 			if err == apiclient.ErrSession {
 				// run again immediately
-				df.Client.Reset_sid()
 				lock.Lock()
 				lastRun = time.Unix(0, 0)
 				lock.Unlock()
