@@ -159,7 +159,7 @@ func (df *DataFetcher) GetPage(event_type, ranking_type, page int) ([]interface{
 	if err != nil {
 		return nil, servertime, err
 	}
-	//log.Println("get", servertime, ranking_type, page)
+	log.Println("get", servertime, ranking_type, page)
 	ranking_list = resp["data"].(map[interface{}]interface{})["ranking_list"].([]interface{})
 	return ranking_list, servertime, err
 }
