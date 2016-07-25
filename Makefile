@@ -1,4 +1,4 @@
-MAIN := rankserver dfticker
+MAIN := rankserver dfticker twitter_ticker
 EXTRA := pcapdump dumpbody unlz4 res get_profile test1 ticker df
 all: ${MAIN}
 extra: ${EXTRA}

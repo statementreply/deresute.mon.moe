@@ -926,7 +926,7 @@ func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Reque
 		501:   "5百位",
 		5001:  "5千位",
 		50001:  "5万位",
-		500001:  "5十万位",
+		500001:  "50万位",
 	}
 	rankingType := 0
 	for _, rank := range list_rank {
