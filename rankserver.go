@@ -916,7 +916,7 @@ func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Reque
 	r.init_req(w, req)
 	title := "デレステボーダーbotβ"
 	if r.currentEvent != nil {
-		title = r.currentEvent.Name() + "イベント称号ボーダー"
+		title = r.currentEvent.Name() + "イベント称号ボーダー（時速）"
 	} else {
 		return
 	}
@@ -933,7 +933,7 @@ func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Reque
 		border := r.fetchData(timestamp, rankingType, rank)
 		name_rank := map_rank[rank]
 		t := r.timestampToTime(timestamp)
-		t_prev := t.Add(-INTERVAL0)
+		t_prev := t.Add(-INTERVAL0 * 4)
 		timestamp_prev := r.timeToTimestamp(t_prev)
 		border_prev := r.fetchData(timestamp_prev, rankingType, rank)
 		delta := -1
