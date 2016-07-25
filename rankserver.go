@@ -70,12 +70,12 @@ func MakeRankServer() *RankServer {
 	tz, err := time.LoadLocation("Asia/Tokyo")
 	r.tz = tz
 	if err != nil {
-		log.Fatalln(err, "load timezone")
+		log.Fatalln("load timezone", err)
 	}
 
 	content, err := ioutil.ReadFile(CONFIG_FILE)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln("read config file", err)
 	}
 	var config map[string]string
 	yaml.Unmarshal(content, &config)
@@ -88,7 +88,7 @@ func MakeRankServer() *RankServer {
 	log.Print("logfile is ", LOG_FILE)
 	fh, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln("open log file", err)
 	}
 	r.logger = log.New(fh, "", log.LstdFlags)
 
@@ -102,7 +102,7 @@ func MakeRankServer() *RankServer {
 	}
 	r.hostname, ok = config["hostname"]
 	if !ok {
-		r.logger.Fatal("no hostname in config")
+		r.logger.Fatalln("no hostname in config")
 	}
 
 	if (r.keyFile != "") && (r.certFile != "") {
@@ -110,7 +110,7 @@ func MakeRankServer() *RankServer {
 		r.logger.Print("keyFile " + r.keyFile + " certFile " + r.certFile)
 		cert, err := tls.LoadX509KeyPair(r.certFile, r.keyFile)
 		if err != nil {
-			r.logger.Fatal(err)
+			r.logger.Fatalln("load keypair", err)
 		}
 		r.tlsServer = &http.Server{
 			Addr:      ":4002",
@@ -150,13 +150,18 @@ func (r *RankServer) setHandleFunc() {
 func (r *RankServer) updateTimestamp() {
 	dir, err := os.Open(RANK_CACHE_DIR)
 	if err != nil {
-		r.logger.Fatal(err)
+		// FIXME
+		r.logger.Println(err)
+		os.MkdirAll(RANK_CACHE_DIR, 0755)
+		return
 	}
 	defer dir.Close()
 
 	fi, err := dir.Readdir(0)
 	if err != nil {
-		r.logger.Fatal(err)
+		// FIXME
+		r.logger.Println(err)
+		return
 	}
 	r.mux_timestamp.Lock()
 	r.list_timestamp = make([]string, 0, len(fi))
@@ -191,12 +196,15 @@ func (r *RankServer) checkDir(timestamp string) bool {
 	subdirPath := RANK_CACHE_DIR + timestamp + "/"
 	subdir, err := os.Open(subdirPath)
 	if err != nil {
-		r.logger.Fatal(err)
+		// FIXME
+		r.logger.Println("opendir", err)
+		return false
 	}
 	defer subdir.Close()
 	key, err := subdir.Readdir(0)
 	if err != nil {
-		r.logger.Fatal(err)
+		r.logger.Println("readdir", err)
+		return false
 	}
 	if len(key) > 0 {
 		return true
@@ -225,13 +233,15 @@ func (r *RankServer) checkData(timestamp string) {
 
 	subdir, err := os.Open(subdirPath)
 	if err != nil {
-		r.logger.Fatal(err)
+		r.logger.Println("opendir", err)
+		return
 	}
 	defer subdir.Close()
 	//log.Print(subdir)
 	key, err := subdir.Readdir(0)
 	if err != nil {
-		r.logger.Fatal(err)
+		r.logger.Println("readdir", err)
+		return
 	}
 	for _, pt := range key {
 		rankingType := r.RankingType(pt.Name())
@@ -450,7 +460,7 @@ func (r *RankServer) run() {
 			defer wg.Done()
 			err := r.tlsServer.ListenAndServeTLS(r.certFile, r.keyFile)
 			if err != nil {
-				r.logger.Fatal(err)
+				r.logger.Fatalln("tlsServer", err)
 			}
 		}()
 	}
@@ -459,7 +469,7 @@ func (r *RankServer) run() {
 		defer wg.Done()
 		err := r.plainServer.ListenAndServe()
 		if err != nil {
-			r.logger.Fatal(err)
+			r.logger.Fatalln("plainServer", err)
 		}
 	}()
 	fmt.Println("here+1")
