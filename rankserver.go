@@ -472,7 +472,7 @@ func (r *RankServer) run() {
 			r.logger.Fatalln("plainServer", err)
 		}
 	}()
-	fmt.Println("here+1")
+	//fmt.Println("here+1")
 }
 
 func (r *RankServer) dumpData() string {
