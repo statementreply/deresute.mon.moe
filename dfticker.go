@@ -13,6 +13,7 @@ import (
 
 // parameters
 var SECRET_FILE string = "secret.yaml"
+var LOG_FILE string = "dfticker.log"
 var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
 var RESOURCE_CACHE_DIR string = BASE + "/data/resourcesbeta/"
@@ -26,6 +27,12 @@ var lastRun = time.Unix(0, 0)
 var sleepDuration = time.Minute * 3
 
 func main() {
+	fh, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
+	if err != nil {
+		log.Fatalln("logfile", err)
+	}
+	log.SetOutput(fh)
+
 	log.Println("local-timestamp", datafetcher.GetLocalTimestamp())
 	key_point := [][2]int{
 		[2]int{1, 2001},    // tier 1
