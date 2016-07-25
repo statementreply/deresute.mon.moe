@@ -46,7 +46,7 @@ func NewResourceMgr(res_ver string, cache_dir string) *ResourceMgr {
 func (r *ResourceMgr) Fetch(loc string) (string, error) {
 	dest := r.cache_dir + "/storage/" + loc
 	url := URLBASE + loc
-	log.Println("url is", url)
+	//log.Println("url is", url)
 	if _, err := os.Stat(dest); err == nil {
 		return dest, nil
 	} else {
@@ -73,7 +73,7 @@ func (r *ResourceMgr) Fetch(loc string) (string, error) {
 
 func (r *ResourceMgr) FetchLz4(loc string) (string, error) {
 	dest := r.cache_dir + "/unlz4/" + loc
-	log.Println("url is", URLBASE+loc)
+	//log.Println("url is", URLBASE+loc)
 	if _, err := os.Stat(dest); err == nil {
 		return dest, nil
 	} else {
@@ -234,7 +234,7 @@ func (r *ResourceMgr) ParseMusic(fileName string) {
 
 func (r *ResourceMgr) ParseEvent() {
 	master := r.LoadMaster()
-	log.Println("master db is", master)
+	//log.Println("master db is", master)
 	db, err := sql.Open("sqlite3", master)
 	if err != nil {
 		log.Println("open masterdb", err)
