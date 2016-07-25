@@ -31,6 +31,7 @@ func main() {
 	data := client.GetProfile(friend_id)
 	yy, _ := yaml.Marshal(data)
 	fmt.Println(string(yy))
+	fmt.Println(client.Get_res_ver())
 	//DumpToFile(data, "user3520")
 
 	//p1 := client.GetPage(1, 9)

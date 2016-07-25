@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"resource_mgr"
+	"fmt"
 	//"time"
 )
 
@@ -30,4 +31,5 @@ func main() {
 
 	r.LoadMusic()
 
+	fmt.Println(r.LoadMaster())
 }

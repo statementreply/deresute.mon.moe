@@ -23,7 +23,7 @@ df: src/datafetcher/* src/apiclient/*
 test1: src/apiclient/*
 pcapdump: src/apiclient/*
 unlz4: src/resource_mgr/*
-res: src/resource_mgr/*
+res: src/resource_mgr/* src/apiclient/*
 get_profile: src/apiclient/*
 
 %: %.go
