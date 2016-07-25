@@ -38,7 +38,7 @@ func main() {
 		cache_filename: "cached_status_emblem_debug",
 		url:            "https://deresuteborder.mon.moe/twitter_emblem",
 		interval:       30*time.Second,
-		div:            15*60*time.Second,
+		div:            60*60*time.Second,
 	    rem:            3*60*time.Second,
 	}
 	wg.Add(2)
