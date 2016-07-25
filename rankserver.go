@@ -145,6 +145,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/chart", r.chartHandler)
 	http.HandleFunc("/qchart", r.qchartHandler)
 	http.HandleFunc("/twitter", r.twitterHandler)
+	http.HandleFunc("/twitter_emblem", r.twitterEmblemHandler)
 }
 
 func (r *RankServer) updateTimestamp() {
@@ -740,6 +741,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	//fmt.Fprintf(w, "<a href=\"chart\">%s</a><br>\n", "グラフβ")
 	fmt.Fprintf(w, "%s\n", "12万位ボーダーグラフ")
 	fmt.Fprintf(w, "（<a href=\"qchart?rank=2001&rank=10001&rank=20001&rank=60001&rank=120001\">%s</a>）<br>\n", "他のボーダーはここ")
+	fmt.Fprintf(w, "（<a href=\"qchart?rank=501&rank=5001&rank=50001&rank=500001\">%s</a>）<br>\n", "イベント称号ボーダー")
 	// insert graph here
 	fmt.Fprint(w, `
     <table class="columns">
@@ -882,6 +884,49 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 		20001:  "2万位",
 		60001:  "6万位",
 		120001: "12万位",
+	}
+	rankingType := 0
+	for _, rank := range list_rank {
+		border := r.fetchData(timestamp, rankingType, rank)
+		name_rank := map_rank[rank]
+		t := r.timestampToTime(timestamp)
+		t_prev := t.Add(-INTERVAL0)
+		timestamp_prev := r.timeToTimestamp(t_prev)
+		border_prev := r.fetchData(timestamp_prev, rankingType, rank)
+		delta := -1
+		if border < 0 {
+			fmt.Fprintf(w, "UPDATING\n")
+			break
+		}
+		if border_prev >= 0 {
+			delta = border - border_prev
+			fmt.Fprintf(w, "%s: %d (+%d)\n", name_rank, border, delta)
+		} else {
+			fmt.Fprintf(w, "%s: %d\n", name_rank, border)
+		}
+	}
+	fmt.Fprint(w, "\n")
+	fmt.Fprint(w, "https://"+r.hostname+"\n")
+	fmt.Fprint(w, "#デレステ\n")
+}
+
+func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Request) {
+	r.checkData("")
+	timestamp := r.latestTimestamp()
+	r.init_req(w, req)
+	title := "デレステボーダーbotβ"
+	if r.currentEvent != nil {
+		title = r.currentEvent.Name() + "イベント称号ボーダー"
+	} else {
+		return
+	}
+	fmt.Fprint(w, title, " ", r.formatTimestamp_short(timestamp), "\n")
+	list_rank := []int{501, 5001, 50001, 500001}
+	map_rank := map[int]string{
+		501:   "5百位",
+		5001:  "5千位",
+		50001:  "5万位",
+		500001:  "5十万位",
 	}
 	rankingType := 0
 	for _, rank := range list_rank {

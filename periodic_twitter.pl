@@ -1,12 +1,18 @@
 #!/usr/bin/perl
 use common::sense;
 
+if (@ARGV != 3) {
+    die "need 3 parameters: cache_filename, url, interval/sec";
+}
 my $cache_filename = "cached_status";
+$cache_filename = @ARGV[0];
+my $url = $ARGV[1];
+my $interval = $ARGV[2];
 my $cached_status = read_file($cache_filename);
 
 while (1) {
     # -s: silent
-    my $new_status = qx(curl -s https://deresuteborder.mon.moe/twitter);
+    my $new_status = qx(curl -s $url);
     if ($new_status =~ /^\s*$/ or $new_status =~ /UPDATING/) {
         # should sleep
         next;
@@ -19,7 +25,7 @@ while (1) {
         write_file($cache_filename, $cached_status);
     }
 } continue {
-    sleep 60;
+    sleep $interval;
 }
 
 sub read_file {

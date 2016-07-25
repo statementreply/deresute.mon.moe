@@ -5,10 +5,16 @@ extra: ${EXTRA}
 clean:
 	rm -fv ${MAIN} ${EXTRA}
 
-web: prep rankserver
+
+
+server: rankserver
 	./rankserver
-fetch: df
-	./df
+fetch: dfticker
+	./dfticker
+twitter:
+	perl periodic_twitter.pl cached_status https://deresuteborder.mon.moe/twitter 60
+twitter2:
+	perl periodic_twitter.pl cached_status_emblem https://deresuteborder.mon.moe/twitter_emblem 3600
 
 
 prep:
