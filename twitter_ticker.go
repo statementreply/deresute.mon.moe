@@ -28,14 +28,14 @@ func main() {
 	fmt.Println("go version of twitter ticker")
 	log.Println("go version of twitter ticker")
 	twitter1 := &Periodic{
-		cache_filename: "cached_status",
+		cache_filename: "cached_status_debug",
 		url:            "https://deresuteborder.mon.moe/twitter",
 		interval:       30 * time.Second,
 		div:            15*60 * time.Second,
 		rem:            2*60 * time.Second,
 	}
 	twitter2 := &Periodic{
-		cache_filename: "cached_status_emblem",
+		cache_filename: "cached_status_emblem_debug",
 		url:            "https://deresuteborder.mon.moe/twitter_emblem",
 		interval:       30*time.Second,
 		div:            15*60*time.Second,
