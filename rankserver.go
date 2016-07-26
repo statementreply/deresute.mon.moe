@@ -597,7 +597,9 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, li
 	r.init_req(w, req)
 	fmt.Fprint(w, "<!DOCTYPE html>")
 	fmt.Fprint(w, "<head>")
-	fmt.Fprint(w, `<meta charset="UTF-8"><title>デレステボーダーbotβ+</title>`)
+	fmt.Fprint(w, `<meta charset="UTF-8">
+<meta name="keywords" content="デレステ, イベントランキング, ボーダー, アイマス, アイドルマスターシンデレラガールズスターライトステージ">
+<title>デレステボーダーbotβ+</title>`)
 	if list_rank != nil {
 		fmt.Fprint(w, `
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
