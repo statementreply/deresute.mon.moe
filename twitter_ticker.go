@@ -28,14 +28,14 @@ func main() {
 	fmt.Println("go version of twitter ticker")
 	log.Println("go version of twitter ticker")
 	twitter1 := &Periodic{
-		cache_filename: "cached_status_debug",
+		cache_filename: "cached_status",
 		url:            "https://deresuteborder.mon.moe/twitter",
 		interval:       30 * time.Second,
 		div:            15*60 * time.Second,
 		rem:            2*60 * time.Second,
 	}
 	twitter2 := &Periodic{
-		cache_filename: "cached_status_emblem_debug",
+		cache_filename: "cached_status_emblem",
 		url:            "https://deresuteborder.mon.moe/twitter_emblem",
 		interval:       30*time.Second,
 		div:            60*60*time.Second,
@@ -92,20 +92,20 @@ func (p *Periodic) Run() {
 					goto Retry
 				}
 
-
 				err = ioutil.WriteFile(p.cache_filename, body, 0644)
 				if err != nil {
 					log.Println("cannot write file", err)
 				}
-				result, err = exec.Command("perl", "twitter_fake.pl", string(body)).CombinedOutput()
+				result, err = exec.Command("perl", "twitter.pl", string(body)).CombinedOutput()
 				log.Println(string(result))
 				if err != nil {
-					log.Println("error occured")
+					log.Println("error occured", err)
+					goto Retry
 				}
 
 				quotient = quotient_new
 				break
-			Retry:
+			Retry: // continue block
 				time.Sleep(p.interval)
 			}
 		}
