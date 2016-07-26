@@ -142,7 +142,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/event", r.eventHandler)
 	http.HandleFunc("/q", r.qHandler)
 	http.HandleFunc("/log", r.logHandler)
-	http.HandleFunc("/chart", r.chartHandler)
+	//http.HandleFunc("/chart", r.chartHandler)
 	http.HandleFunc("/qchart", r.qchartHandler)
 	http.HandleFunc("/twitter", r.twitterHandler)
 	http.HandleFunc("/twitter_emblem", r.twitterEmblemHandler)
@@ -594,6 +594,7 @@ func (r *RankServer) preload(w http.ResponseWriter, req *http.Request) {
 }
 */
 
+/*
 func (r *RankServer) preload_c(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	fmt.Fprint(w, "<!DOCTYPE html>")
@@ -648,6 +649,7 @@ func (r *RankServer) preload_c(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "<html>")
 	fmt.Fprint(w, "<body>")
 }
+*/
 
 func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, list_rank []int, event *resource_mgr.EventDetail) {
 	r.init_req(w, req)
@@ -786,6 +788,7 @@ func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+/*
 func (r *RankServer) chartHandler(w http.ResponseWriter, req *http.Request) {
 	r.checkData("")
 	r.preload_c(w, req)
@@ -804,6 +807,7 @@ func (r *RankServer) chartHandler(w http.ResponseWriter, req *http.Request) {
     </table>
     `)
 }
+*/
 
 func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	r.checkData("")
