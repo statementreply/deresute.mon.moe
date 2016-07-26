@@ -585,12 +585,14 @@ func (r *RankServer) init_req(w http.ResponseWriter, req *http.Request) {
 	r.logger.Printf("%T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
 }
 
+/*
 func (r *RankServer) preload(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	fmt.Fprint(w, "<!DOCTYPE html>")
 	fmt.Fprint(w, "<html>")
 	fmt.Fprint(w, "<body>")
 }
+*/
 
 func (r *RankServer) preload_c(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
@@ -706,7 +708,7 @@ func (r *RankServer) postload(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
-	r.preload(w, req)
+	r.preload_qchart(w, req, nil, nil)
 	defer r.postload(w, req)
 	fmt.Fprint(w, "<pre>")
 	defer fmt.Fprint(w, "</pre>")
@@ -756,7 +758,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
-	r.preload(w, req)
+	r.preload_qchart(w, req, nil, nil)
 	defer r.postload(w, req)
 	fmt.Fprintf(w, `<table class="columns">`)
 	fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n", "event", "start", "second-half", "end")
@@ -773,7 +775,7 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 
 func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	r.updateTimestamp()
-	r.preload(w, req)
+	r.preload_qchart(w, req, nil, nil)
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<br>デレステイベントボーダー<br><br>")
 	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "最新ボーダー")
