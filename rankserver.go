@@ -675,7 +675,7 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload_qchart(w, req, []int{120001}, r.currentEvent)
 	defer r.postload(w, req)
-	fmt.Fprintf(w, "<h1>デレステイベントボーダーbotβ+</h1>")
+	fmt.Fprintf(w, "<h2>デレステイベントボーダーbotβ+</h2>")
 	if r.currentEvent != nil {
 		fmt.Fprintf(w, "<p>")
 		fmt.Fprintf(w, "イベント開催中：%s", r.currentEvent.Name())
@@ -688,7 +688,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "<a href=\"event\">%s</a><br>\n", "過去のイベント (new)")
 	fmt.Fprintf(w, "<a href=\"log\">%s</a><br>\n", "過去のデータ")
 	fmt.Fprint(w, "<hr>")
-	fmt.Fprintf(w, "<h2>%s</h2>\n", "12万位ボーダーグラフ")
+	fmt.Fprintf(w, "<h3>%s</h3>\n", "12万位ボーダーグラフ")
 	fmt.Fprintf(w, "（<a href=\"qchart?rank=2001&rank=10001&rank=20001&rank=60001&rank=120001\">%s</a>）<br>\n", "他のボーダーはここ")
 	fmt.Fprintf(w, "（<a href=\"qchart?rank=501&rank=5001&rank=50001&rank=500001\">%s</a>）<br>\n", "イベント称号ボーダー")
 	// insert graph here
@@ -701,7 +701,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
     `)
 
 	fmt.Fprint(w, "<hr>")
-	fmt.Fprintf(w, "<h2>%s</h2>\n", "最新ボーダー")
+	fmt.Fprintf(w, "<h3>%s</h3>\n", "最新ボーダー")
 	r.checkData("")
 	fmt.Fprint(w, "<pre>")
 	defer fmt.Fprint(w, "</pre>")
