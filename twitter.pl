@@ -22,6 +22,7 @@ my $status = "（テスト）";
 if (@ARGV) {
     $status = decode("UTF-8", pop(@ARGV));
 }
+print "status is ", encode("UTF-8", $status);
 
 my $result;
 eval {
