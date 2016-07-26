@@ -11,10 +11,10 @@ import (
 )
 
 type lz4Header struct {
-	Magic  uint32  // [0:4]
-	Uncomp uint32  // [4:8]
-	Comp   uint32  // [8:12]
-	Unk    uint32  // [12:16]
+	Magic  uint32 // [0:4]
+	Uncomp uint32 // [4:8]
+	Comp   uint32 // [8:12]
+	Unk    uint32 // [12:16]
 }
 
 func Unlz4(fileName string) []byte {
@@ -33,7 +33,7 @@ func Unlz4(fileName string) []byte {
 	}
 	log.Println("header", lh.Uncomp, lh)
 	// 1G
-	if lh.Uncomp > 1024 * 1024 * 1024 {
+	if lh.Uncomp > 1024*1024*1024 {
 		log.Println("too large")
 		return nil
 	}

@@ -153,7 +153,6 @@ func (df *DataFetcher) GetPage(event_type, ranking_type, page int) ([]interface{
 		return nil, 0, ErrNoResponse
 	}
 
-
 	servertime := resp["data_headers"].(map[interface{}]interface{})["servertime"].(uint64)
 	err := df.Client.ParseResultCode(resp)
 	if err != nil {

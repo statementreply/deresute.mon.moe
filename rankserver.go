@@ -923,10 +923,10 @@ func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Reque
 	fmt.Fprint(w, title, " ", r.formatTimestamp_short(timestamp), "\n")
 	list_rank := []int{501, 5001, 50001, 500001}
 	map_rank := map[int]string{
-		501:   "5百位",
-		5001:  "5千位",
+		501:    "5百位",
+		5001:   "5千位",
 		50001:  "5万位",
-		500001:  "50万位",
+		500001: "50万位",
 	}
 	rankingType := 0
 	for _, rank := range list_rank {

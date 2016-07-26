@@ -1,15 +1,15 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"time"
-	"io/ioutil"
-	"net/http"
 	"bytes"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"os/exec"
-	"sync"
 	"regexp"
+	"sync"
+	"time"
 )
 
 var wg sync.WaitGroup
@@ -23,7 +23,6 @@ type Periodic struct {
 	div, rem       time.Duration
 }
 
-
 func main() {
 	fmt.Println("go version of twitter ticker")
 	log.Println("go version of twitter ticker")
@@ -31,15 +30,15 @@ func main() {
 		cache_filename: "cached_status",
 		url:            "https://deresuteborder.mon.moe/twitter",
 		interval:       30 * time.Second,
-		div:            15*60 * time.Second,
-		rem:            2*60 * time.Second,
+		div:            15 * 60 * time.Second,
+		rem:            2 * 60 * time.Second,
 	}
 	twitter2 := &Periodic{
 		cache_filename: "cached_status_emblem",
 		url:            "https://deresuteborder.mon.moe/twitter_emblem",
-		interval:       30*time.Second,
-		div:            60*60*time.Second,
-	    rem:            3*60*time.Second,
+		interval:       30 * time.Second,
+		div:            60 * 60 * time.Second,
+		rem:            3 * 60 * time.Second,
 	}
 	wg.Add(2)
 	go twitter1.Run()
@@ -58,8 +57,8 @@ func (p *Periodic) Run() {
 		select {
 		case t := <-ticker.C:
 			_ = t
-			quotient_new := (time.Duration(time.Now().UnixNano()) - p.rem) / p.div;
-			if (quotient_new <= quotient) {
+			quotient_new := (time.Duration(time.Now().UnixNano()) - p.rem) / p.div
+			if quotient_new <= quotient {
 				continue
 			}
 			for {

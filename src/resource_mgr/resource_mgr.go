@@ -102,7 +102,7 @@ func (r *ResourceMgr) LoadManifest() string {
 	}
 	fh, err := os.Open(list)
 	if err != nil {
-		log.Println("load manifest",err)
+		log.Println("load manifest", err)
 		return ""
 	}
 	bh := bufio.NewReader(fh)
@@ -269,8 +269,8 @@ func (r *ResourceMgr) ParseEvent() {
 func ParseTime(tstr string) time.Time {
 	t, err := time.Parse("2006-01-02 15:04:05 -0700 MST", tstr+" +0900 JST")
 	if err != nil {
-		log.Println("time parse",err)
-		return time.Unix(0,0)
+		log.Println("time parse", err)
+		return time.Unix(0, 0)
 	}
 	return t
 }
