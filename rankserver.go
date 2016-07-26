@@ -683,7 +683,8 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 
 	fmt.Fprintf(w, "<a href=\"event\">%s</a><br>\n", "過去のイベント (new)")
 	fmt.Fprintf(w, "<a href=\"log\">%s</a><br>\n", "過去のデータ")
-	fmt.Fprintf(w, "%s\n", "12万位ボーダーグラフ")
+	fmt.Fprint(w, "<hr>")
+	fmt.Fprintf(w, "<h2>%s</h2>\n", "12万位ボーダーグラフ")
 	fmt.Fprintf(w, "（<a href=\"qchart?rank=2001&rank=10001&rank=20001&rank=60001&rank=120001\">%s</a>）<br>\n", "他のボーダーはここ")
 	fmt.Fprintf(w, "（<a href=\"qchart?rank=501&rank=5001&rank=50001&rank=500001\">%s</a>）<br>\n", "イベント称号ボーダー")
 	// insert graph here
@@ -695,7 +696,8 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
     </table>
     `)
 
-	fmt.Fprintf(w, "<br>%s<br>\n", "最新ボーダー")
+	fmt.Fprint(w, "<hr>")
+	fmt.Fprintf(w, "<h2>%s</h2>\n", "最新ボーダー")
 	r.checkData("")
 	fmt.Fprint(w, "<pre>")
 	defer fmt.Fprint(w, "</pre>")
