@@ -916,7 +916,7 @@ func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Reque
 	r.init_req(w, req)
 	title := "デレステボーダーbotβ"
 	if r.currentEvent != nil {
-		title = r.currentEvent.Name() + "イベント称号ボーダー（時速）"
+		title = r.currentEvent.Name() + "\n" + "イベント称号ボーダー（時速）"
 	} else {
 		return
 	}
