@@ -6,6 +6,9 @@ clean:
 	rm -fv ${MAIN} ${EXTRA}
 
 
+fmt:
+	go fmt
+	go fmt apiclient resource_mgr datafetcher rijndael_wrapper
 
 server: rankserver
 	./rankserver
