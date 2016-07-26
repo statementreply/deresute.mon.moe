@@ -367,7 +367,7 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 	if err != nil {
 		// file doesn't exist?
 		// -1 for missing data
-		r.logger.Println(err, "return -1")
+		//r.logger.Println(err, "return -1")
 		return -1
 	}
 	// potential read/write race
@@ -731,6 +731,7 @@ func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// FIXME...
 func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	r.checkData("")
 
@@ -757,10 +758,12 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 
 	event_id_str_list, ok := req.Form["event"]
 	event := r.currentEvent
+	var prefill_event string = ""
 	if ok {
 		event_id_str := event_id_str_list[0]
 		event_id, err := strconv.Atoi(event_id_str)
 		if err == nil {
+			prefill_event = event_id_str
 			event = r.resourceMgr.FindEventById(event_id)
 			if event == nil {
 				event = r.currentEvent
@@ -785,8 +788,10 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, `
 <form action="qchart" method="get">customized border graph：<br>
 <input type="text" name="rank" size=35 value="%s"></input>
-<input type="submit" value="更新"></form>
-	`, prefill)
+<input type="hidden" name="event" value="%s"></input>
+<input type="submit" value="更新">
+</form>
+	`, prefill, prefill_event)
 	fmt.Fprint(w, `
     <table class="columns">
 <tr><td><div id="myLineChart" style="border: 1px solid #ccc"/></td></tr>
