@@ -599,15 +599,18 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, li
 	fmt.Fprint(w, "<head>")
 	fmt.Fprint(w, `<meta charset="UTF-8"><title>デレステボーダーbotβ+</title>`)
 	if list_rank != nil {
-		fmt.Fprint(w, `<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">google.charts.load('current', {packages: ['corechart']});google.charts.setOnLoadCallback(drawLineChart);`)
+		fmt.Fprint(w, `
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+google.charts.load('current', {packages: ['corechart']});
+google.charts.setOnLoadCallback(drawLineChart);`)
 		fmt.Fprint(w, `function drawLineChart() {`)
 		fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(0, list_rank, event), ")")
 		fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(0, list_rank, event), ")")
 		fmt.Fprint(w, `
-      var options = {
-        width: 900,
-        height: 500,
+	var options = {
+		width: 900,
+		height: 500,
         hAxis: {
             format: 'MM/dd HH:mm',
             gridlines: {count: 12}
@@ -619,8 +622,8 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, li
         interpolateNulls: true,
         explorer: {maxZoomIn: 0.1},
     };
-      var options_speed = {
-        width: 900,
+	var options_speed = {
+		width: 900,
         height: 500,
         hAxis: {
             format: 'MM/dd HH:mm',
@@ -632,8 +635,7 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, li
         },
         interpolateNulls: false,
         explorer: {maxZoomIn: 0.1},
-    };
-
+	};
     var chart = new google.visualization.LineChart(document.getElementById('myLineChart'));
     var chart_speed = new google.visualization.LineChart(document.getElementById('mySpeedChart'));
     chart.draw(data_rank, options);
@@ -681,7 +683,6 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 
 	fmt.Fprintf(w, "<a href=\"event\">%s</a><br>\n", "過去のイベント (new)")
 	fmt.Fprintf(w, "<a href=\"log\">%s</a><br>\n", "過去のデータ")
-	//fmt.Fprintf(w, "<a href=\"chart\">%s</a><br>\n", "グラフβ")
 	fmt.Fprintf(w, "%s\n", "12万位ボーダーグラフ")
 	fmt.Fprintf(w, "（<a href=\"qchart?rank=2001&rank=10001&rank=20001&rank=60001&rank=120001\">%s</a>）<br>\n", "他のボーダーはここ")
 	fmt.Fprintf(w, "（<a href=\"qchart?rank=501&rank=5001&rank=50001&rank=500001\">%s</a>）<br>\n", "イベント称号ボーダー")
