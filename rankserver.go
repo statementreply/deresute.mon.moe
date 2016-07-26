@@ -142,7 +142,6 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/event", r.eventHandler)
 	http.HandleFunc("/q", r.qHandler)
 	http.HandleFunc("/log", r.logHandler)
-	//http.HandleFunc("/chart", r.chartHandler)
 	http.HandleFunc("/qchart", r.qchartHandler)
 	http.HandleFunc("/twitter", r.twitterHandler)
 	http.HandleFunc("/twitter_emblem", r.twitterEmblemHandler)
@@ -594,63 +593,6 @@ func (r *RankServer) preload(w http.ResponseWriter, req *http.Request) {
 }
 */
 
-/*
-func (r *RankServer) preload_c(w http.ResponseWriter, req *http.Request) {
-	r.init_req(w, req)
-	fmt.Fprint(w, "<!DOCTYPE html>")
-	fmt.Fprint(w, "<head>")
-	fmt.Fprint(w, `
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {packages: ['corechart', 'annotationchart']});
-      google.charts.setOnLoadCallback(drawLineChart);
-      `)
-	fmt.Fprint(w, `
-    function drawLineChart() {
-      // Define the chart to be drawn.
-      //var data = new google.visualization.DataTable();`)
-	fmt.Fprint(w, "\nvar data_r = new google.visualization.DataTable(", r.rankData_list(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
-	fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list(0, []int{2001, 10001, 20001, 60001, 120001, 300001}), ")")
-	fmt.Fprint(w, "\nvar data_speed_12 = new google.visualization.DataTable(", r.speedData_list(0, []int{60001, 120001}), ")")
-	fmt.Fprint(w, "\nvar data_speed_2 = new google.visualization.DataTable(", r.speedData_list(0, []int{2001, 10001, 20001}), ")")
-	fmt.Fprint(w, `
-      var options = {
-        //title: 'Rate the Day on a Scale of 1 to 10',
-        width: 900,
-        height: 500,
-        hAxis: {
-            format: 'MM/dd HH:mm',
-            gridlines: {count: 12}
-        },
-        vAxis: {
-            //gridlines: {color: 'none'},
-            minValue: 0
-        },
-        interpolateNulls: true,
-        explorer: {},
-    };
-    var options_a = {width: 900, height: 500,};
-    var options_speed = {width: 900, height: 500,title: '時速'};
-    // Instantiate and draw the chart.
-    var chart = new google.visualization.LineChart(document.getElementById('myLineChart'));
-    var chart_a = new google.visualization.AnnotationChart(document.getElementById('myAnnotationChart'));
-    var chart_speed = new google.visualization.AnnotationChart(document.getElementById('mySpeedChart'));
-    var chart_speed_12 = new google.visualization.LineChart(document.getElementById('mySpeedChart12'));
-    var chart_speed_2 = new google.visualization.LineChart(document.getElementById('mySpeedChart2'));
-    chart.draw(data_r, options);
-    chart_a.draw(data_r, options_a);
-    chart_speed.draw(data_speed, options_speed);
-    chart_speed_12.draw(data_speed_12, options);
-    chart_speed_2.draw(data_speed_2, options);
-    }
-    `)
-	fmt.Fprint(w, `</script>`)
-	fmt.Fprint(w, "</head>")
-	fmt.Fprint(w, "<html>")
-	fmt.Fprint(w, "<body>")
-}
-*/
-
 func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, list_rank []int, event *resource_mgr.EventDetail) {
 	r.init_req(w, req)
 	fmt.Fprint(w, "<!DOCTYPE html>")
@@ -788,29 +730,10 @@ func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-/*
-func (r *RankServer) chartHandler(w http.ResponseWriter, req *http.Request) {
-	r.checkData("")
-	r.preload_c(w, req)
-	defer r.postload(w, req)
-	fmt.Fprint(w, `
-    uses javascript library from <code>https://www.gstatic.com/charts/loader.js</code><br>`)
-	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "ホームページ")
-	fmt.Fprint(w, `
-<!-- Identify where the chart should be drawn. -->
-    <table class="columns">
-<tr><td><div id="myLineChart" style="border: 1px solid #ccc"/></td></tr>
-<tr><td><div id="myAnnotationChart" /></td></tr>
-<tr><td>時速<div id="mySpeedChart12" style="border: 1px solid #ccc"/></td></tr>
-<tr><td><div id="mySpeedChart2" style="border: 1px solid #ccc"/></td></tr>
-<tr><td><div id="mySpeedChart"/></td></tr>
-    </table>
-    `)
-}
-*/
-
 func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	r.checkData("")
+
+	// parse parameters
 	req.ParseForm()
 	list_rank_str, ok := req.Form["rank"]
 	var list_rank []int
@@ -853,6 +776,8 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 		}
 		prefill = strings.Join(n_rank, " ")
 	}
+
+	// generate html
 	r.preload_qchart(w, req, list_rank, event)
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "ホームページ")
