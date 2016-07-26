@@ -644,7 +644,7 @@ google.charts.setOnLoadCallback(drawLineChart);`)
 		fmt.Fprint(w, `</script>`)
 	}
 	fmt.Fprint(w, "</head>")
-	fmt.Fprint(w, "<html>")
+	fmt.Fprint(w, `<html lang="ja">`)
 	fmt.Fprint(w, "<body>")
 }
 
@@ -673,7 +673,7 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload_qchart(w, req, []int{120001}, r.currentEvent)
 	defer r.postload(w, req)
-	fmt.Fprintf(w, "<br>デレステイベントボーダーbotβ+<br><br>")
+	fmt.Fprintf(w, "<h1>デレステイベントボーダーbotβ+</h1>")
 	if r.currentEvent != nil {
 		fmt.Fprintf(w, "イベント開催中：%s<br>", r.currentEvent.Name())
 		if r.currentEvent.LoginBonusType() > 0 {
