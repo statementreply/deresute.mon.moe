@@ -651,17 +651,14 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, li
 	r.init_req(w, req)
 	fmt.Fprint(w, "<!DOCTYPE html>")
 	fmt.Fprint(w, "<head>")
-	fmt.Fprint(w, `
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {packages: ['corechart']});
-      google.charts.setOnLoadCallback(drawLineChart);
-      `)
-	fmt.Fprint(w, `
-    function drawLineChart() {`)
-	fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(0, list_rank, event), ")")
-	fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(0, list_rank, event), ")")
-	fmt.Fprint(w, `
+	fmt.Fprint(w, `<meta charset="UTF-8"><title>デレステボーダーbotβ+</title>`)
+	if list_rank != nil {
+		fmt.Fprint(w, `<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">google.charts.load('current', {packages: ['corechart']});google.charts.setOnLoadCallback(drawLineChart);`)
+		fmt.Fprint(w, `function drawLineChart() {`)
+		fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(0, list_rank, event), ")")
+		fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(0, list_rank, event), ")")
+		fmt.Fprint(w, `
       var options = {
         width: 900,
         height: 500,
@@ -695,9 +692,9 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, li
     var chart_speed = new google.visualization.LineChart(document.getElementById('mySpeedChart'));
     chart.draw(data_rank, options);
     chart_speed.draw(data_speed, options_speed);
-    }
-    `)
-	fmt.Fprint(w, `</script>`)
+    }`)
+		fmt.Fprint(w, `</script>`)
+	}
 	fmt.Fprint(w, "</head>")
 	fmt.Fprint(w, "<html>")
 	fmt.Fprint(w, "<body>")
