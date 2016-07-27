@@ -810,6 +810,10 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
+	r.twitterHandler_common(w, req)
+}
+
+func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Request) {
 	var status string
 	r.checkData("")
 	timestamp := r.latestTimestamp()
@@ -821,7 +825,7 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 		title = r.currentEvent.Name()
 		t := r.timestampToTime(timestamp)
 		if r.currentEvent.IsFinal(t) {
-			timestamp_str = "結果発表"
+			timestamp_str = "【結果発表】"
 		}
 	}
 	status += title + " " + timestamp_str + "\n"
