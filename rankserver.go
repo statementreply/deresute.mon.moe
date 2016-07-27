@@ -17,6 +17,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 var wg sync.WaitGroup
@@ -809,6 +810,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
+	var status string
 	r.checkData("")
 	timestamp := r.latestTimestamp()
 	r.init_req(w, req)
@@ -816,7 +818,7 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	if r.currentEvent != nil {
 		title = r.currentEvent.Name()
 	}
-	fmt.Fprint(w, title, " ", r.formatTimestamp_short(timestamp), "\n")
+	status += title + " " + r.formatTimestamp_short(timestamp) + "\n"
 	list_rank := []int{2001, 10001, 20001, 60001, 120001}
 	map_rank := map[int]string{
 		2001:   "2千位",
@@ -835,20 +837,27 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 		border_prev := r.fetchData(timestamp_prev, rankingType, rank)
 		delta := -1
 		if border < 0 {
-			fmt.Fprintf(w, "UPDATING\n")
+			status += "UPDATING\n"
 			break
 		}
 		if border_prev >= 0 {
 			delta = border - border_prev
-			fmt.Fprintf(w, "%s: %d (+%d)\n", name_rank, border, delta)
+			status += fmt.Sprintf("%s：%d (+%d)\n", name_rank, border, delta)
 		} else {
-			fmt.Fprintf(w, "%s: %d\n", name_rank, border)
+			status += fmt.Sprintf("%s：%d\n", name_rank, border)
 		}
 	}
-	fmt.Fprint(w, "\n")
-	//fmt.Fprint(w, "https://"+r.hostname+"\n")
+	status += "\n"
+	status += "https://" + r.hostname + "\n"
 	//fmt.Fprint(w, r.hostname+"\n")
-	fmt.Fprint(w, "#デレステ\n")
+	status += fmt.Sprint("#デレステ")
+	log.Println("len/bytes of status", len(status))
+	log.Println("len/runes of status", utf8.RuneCountInString(status))
+	log.Println("status", (status))
+	fmt.Fprint(w, status)
+	if utf8.RuneCountInString(status) > 140 {
+		log.Println("[WARN] twitter status limit exceeded")
+	}
 }
 
 func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Request) {
