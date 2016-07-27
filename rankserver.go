@@ -146,6 +146,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/qchart", r.qchartHandler)
 	http.HandleFunc("/twitter", r.twitterHandler)
 	http.HandleFunc("/twitter_emblem", r.twitterEmblemHandler)
+	http.HandleFunc("/twitter_emblem_old", r.twitterEmblemHandler_old)
 }
 
 func (r *RankServer) updateTimestamp() {
@@ -809,40 +810,74 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, `javascript library from <code>https://www.gstatic.com/charts/loader.js</code><br>`)
 }
 
-func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
-	r.twitterHandler_common(w, req)
+type twitterParam struct {
+	title_alt, title_suffix string
+	list_rank []int
+	map_rank map[int]string
+	rankingType int
+	interval time.Duration
 }
 
-func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Request) {
+func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
+	param := twitterParam{
+		title_alt: "デレステボーダーbotβ",
+		title_suffix: "",
+		list_rank: []int{2001, 10001, 20001, 60001, 120001},
+		map_rank : map[int]string{
+			2001:   "2千位",
+			10001:  "1万位",
+			20001:  "2万位",
+			60001:  "6万位",
+			120001: "12万位",
+		},
+		rankingType: 0,
+		interval: INTERVAL0,
+	}
+	r.twitterHandler_common(w, req, param)
+}
+
+func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Request) {
+	param := twitterParam{
+		title_alt : "デレステボーダーbotβ",
+		title_suffix:  "\n" + "イベント称号ボーダー（時速）",
+		list_rank : []int{501, 5001, 50001, 500001},
+		map_rank : map[int]string{
+			501:    "5百位",
+			5001:   "5千位",
+			50001:  "5万位",
+			500001: "50万位",
+		},
+		rankingType : 0,
+		interval: INTERVAL0 * 4,
+	}
+	r.twitterHandler_common(w, req, param)
+}
+
+func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Request, param twitterParam) {
 	var status string
 	r.checkData("")
 	timestamp := r.latestTimestamp()
 	r.init_req(w, req)
-	title := "デレステボーダーbotβ"
+	title := param.title_alt
+
 	timestamp_str := r.formatTimestamp_short(timestamp)
 
 	if r.currentEvent != nil {
-		title = r.currentEvent.Name()
+		title = r.currentEvent.Name() + param.title_suffix
 		t := r.timestampToTime(timestamp)
 		if r.currentEvent.IsFinal(t) {
 			timestamp_str = "【結果発表】"
 		}
 	}
 	status += title + " " + timestamp_str + "\n"
-	list_rank := []int{2001, 10001, 20001, 60001, 120001}
-	map_rank := map[int]string{
-		2001:   "2千位",
-		10001:  "1万位",
-		20001:  "2万位",
-		60001:  "6万位",
-		120001: "12万位",
-	}
-	rankingType := 0
+	list_rank := param.list_rank
+	map_rank := param.map_rank
+	rankingType := param.rankingType
 	for _, rank := range list_rank {
 		border := r.fetchData(timestamp, rankingType, rank)
 		name_rank := map_rank[rank]
 		t := r.timestampToTime(timestamp)
-		t_prev := t.Add(-INTERVAL0)
+		t_prev := t.Add(-param.interval)
 		timestamp_prev := r.timeToTimestamp(t_prev)
 		border_prev := r.fetchData(timestamp_prev, rankingType, rank)
 		delta := -1
@@ -879,7 +914,7 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	}
 }
 
-func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Request) {
+func (r *RankServer) twitterEmblemHandler_old(w http.ResponseWriter, req *http.Request) {
 	r.checkData("")
 	timestamp := r.latestTimestamp()
 	r.init_req(w, req)
