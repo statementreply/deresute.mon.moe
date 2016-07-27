@@ -102,9 +102,9 @@ func runCommand(df *datafetcher.DataFetcher) {
 			}
 		}
 
-		log.Println("current:", time.Now().String())
+		log.Println("[INFO] current:", time.Now().String())
 		lock.Lock()
-		log.Println("lastRun:", lastRun.String())
+		log.Println("[INFO] lastRun:", lastRun.String())
 		lock.Unlock()
 	}
 }

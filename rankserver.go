@@ -581,7 +581,7 @@ func (r *RankServer) speedData_list_e(rankingType int, list_rank []int, event *r
 
 func (r *RankServer) init_req(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
-	r.logger.Printf("%T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
+	r.logger.Printf("[INFO] %T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
 }
 
 /*

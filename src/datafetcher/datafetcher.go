@@ -120,7 +120,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	server_timestamp := fmt.Sprintf("%d", server_timestamp_i)
 
 	if server_timestamp != local_timestamp {
-		log.Println("{NOTICE} change to server:", server_timestamp, "local:", local_timestamp)
+		log.Println("[NOTICE] change to server:", server_timestamp, "local:", local_timestamp)
 		dirname = df.rank_cache_dir + server_timestamp + "/"
 		path = dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
 		if !Exists(dirname) {
@@ -158,7 +158,7 @@ func (df *DataFetcher) GetPage(event_type, ranking_type, page int) ([]interface{
 	if err != nil {
 		return nil, servertime, err
 	}
-	log.Println("get", servertime, ranking_type, page)
+	log.Println("[INFO] get", servertime, ranking_type, page)
 	ranking_list = resp["data"].(map[interface{}]interface{})["ranking_list"].([]interface{})
 	return ranking_list, servertime, err
 }
