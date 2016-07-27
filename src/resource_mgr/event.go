@@ -81,6 +81,15 @@ func (e *EventDetail) RankingAvailable() bool {
 	}
 }
 
+func (e *EventDetail) IsFinal(t time.Time) bool {
+	if !t.Before(e.result_start) && !t.After(e.result_end) {
+		return true
+	} else {
+		return false
+	}
+}
+
+
 func FindCurrentEvent(eventList []*EventDetail) *EventDetail {
 	now := time.Now()
 	for _, e := range eventList {

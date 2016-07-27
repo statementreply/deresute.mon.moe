@@ -815,10 +815,16 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	timestamp := r.latestTimestamp()
 	r.init_req(w, req)
 	title := "デレステボーダーbotβ"
+	timestamp_str := r.formatTimestamp_short(timestamp)
+
 	if r.currentEvent != nil {
 		title = r.currentEvent.Name()
+		t := r.timestampToTime(timestamp)
+		if r.currentEvent.IsFinal(t) {
+			timestamp_str = "結果発表"
+		}
 	}
-	status += title + " " + r.formatTimestamp_short(timestamp) + "\n"
+	status += title + " " + timestamp_str + "\n"
 	list_rank := []int{2001, 10001, 20001, 60001, 120001}
 	map_rank := map[int]string{
 		2001:   "2千位",
@@ -847,10 +853,19 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 			status += fmt.Sprintf("%s：%d\n", name_rank, border)
 		}
 	}
-	status += "\n"
-	status += "https://" + r.hostname + "\n"
-	//fmt.Fprint(w, r.hostname+"\n")
-	status += fmt.Sprint("#デレステ")
+
+	if utf8.RuneCountInString(status) > 140 {
+		log.Println("[WARN] twitter status limit exceeded")
+	}
+	tail1 := "\n" + "https://" + r.hostname + "\n"
+	tail2 := fmt.Sprint("#デレステ")
+	if utf8.RuneCountInString(status+tail1) <= 140 {
+		status += tail1
+	}
+	if utf8.RuneCountInString(status+tail2) <= 140 {
+		status += tail2
+	}
+
 	log.Println("len/bytes of status", len(status))
 	log.Println("len/runes of status", utf8.RuneCountInString(status))
 	log.Println("status", (status))
