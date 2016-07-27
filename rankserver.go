@@ -865,6 +865,9 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	if r.currentEvent != nil {
 		title = r.currentEvent.Name() + param.title_suffix
 		t := r.timestampToTime(timestamp)
+		if r.currentEvent.IsCalc(t) {
+			timestamp_str = "WAITING"
+		}
 		if r.currentEvent.IsFinal(t) {
 			timestamp_str = "【結果発表】"
 		}

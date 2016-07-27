@@ -81,6 +81,14 @@ func (e *EventDetail) RankingAvailable() bool {
 	}
 }
 
+func (e *EventDetail) IsCalc(t time.Time) bool {
+	if t.After(e.calc_start) && t.Before(e.result_start) {
+		return true
+	} else {
+		return false
+	}
+}
+
 func (e *EventDetail) IsFinal(t time.Time) bool {
 	if !t.Before(e.result_start) && !t.After(e.result_end) {
 		return true

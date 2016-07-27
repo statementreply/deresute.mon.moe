@@ -15,6 +15,7 @@ import (
 var wg sync.WaitGroup
 
 var updatingFilter = regexp.MustCompile("(^\\s*$)|UPDATING")
+var waitFilter = regexp.MustCompile("WAITING")
 
 type Periodic struct {
 	cache_filename string
@@ -90,6 +91,10 @@ func (p *Periodic) Run() {
 				if updatingFilter.Match(body) {
 					goto Retry
 				}
+				if waitFilter.Match(body) {
+					log.Println("wait filter matched")
+					goto Finish
+				}
 
 				err = ioutil.WriteFile(p.cache_filename, body, 0644)
 				if err != nil {
@@ -102,6 +107,7 @@ func (p *Periodic) Run() {
 					goto Retry
 				}
 
+			Finish:
 				quotient = quotient_new
 				break
 			Retry: // continue block
