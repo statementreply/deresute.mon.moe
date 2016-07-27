@@ -865,7 +865,8 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	if r.currentEvent != nil {
 		title = r.currentEvent.Name() + param.title_suffix
 		t := r.timestampToTime(timestamp)
-		if r.currentEvent.IsCalc(t) {
+		// FIXME wait only after 2 hour
+		if r.currentEvent.IsCalc(time.Now().Add(-2 * time.Hour)) {
 			timestamp_str = "WAITING"
 		}
 		if r.currentEvent.IsFinal(t) {
