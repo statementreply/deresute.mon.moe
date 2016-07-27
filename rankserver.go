@@ -847,7 +847,7 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	fmt.Fprint(w, "\n")
 	//fmt.Fprint(w, "https://"+r.hostname+"\n")
-	fmt.Fprint(w, r.hostname+"\n")
+	//fmt.Fprint(w, r.hostname+"\n")
 	fmt.Fprint(w, "#デレステ\n")
 }
 
