@@ -1,9 +1,10 @@
 TODO
-- event datetime filter based on sqlite3
-- translate python/perl to go?
+- [done] event datetime filter based on sqlite3
+- [pydone] translate python/perl to go?
+- dfticker mem leak?
 
 
-Data flow           when to run
+[outdated] Data flow           when to run
 - python main2.py   periodic
 - rankserver.go     alltime    prevent mem leak?
 - twitter.pl        trigger by periodic_twitter.pl
