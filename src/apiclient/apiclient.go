@@ -50,8 +50,8 @@ type ApiClient struct {
 	// need lock
 	sid     string
 	res_ver string
-	// true: if LoadCheck was called
-	// false: need to call LoadCheck
+	// true: no need to call LoadCheck
+	// false: need to call LoadCheck?
 	initialized bool
 
 	lock sync.RWMutex
@@ -86,6 +86,7 @@ func NewApiClient(user, viewer_id int32, udid, app_ver, res_ver string, VIEWER_I
 func (client *ApiClient) Reset_sid() {
 	client.lock.Lock()
 	client.sid = client.viewer_id_str + client.udid
+	// change to true?
 	client.initialized = false
 	client.lock.Unlock()
 }
