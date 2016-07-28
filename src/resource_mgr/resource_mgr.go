@@ -262,8 +262,11 @@ func (r *ResourceMgr) ParseEvent() {
 			ParseTime(notice_start), ParseTime(event_start), ParseTime(second_half_start), ParseTime(event_end), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end),
 			limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count}
 		// deduplicate
+		// new override old
 		if r.EventList.FindEventById(e.Id()) == nil {
 			r.EventList = append(r.EventList, e)
+		} else {
+			r.EventList.Overwrite(e)
 		}
 	}
 	sort.Sort(r.EventList)

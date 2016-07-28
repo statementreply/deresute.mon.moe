@@ -130,3 +130,11 @@ func (eventList *EventDetailList) FindEventById(id int) *EventDetail {
 	}
 	return nil
 }
+
+func (eventList *EventDetailList) Overwrite(e_new *EventDetail) {
+	for index, e := range *eventList {
+		if e.Id() == e_new.Id() {
+			(*eventList)[index] = e_new
+		}
+	}
+}
