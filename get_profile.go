@@ -22,7 +22,8 @@ var RANK_CACHE_DIR string = BASE + "/data/rankbeta/"
 func main() {
 	rand.Seed(time.Now().Unix())
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
-	client.LoadCheck()
+	// not necessary
+	//client.LoadCheck()
 
 	friend_id := 679923520
 	if len(os.Args) > 1 {
