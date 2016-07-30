@@ -17,6 +17,7 @@ var wg sync.WaitGroup
 var updatingFilter = regexp.MustCompile("(^\\s*$)|UPDATING")
 var waitFilter = regexp.MustCompile("WAITING")
 var resultFilter = regexp.MustCompile("【結果発表】")
+var emptyFilter = regexp.MustCompile("EMPTY")
 
 type Periodic struct {
 	cache_filename string
@@ -98,6 +99,10 @@ func (p *Periodic) Run() {
 				}
 				if resultFilter.Match(content) && resultFilter.Match(body) {
 					log.Println("don't post final twice")
+					goto Finish
+				}
+				if emptyFilter.Match(body) {
+					log.Println("empty response")
 					goto Finish
 				}
 

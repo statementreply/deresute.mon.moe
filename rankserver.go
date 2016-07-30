@@ -873,6 +873,10 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 		if r.currentEvent.IsFinal(t) {
 			timestamp_str = "【結果発表】"
 		}
+	} else {
+		r.logger.Println("no event")
+		fmt.Fprint(w, "EMPTY")
+		return
 	}
 	status += title + " " + timestamp_str + "\n"
 	list_rank := param.list_rank
