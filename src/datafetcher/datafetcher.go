@@ -16,12 +16,15 @@ var ErrNoEvent = errors.New("no event is running now")
 var ErrEventType = errors.New("current event type has no ranking")
 var ErrRankingNA = errors.New("current time is not in event/result period")
 var ErrNoResponse = errors.New("no response received")
+var ErrRerun = errors.New("new server timestamp")
 
 type DataFetcher struct {
 	Client         *apiclient.ApiClient
 	resourceMgr    *resource_mgr.ResourceMgr
 	key_point      [][2]int
 	rank_cache_dir string
+	// prevent duplicate during [resultstart, resultend]
+	currentResultEnd time.Time
 }
 
 func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_dir, resource_cache_dir string) *DataFetcher {
@@ -36,6 +39,8 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_
 	df.Client.LoadCheck()
 	rv := client.Get_res_ver()
 	df.resourceMgr = resource_mgr.NewResourceMgr(rv, resource_cache_dir)
+
+	df.currentResultEnd = time.Unix(0, 0)
 
 	//log.Println(GetLocalTimestamp())
 	//log.Println(RoundTimestamp(time.Now()).String())
@@ -55,15 +60,32 @@ func (df *DataFetcher) Run() error {
 		return ErrNoEvent
 	}
 
+	local_timestamp := GetLocalTimestamp()
+	local_time := TimestampToTime(local_timestamp)
+	if local_time.Before(df.currentResultEnd) {
+		log.Println("duplicate final result prevented")
+		return nil
+	}
+
 	for _, key := range df.key_point {
 		//log.Println("rankingtype:", key[0], "rank:", key[1])
-		statusStr, err := df.GetCache(currentEvent, key[0], RankToPage(key[1]))
+		timestamp, statusStr, err := df.GetCache(currentEvent, key[0], RankToPage(key[1]))
 		if err != nil {
 			//log.Fatal(err)
 			return err
 		}
+		if timestamp != local_timestamp {
+			return ErrRerun
+		}
 		fmt.Print(statusStr) // progress bar
 	}
+	// if every datapoint is ok
+	if currentEvent.IsFinal(local_time) {
+		df.currentResultEnd = currentEvent.ResultEnd()
+	} else {
+		df.currentResultEnd = time.Unix(0, 0)
+	}
+
 	fmt.Print("\n")
 	return nil
 }
@@ -85,14 +107,16 @@ func DumpToFile(v interface{}, fileName string) {
 }
 
 // string for hit/miss
-func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_type int, page int) (string, error) {
+func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_type int, page int) (string, string, error) {
+	//return timestamp, statuscode, err
+
 	event_type := currentEvent.Type()
 	//log.Println("current event type:", event_type)
 	if !currentEvent.HasRanking() {
-		return "", ErrEventType
+		return "", "", ErrEventType
 	}
 	if !currentEvent.RankingAvailable() {
-		return "", ErrRankingNA
+		return "", "", ErrRankingNA
 	}
 
 	//localtime := float64(time.Now().UnixNano()) / 1e9 // for debug
@@ -102,7 +126,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	if Exists(path) {
 		// cache hit
 		//log.Println("hit", local_timestamp, ranking_type, page)
-		return "-", nil
+		return local_timestamp, "-", nil
 	} else {
 		// cache miss
 		if !Exists(dirname) {
@@ -112,7 +136,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	time.Sleep(1020 * time.Millisecond)
 	ranking_list, servertime, err := df.GetPage(event_type, ranking_type, page)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	//log.Printf("localtime: %f servertime: %d lag: %f\n", localtime, servertime, float64(servertime)-localtime)
 
@@ -132,7 +156,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	ioutil.WriteFile(lockfile, []byte(""), 0644)
 	DumpToFile(ranking_list, path)
 	os.Remove(lockfile)
-	return "*", nil
+	return server_timestamp, "*", nil
 }
 
 func (df *DataFetcher) GetPage(event_type, ranking_type, page int) ([]interface{}, uint64, error) {

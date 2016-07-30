@@ -94,7 +94,7 @@ func runCommand(df *datafetcher.DataFetcher) {
 			if err != nil {
 				df.Client.Reset_sid()
 			}
-			if err == apiclient.ErrSession {
+			if err == apiclient.ErrSession || err == datafetcher.ErrRerun {
 				// run again immediately
 				lock.Lock()
 				lastRun = time.Unix(0, 0)
