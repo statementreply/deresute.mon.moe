@@ -216,8 +216,14 @@ func (r *RankServer) checkDir(timestamp string) bool {
 }
 
 func (r *RankServer) checkData(timestamp string) {
+	r.updateTimestamp()
+	latest := r.latestTimestamp()
+	latest_time := time.Unix(0, 0)
+	if latest != "" {
+		latest_time = r.timestampToTime(latest)
+	}
 	// check new res_ver
-	if time.Now().Sub(r.lastCheck) >= 6*time.Hour {
+	if ( time.Now().Sub(r.lastCheck) >= 6*time.Hour ) || ( (r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 3 * time.Hour) ) {
 		r.client.LoadCheck()
 		rv := r.client.Get_res_ver()
 		r.resourceMgr.Set_res_ver(rv)
@@ -226,8 +232,6 @@ func (r *RankServer) checkData(timestamp string) {
 		r.lastCheck = time.Now()
 	}
 
-	r.updateTimestamp()
-	latest := r.latestTimestamp()
 	if timestamp == "" {
 		timestamp = latest
 	}
