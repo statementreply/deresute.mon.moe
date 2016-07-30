@@ -8,6 +8,11 @@ use utf8;
 
 my $config = LoadFile("secret.yaml");
 #print "$config\n";
+if (exists $$config{"twitter_dummy"}) {
+    # testmode
+    print "twitter.pl called: <@ARGV>\n";
+    exit 0;
+}
 my $nt = Net::Twitter->new(
     "ssl"      => 1,
     "traits"   => ["API::RESTv1_1",],

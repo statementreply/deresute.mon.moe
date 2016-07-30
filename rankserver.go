@@ -286,6 +286,7 @@ func (r *RankServer) RankingType(fileName string) int {
 	}
 }
 
+// FIXME duplicate in datafetcher
 func (r *RankServer) timestampToTime(timestamp string) time.Time {
 	itime, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {
