@@ -23,15 +23,15 @@ func main() {
 	r.LoadMaster()
 	r.ParseEvent()
 	for _, e := range r.EventList {
-		//log.Println(e)
-		log.Println(e.Name())
+		log.Println(e.NoticeStart(), e.EventStart(), e.Name())
 	}
 	currentEvent := resource_mgr.FindCurrentEvent(r.EventList)
 	if currentEvent != nil {
 		log.Println(currentEvent.Name())
 	}
 
-	r.LoadMusic()
+	// download musicscores
+	//r.LoadMusic()
 
 	fmt.Println(r.LoadMaster())
 

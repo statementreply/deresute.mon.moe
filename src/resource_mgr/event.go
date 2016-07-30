@@ -27,6 +27,10 @@ func (e *EventDetail) Id() int {
 }
 
 // not exported: NoticeStart
+func (e *EventDetail) NoticeStart() time.Time {
+	return e.notice_start
+}
+
 func (e *EventDetail) EventStart() time.Time {
 	return e.event_start
 }
