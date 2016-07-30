@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 use common::sense;
 use Data::Dump::Streamer;
 

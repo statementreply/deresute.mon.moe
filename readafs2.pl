@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 use common::sense;
 use Data::Dump::Streamer;
 
@@ -61,7 +62,7 @@ sub dump_file {
     my $cueid = shift;
     my $start = shift;
     my $end = shift;
-    write_file(sprintf("tmp3/%03d.hca", $cueid), substr(at($start), 0, $end - $start));
+    write_file(sprintf("$outdir/%03d.hca", $cueid), substr(at($start), 0, $end - $start));
 }
 
 

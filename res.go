@@ -27,7 +27,9 @@ func main() {
 		log.Println(e.Name())
 	}
 	currentEvent := resource_mgr.FindCurrentEvent(r.EventList)
-	log.Println(currentEvent.Name())
+	if currentEvent != nil {
+		log.Println(currentEvent.Name())
+	}
 
 	r.LoadMusic()
 
@@ -37,5 +39,7 @@ func main() {
 	//v/chara_271.acb|3428b3a012082796aeb14d8a0412e602|0|every| 
 	// "v/chara_271.acb"
 	d, err := r.Fetch("dl/resources/High/Sound/Common/v/3428b3a012082796aeb14d8a0412e602")
+	// l/song_1023.acb
+	d, err = r.Fetch("dl/resources/High/Sound/Common/l/7440496164fa88f65518da9d63601d76")
 	fmt.Println("fetched", d, err)
 }
