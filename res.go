@@ -32,4 +32,10 @@ func main() {
 	r.LoadMusic()
 
 	fmt.Println(r.LoadMaster())
+
+	fmt.Println("debug")
+	//v/chara_271.acb|3428b3a012082796aeb14d8a0412e602|0|every| 
+	// "v/chara_271.acb"
+	d, err := r.Fetch("dl/resources/High/Sound/Common/v/3428b3a012082796aeb14d8a0412e602")
+	fmt.Println("fetched", d, err)
 }
