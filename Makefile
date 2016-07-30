@@ -48,3 +48,8 @@ precompile:
 linksys:
 	ln -s /usr/share/gocode/src/github.com src/ || true
 	ln -s /usr/share/gocode/src/gopkg.in   src/ || true
+
+setcap:
+	sudo setcap cap_net_raw,cap_net_admin=eip ./pcapdump
+capture:
+	./pcapdump -i eth0 -f 'tcp and port 80'
