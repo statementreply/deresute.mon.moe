@@ -31,7 +31,7 @@ func main() {
 	}
 
 	// download musicscores
-	//r.LoadMusic()
+	r.LoadMusic()
 
 	fmt.Println(r.LoadMaster())
 
