@@ -144,9 +144,11 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/q", r.qHandler)
 	http.HandleFunc("/log", r.logHandler)
 	http.HandleFunc("/qchart", r.qchartHandler)
+	// API/plaintext
 	http.HandleFunc("/twitter", r.twitterHandler)
 	http.HandleFunc("/twitter_emblem", r.twitterEmblemHandler)
 	http.HandleFunc("/twitter_emblem_old", r.twitterEmblemHandler_old)
+	http.HandleFunc("/res_ver", r.res_verHandler)
 }
 
 func (r *RankServer) updateTimestamp() {
@@ -937,6 +939,12 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	if statusLenFinal > 140 {
 		r.logger.Println("[WARN] twitter status limit exceeded", "<"+status+">")
 	}
+}
+
+
+func (r *RankServer) res_verHandler(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
+	fmt.Fprint(w, r.client.Get_res_ver())
 }
 
 func (r *RankServer) twitterEmblemHandler_old(w http.ResponseWriter, req *http.Request) {
