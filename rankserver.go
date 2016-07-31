@@ -147,7 +147,6 @@ func (r *RankServer) setHandleFunc() {
 	// API/plaintext
 	http.HandleFunc("/twitter", r.twitterHandler)
 	http.HandleFunc("/twitter_emblem", r.twitterEmblemHandler)
-	http.HandleFunc("/twitter_emblem_old", r.twitterEmblemHandler_old)
 	http.HandleFunc("/res_ver", r.res_verHandler)
 }
 
@@ -945,49 +944,6 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 func (r *RankServer) res_verHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	fmt.Fprint(w, r.client.Get_res_ver())
-}
-
-func (r *RankServer) twitterEmblemHandler_old(w http.ResponseWriter, req *http.Request) {
-	r.checkData("")
-	timestamp := r.latestTimestamp()
-	r.init_req(w, req)
-	title := "デレステボーダーbotβ"
-	if r.currentEvent != nil {
-		title = r.currentEvent.Name() + "\n" + "イベント称号ボーダー（時速）"
-	} else {
-		return
-	}
-	fmt.Fprint(w, title, " ", r.formatTimestamp_short(timestamp), "\n")
-	list_rank := []int{501, 5001, 50001, 500001}
-	map_rank := map[int]string{
-		501:    "5百位",
-		5001:   "5千位",
-		50001:  "5万位",
-		500001: "50万位",
-	}
-	rankingType := 0
-	for _, rank := range list_rank {
-		border := r.fetchData(timestamp, rankingType, rank)
-		name_rank := map_rank[rank]
-		t := r.timestampToTime(timestamp)
-		t_prev := t.Add(-INTERVAL0 * 4)
-		timestamp_prev := r.timeToTimestamp(t_prev)
-		border_prev := r.fetchData(timestamp_prev, rankingType, rank)
-		delta := -1
-		if border < 0 {
-			fmt.Fprintf(w, "UPDATING\n")
-			break
-		}
-		if border_prev >= 0 {
-			delta = border - border_prev
-			fmt.Fprintf(w, "%s: %d (+%d)\n", name_rank, border, delta)
-		} else {
-			fmt.Fprintf(w, "%s: %d\n", name_rank, border)
-		}
-	}
-	fmt.Fprint(w, "\n")
-	fmt.Fprint(w, "https://"+r.hostname+"\n")
-	fmt.Fprint(w, "#デレステ\n")
 }
 
 func (r *RankServer) redirectHandler(w http.ResponseWriter, req *http.Request) {
