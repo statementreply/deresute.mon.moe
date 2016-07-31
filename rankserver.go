@@ -574,16 +574,8 @@ func (r *RankServer) rankData_list_f_e(rankingType int, list_rank []int, dataSou
 	return raw
 }
 
-func (r *RankServer) rankData_list(rankingType int, list_rank []int) string {
-	return r.rankData_list_f(rankingType, list_rank, r.fetchData_i)
-}
-
 func (r *RankServer) rankData_list_e(rankingType int, list_rank []int, event *resource_mgr.EventDetail) string {
 	return r.rankData_list_f_e(rankingType, list_rank, r.fetchData_i, event)
-}
-
-func (r *RankServer) speedData_list(rankingType int, list_rank []int) string {
-	return r.rankData_list_f(rankingType, list_rank, r.getSpeed_i)
 }
 
 func (r *RankServer) speedData_list_e(rankingType int, list_rank []int, event *resource_mgr.EventDetail) string {
