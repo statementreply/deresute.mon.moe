@@ -23,7 +23,7 @@ func main() {
 	rand.Seed(time.Now().Unix())
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 	// not necessary
-	//client.LoadCheck()
+	client.LoadCheck()
 
 	friend_id := 679923520
 	if len(os.Args) > 1 {
