@@ -515,10 +515,6 @@ func (r *RankServer) showData(timestamp string) string {
 //   [{"id":"timestamp","label":"timestamp","type":"date"},{"id":"score","label":"score","type":"number"}],
 //  "rows":[{"c":[{"v":"new Date(1467770520)"},{"v":14908}]}]}
 
-//func (r *RankServer) rankData_list_f(rankingType int, list_rank []int, dataSource func(string, int, int) interface{}) string {
-//	return r.rankData_list_f_e(rankingType, list_rank, dataSource, r.currentEvent)
-//}
-
 func (r *RankServer) get_list_timestamp() []string {
 	r.mux_timestamp.RLock()
 	local_timestamp := make([]string, len(r.list_timestamp))
