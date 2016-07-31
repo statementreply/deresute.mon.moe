@@ -223,7 +223,10 @@ func (r *RankServer) checkData(timestamp string) {
 		latest_time = r.timestampToTime(latest)
 	}
 	// check new res_ver
-	if ( time.Now().Sub(r.lastCheck) >= 6*time.Hour ) || ( (r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 3 * time.Hour) ) {
+	// FIXME need some test
+	//r.logger.Println("test recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
+	if ( time.Now().Sub(r.lastCheck) >= 5 * time.Hour / 2 ) || ( (r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 2 * time.Hour) ) {
+		r.logger.Println("recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
 		r.client.LoadCheck()
 		rv := r.client.Get_res_ver()
 		r.resourceMgr.Set_res_ver(rv)
