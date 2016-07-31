@@ -880,7 +880,7 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 		if r.currentEvent.IsFinal(t) {
 			timestamp_str = "【結果発表】"
 		}
-		title = r.currentEvent.ShortName() + param.title_suffix + " " + timestamp_str + "\n"
+		title = r.currentEvent.ShortName() + " " + timestamp_str +  param.title_suffix + "\n"
 	} else {
 		r.logger.Println("no event")
 		fmt.Fprint(w, "EMPTY")
