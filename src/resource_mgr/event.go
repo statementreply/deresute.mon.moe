@@ -2,7 +2,10 @@ package resource_mgr
 
 import (
 	"time"
+	"regexp"
 )
+
+var grooveFilter = regexp.MustCompile("LIVE Groove")
 
 type EventDetail struct {
 	id, typ                                   int
@@ -20,6 +23,14 @@ func (e *EventDetail) Type() int {
 
 func (e *EventDetail) Name() string {
 	return e.name
+}
+
+func (e *EventDetail) ShortName() string {
+	if grooveFilter.MatchString(e.name) {
+		return "LIVE Groove"
+	} else {
+		return e.name
+	}
 }
 
 func (e *EventDetail) Id() int {

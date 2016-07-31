@@ -871,7 +871,7 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	timestamp_str := r.formatTimestamp_short(timestamp)
 
 	if r.currentEvent != nil {
-		title = r.currentEvent.Name() + param.title_suffix
+		title = r.currentEvent.ShortName() + param.title_suffix
 		t := r.timestampToTime(timestamp)
 		// FIXME wait only after 2 hour
 		if r.currentEvent.IsCalc(time.Now().Add(-2 * time.Hour)) {
@@ -910,26 +910,31 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	}
 
 	statusLen := utf8.RuneCountInString(status)
+	statusLenFinal := statusLen
 	if statusLen > 140 {
-		log.Println("[WARN] twitter status limit exceeded")
+		r.logger.Println("[WARN] twitter status limit exceeded", "<"+status+">")
 	}
 	tail1 := "\n" + "https://" + r.hostname
 	tail1Len := 1 + 23 // twitter shortener
 	tail2 := "\n" + fmt.Sprint("#デレステ")
 	tail2Len := utf8.RuneCountInString(tail2)
+
 	if statusLen + tail1Len <= 140 {
 		status += tail1
+		statusLenFinal += tail1Len
 	}
 	if statusLen + tail1Len + tail2Len <= 140 {
 		status += tail2
+		statusLenFinal += tail2Len
 	}
 
-	log.Println("len/bytes of status", len(status))
+	//log.Println("len/bytes of status", len(status))
 	log.Println("len/runes of status", utf8.RuneCountInString(status))
+	log.Println("len/twitter of status", statusLenFinal)
 	log.Println("status: <" + status + ">")
 	fmt.Fprint(w, status)
-	if utf8.RuneCountInString(status) > 140 {
-		log.Println("[WARN] twitter status limit exceeded")
+	if statusLenFinal > 140 {
+		r.logger.Println("[WARN] twitter status limit exceeded", "<"+status+">")
 	}
 }
 
