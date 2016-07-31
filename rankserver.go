@@ -595,15 +595,6 @@ func (r *RankServer) init_req(w http.ResponseWriter, req *http.Request) {
 	r.logger.Printf("[INFO] %T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
 }
 
-/*
-func (r *RankServer) preload(w http.ResponseWriter, req *http.Request) {
-	r.init_req(w, req)
-	fmt.Fprint(w, "<!DOCTYPE html>")
-	fmt.Fprint(w, "<html>")
-	fmt.Fprint(w, "<body>")
-}
-*/
-
 func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, list_rank []int, event *resource_mgr.EventDetail) {
 	r.init_req(w, req)
 	fmt.Fprint(w, "<!DOCTYPE html>")
