@@ -866,12 +866,12 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	r.checkData("")
 	timestamp := r.latestTimestamp()
 	r.init_req(w, req)
+	// FIXME useless
 	title := param.title_alt
 
 	timestamp_str := r.formatTimestamp_short(timestamp)
 
 	if r.currentEvent != nil {
-		title = r.currentEvent.ShortName() + param.title_suffix
 		t := r.timestampToTime(timestamp)
 		// FIXME wait only after 2 hour
 		if r.currentEvent.IsCalc(time.Now().Add(-2 * time.Hour)) {
@@ -880,12 +880,13 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 		if r.currentEvent.IsFinal(t) {
 			timestamp_str = "【結果発表】"
 		}
+		title = r.currentEvent.ShortName() + param.title_suffix + " " + timestamp_str + "\n"
 	} else {
 		r.logger.Println("no event")
 		fmt.Fprint(w, "EMPTY")
 		return
 	}
-	status += title + " " + timestamp_str + "\n"
+	status += title
 	list_rank := param.list_rank
 	map_rank := param.map_rank
 	rankingType := param.rankingType
