@@ -930,7 +930,7 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	}
 
 	//log.Println("len/bytes of status", len(status))
-	log.Println("len/runes of status", utf8.RuneCountInString(status))
+	//log.Println("len/runes of status", utf8.RuneCountInString(status))
 	log.Println("len/twitter of status", statusLenFinal)
 	log.Println("status: <" + status + ">")
 	fmt.Fprint(w, status)
