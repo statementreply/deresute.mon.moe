@@ -912,8 +912,8 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	if utf8.RuneCountInString(status) > 140 {
 		log.Println("[WARN] twitter status limit exceeded")
 	}
-	tail1 := "\n" + "https://" + r.hostname + "\n"
-	tail2 := fmt.Sprint("#デレステ")
+	tail1 := "\n" + "https://" + r.hostname
+	tail2 := "\n" + fmt.Sprint("#デレステ")
 	if utf8.RuneCountInString(status+tail1) <= 140 {
 		status += tail1
 	}
