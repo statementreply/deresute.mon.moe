@@ -52,7 +52,7 @@ func main() {
 		interval:       30 * time.Second,
 		div:            60 * 60 * time.Second,
 		rem:            165 * time.Second,
-		dryrun:         true,
+		dryrun:         false,
 	}
 	wg.Add(3)
 	go twitter1.Run()
