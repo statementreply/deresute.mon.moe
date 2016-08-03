@@ -1,10 +1,10 @@
 html {
-    font-size: 3.5vmin;
+    font-size: 5vmin;
     font-family:"メイリオ", Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "Noto", "Noto Regular", "Noto Sans CJK JP", "IPA Pゴシック","IPA PGothic", sans-serif;
 }
 
 div.note {
-    font-size: 1.5vmin;
+    font-size: 3vmin;
 }
 
 div.form {

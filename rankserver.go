@@ -573,10 +573,13 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	fmt.Fprint(w, "<!DOCTYPE html>\n")
 	fmt.Fprint(w, "<head>\n")
 	fmt.Fprint(w, `<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="keywords" content="デレステ, イベントランキング, ボーダー, アイマス, アイドルマスターシンデレラガールズスターライトステージ">
 <title>デレステボーダーbotβ+</title>`)
 	fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/style.css" />
 `)
+	fmt.Fprint(w, `<script language="javascript" type="text/javascript" src="/static/jquery-1.12.3.min.js"></script>`)
+
 	if list_rank != nil {
 		fmt.Fprint(w, `
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -592,40 +595,47 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 			fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart']});`)
 		}
 		fmt.Fprint(w, `google.charts.setOnLoadCallback(drawLineChart);`)
+		fmt.Fprint(w, `google.charts.setOnLoadCallback(orientationChange);
+		function orientationChange() {
+			$(window).on("orientationchange",drawLineChart);
+		};
+		`)
+
 		fmt.Fprint(w, `function drawLineChart() {`)
 		fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(rankingType, list_rank, event), ")")
 		fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ")")
 		fmt.Fprintf(w, `
+	// first get the size from the window
+	// if that didn't work, get it from the body
+	var size = {
+		width: window.innerWidth || document.body.clientWidth,
+		height: window.innerHeight || document.body.clientHeight,
+	};
+	size_m = Math.min(size.width, size.height)
 	var options = {
-		width: 900,
-		height: 500,
+		width: size.width * 0.9,
+		height: size.width * 0.5,
         hAxis: {
             format: 'MM/dd HH:mm',
             gridlines: {count: 12}
         },
         vAxis: {
             //gridlines: {color: 'none'},
-            minValue: 0
+            minValue: 0,
+			textPosition: 'in',
         },
         interpolateNulls: true,
         explorer: {maxZoomIn: 0.1},
-		fontSize: 20,
+		fontSize: 16,
+		chartArea: {width: '100%%', height: '80%%'},
+
+		legend: {position: 'top', alignment: 'center'},
+		//theme: "maximized",
     };
-	var options_speed = {
-		width: 900,
-        height: 500,
-        hAxis: {
-            format: 'MM/dd HH:mm',
-            gridlines: {count: 12}
-        },
-        vAxis: {
-            //gridlines: {color: 'none'},
-            minValue: 0
-        },
-        interpolateNulls: false,
-        explorer: {maxZoomIn: 0.1},
-		fontSize: 20,
-	};
+	var options_speed = $.extend({}, options);
+	options_speed['interpolateNulls'] = false;
+	console.log(options);
+	console.log(options_speed);
     var chart = new google.visualization.%s(document.getElementById('myLineChart'));
     var chart_speed = new google.visualization.%s(document.getElementById('mySpeedChart'));
     chart.draw(data_rank, options);
