@@ -24,6 +24,7 @@ type Periodic struct {
 	url            string
 	interval       time.Duration
 	div, rem       time.Duration
+	dryrun         bool
 }
 
 func main() {
@@ -35,6 +36,7 @@ func main() {
 		interval:       30 * time.Second,
 		div:            15 * 60 * time.Second,
 		rem:            (2*60 + 15) * time.Second,
+		dryrun:         false,
 	}
 	twitter2 := &Periodic{
 		cache_filename: "cached_status_emblem",
@@ -42,10 +44,20 @@ func main() {
 		interval:       30 * time.Second,
 		div:            60 * 60 * time.Second,
 		rem:            3 * 60 * time.Second,
+		dryrun:         false,
 	}
-	wg.Add(2)
+	twitter3 := &Periodic{
+		cache_filename: "cached_status_trophy",
+		url:            "https://deresuteborder.mon.moe/twitter_trophy",
+		interval:       30 * time.Second,
+		div:            60 * 60 * time.Second,
+		rem:            165 * time.Second,
+		dryrun:         true,
+	}
+	wg.Add(3)
 	go twitter1.Run()
 	go twitter2.Run()
+	go twitter3.Run()
 	// wait
 	wg.Wait()
 }
@@ -110,6 +122,11 @@ func (p *Periodic) Run() {
 				if err != nil {
 					log.Println("cannot write file", err)
 				}
+
+				if p.dryrun {
+					goto Finish
+				}
+
 				result, err = exec.Command("perl", "twitter.pl", string(body)).CombinedOutput()
 				log.Println(string(result))
 				if err != nil {
