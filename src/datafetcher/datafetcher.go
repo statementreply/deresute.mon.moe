@@ -10,6 +10,7 @@ import (
 	"os"
 	"resource_mgr"
 	"time"
+	ts "timestamp"
 )
 
 var ErrNoEvent = errors.New("no event is running now")
@@ -61,7 +62,7 @@ func (df *DataFetcher) Run() error {
 	}
 
 	local_timestamp := GetLocalTimestamp()
-	local_time := TimestampToTime(local_timestamp)
+	local_time := ts.TimestampToTime(local_timestamp)
 	if local_time.Before(df.currentResultEnd) {
 		log.Println("duplicate final result prevented")
 		return nil
