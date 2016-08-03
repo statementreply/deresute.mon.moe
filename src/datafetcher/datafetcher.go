@@ -61,7 +61,7 @@ func (df *DataFetcher) Run() error {
 		return ErrNoEvent
 	}
 
-	local_timestamp := GetLocalTimestamp()
+	local_timestamp := ts.GetLocalTimestamp()
 	local_time := ts.TimestampToTime(local_timestamp)
 	if local_time.Before(df.currentResultEnd) {
 		log.Println("duplicate final result prevented")
@@ -121,7 +121,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	}
 
 	//localtime := float64(time.Now().UnixNano()) / 1e9 // for debug
-	local_timestamp := GetLocalTimestamp()
+	local_timestamp := ts.GetLocalTimestamp()
 	dirname := df.rank_cache_dir + local_timestamp + "/"
 	path := dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
 	if Exists(path) {
@@ -141,7 +141,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	}
 	//log.Printf("localtime: %f servertime: %d lag: %f\n", localtime, servertime, float64(servertime)-localtime)
 
-	server_timestamp_i := RoundTimestamp(time.Unix(int64(servertime), 0)).Unix()
+	server_timestamp_i := ts.RoundTimestamp(time.Unix(int64(servertime), 0)).Unix()
 	server_timestamp := fmt.Sprintf("%d", server_timestamp_i)
 
 	if server_timestamp != local_timestamp {

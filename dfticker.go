@@ -9,6 +9,7 @@ import (
 	"path"
 	"sync"
 	"time"
+	ts "timestamp"
 )
 
 // parameters
@@ -33,7 +34,7 @@ func main() {
 	}
 	log.SetOutput(fh)
 
-	log.Println("local-timestamp", datafetcher.GetLocalTimestamp())
+	log.Println("local-timestamp", ts.GetLocalTimestamp())
 	key_point := [][2]int{
 		[2]int{1, 2001},    // tier 1
 		[2]int{1, 10001},   // tier 2
