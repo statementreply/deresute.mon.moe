@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"time"
+	ts "timestamp"
 )
 
 var SECRET_FILE string = "secret.yaml"
@@ -19,8 +20,8 @@ func main() {
 	//rand.Seed(time.Now().Unix())
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 
-	log.Println(datafetcher.GetLocalTimestamp())
-	log.Println(datafetcher.RoundTimestamp(time.Now()).String())
+	log.Println(ts.GetLocalTimestamp())
+	log.Println(ts.RoundTimestamp(time.Now()).String())
 
 	key_point := [][2]int{
 		[2]int{1, 1},
