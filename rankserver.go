@@ -40,9 +40,10 @@ var fileNameFilter = regexp.MustCompile("r\\d{2}\\.(\\d+)$")
 var rankingTypeFilter = regexp.MustCompile("r01\\.\\d+$")
 
 type RankServer struct {
+	//    map[timestamp][rankingType][rank] = score
+	// {"1467555420":   [{10: 2034} ,{30: 203021} ]  }
 	data  map[string][]map[int]int     // need mux
 	speed map[string][]map[int]float32 // need mux
-	// {"1467555420":   [{10: 2034} ,{30: 203021} ]  }
 	list_timestamp []string // need mutex?
 	// for both read and write
 	mux           sync.RWMutex
@@ -148,7 +149,7 @@ func (r *RankServer) updateTimestamp() {
 	dir, err := os.Open(RANK_CACHE_DIR)
 	if err != nil {
 		// FIXME
-		r.logger.Println(err)
+		r.logger.Println("rank cache dir doesnt exist", RANK_CACHE_DIR, err)
 		os.MkdirAll(RANK_CACHE_DIR, 0755)
 		return
 	}
@@ -219,7 +220,6 @@ func (r *RankServer) checkData(timestamp string) {
 	}
 	// check new res_ver
 	// FIXME need some test
-	//r.logger.Println("test recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
 	if (time.Now().Sub(r.lastCheck) >= 5*time.Hour/2) || ((r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 2*time.Hour)) {
 		r.logger.Println("recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
 		r.client.LoadCheck()
@@ -241,7 +241,7 @@ func (r *RankServer) checkData(timestamp string) {
 		return
 	}
 	defer subdir.Close()
-	//log.Print(subdir)
+
 	key, err := subdir.Readdir(0)
 	if err != nil {
 		r.logger.Println("readdir", err)
@@ -337,7 +337,7 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 	content, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		// file doesn't exist?
-		// -1 for missing data
+		// return -1 for missing data
 		//r.logger.Println(err, "return -1")
 		return -1
 	}
@@ -359,9 +359,6 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 	if len(local_rank_list) > 0 {
 		score = local_rank_list[0]["score"].(int)
 	}
-	/*if score == 0 {
-		r.logger.Println(timestamp, fileName, len(local_rank_list), "return 0", content)
-	}*/
 	r.mux.Lock()
 	r.data[timestamp][rankingType][rank] = score
 	r.mux.Unlock()
@@ -443,7 +440,6 @@ func (r *RankServer) run() {
 			r.logger.Fatalln("plainServer", err)
 		}
 	}()
-	//fmt.Println("here+1")
 }
 
 func (r *RankServer) dumpData() string {
@@ -470,11 +466,6 @@ func (r *RankServer) showData(timestamp string) string {
 	return timestamp + "\n" + st + "\n" + string(yy)
 }
 
-// js map
-// {"cols":
-//   [{"id":"timestamp","label":"timestamp","type":"date"},{"id":"score","label":"score","type":"number"}],
-//  "rows":[{"c":[{"v":"new Date(1467770520)"},{"v":14908}]}]}
-
 func (r *RankServer) get_list_timestamp() []string {
 	r.mux_timestamp.RLock()
 	local_timestamp := make([]string, len(r.list_timestamp))
@@ -483,8 +474,10 @@ func (r *RankServer) get_list_timestamp() []string {
 	return local_timestamp
 }
 
+// js map syntax
+// {"cols":  [{"id":"timestamp","label":"timestamp","type":"date"}, {"id":"score","label":"score","type":"number"}],
+//  "rows":  [{"c":[{"v":"new Date(1467770520)"}, {"v":14908}]}] }
 func (r *RankServer) rankData_list_f_e(rankingType int, list_rank []int, dataSource func(string, int, int) interface{}, event *resource_mgr.EventDetail) string {
-	//log.Print("functional version of rankData_list_f()")
 	r.updateTimestamp()
 	raw := ""
 	raw += `{"cols":[{"id":"timestamp","label":"timestamp","type":"datetime"},`
@@ -503,7 +496,6 @@ func (r *RankServer) rankData_list_f_e(rankingType int, list_rank []int, dataSou
 		raw += fmt.Sprintf(`{"c":[{"v":new Date(%s000)},`, timestamp)
 		for _, rank := range list_rank {
 			score := dataSource(timestamp, rankingType, rank)
-			//log.Print("timestamp ", timestamp, " score ", score)
 			switch score.(type) {
 			case int:
 				score_i := score.(int)
@@ -688,7 +680,6 @@ func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// FIXME...
 func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	r.checkData("")
 
@@ -854,7 +845,7 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 		r.logger.Println("[WARN] twitter status limit exceeded", "<"+status+">")
 	}
 	tail1 := "\n" + "https://" + r.hostname
-	tail1Len := 1 + 23 // twitter shortener
+	tail1Len := 1 + 23 // twitter URL shortener
 	tail2 := "\n" + fmt.Sprint("#デレステ")
 	tail2Len := utf8.RuneCountInString(tail2)
 
@@ -867,8 +858,6 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 		statusLenFinal += tail2Len
 	}
 
-	//log.Println("len/bytes of status", len(status))
-	//log.Println("len/runes of status", utf8.RuneCountInString(status))
 	log.Println("len/twitter of status", statusLenFinal)
 	log.Println("status: <" + status + ">")
 	fmt.Fprint(w, status)
