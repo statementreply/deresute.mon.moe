@@ -552,16 +552,19 @@ type qchartParam struct {
 	rankingType int
 	list_rank []int
 	event *resource_mgr.EventDetail
+	fancyChart bool
 }
 
 func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, param *qchartParam) {
 	rankingType := 0
+	fancyChart := false
 	var list_rank []int
 	var event *resource_mgr.EventDetail
 	if param != nil {
 		rankingType = param.rankingType
 		list_rank = param.list_rank
 		event = param.event
+		fancyChart = param.fancyChart
 	}
 	r.init_req(w, req)
 	fmt.Fprint(w, "<!DOCTYPE html>")
@@ -573,12 +576,21 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, pa
 		fmt.Fprint(w, `
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
-google.charts.load('current', {packages: ['corechart']});
-google.charts.setOnLoadCallback(drawLineChart);`)
+`)
+
+		chartType := ""
+		if fancyChart {
+			chartType = "AnnotationChart"
+			fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart', 'annotationchart']});`)
+		} else {
+			chartType = "LineChart"
+			fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart']});`)
+		}
+		fmt.Fprint(w, `google.charts.setOnLoadCallback(drawLineChart);`)
 		fmt.Fprint(w, `function drawLineChart() {`)
 		fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(rankingType, list_rank, event), ")")
 		fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ")")
-		fmt.Fprint(w, `
+		fmt.Fprintf(w, `
 	var options = {
 		width: 900,
 		height: 500,
@@ -607,11 +619,11 @@ google.charts.setOnLoadCallback(drawLineChart);`)
         interpolateNulls: false,
         explorer: {maxZoomIn: 0.1},
 	};
-    var chart = new google.visualization.LineChart(document.getElementById('myLineChart'));
-    var chart_speed = new google.visualization.LineChart(document.getElementById('mySpeedChart'));
+    var chart = new google.visualization.%s(document.getElementById('myLineChart'));
+    var chart_speed = new google.visualization.%s(document.getElementById('mySpeedChart'));
     chart.draw(data_rank, options);
     chart_speed.draw(data_speed, options_speed);
-    }`)
+    }`, chartType, chartType)
 		fmt.Fprint(w, `</script>`)
 	}
 	fmt.Fprint(w, "</head>")
@@ -646,6 +658,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 		rankingType: 0,
 		list_rank: []int{120001},
 		event: r.currentEvent,
+		fancyChart: false,
 	})
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<h2>デレステイベントボーダーbotβ+</h2>")
@@ -779,11 +792,23 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	checked_type := []string{"", ""}
 	checked_type[rankingType] = " checked"
 
+	fancyChart := false
+	fancyChart_checked := ""
+	fancyChart_str_list, ok := req.Form["achart"]
+	if ok {
+		fancyChart_str := fancyChart_str_list[0]
+		if len(fancyChart_str) > 0 {
+			fancyChart = true
+			fancyChart_checked = " checked"
+		}
+	}
+
 	// generate html
 	r.preload_qchart(w, req, &qchartParam{
 		rankingType: rankingType,
 		list_rank: list_rank,
 		event: event,
+		fancyChart: fancyChart,
 	})
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
@@ -793,9 +818,10 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
   <input type="hidden" name="event" value="%s"></input>
   <input type="radio" name="type" value="0"%s>イベントpt</input>
   <input type="radio" name="type" value="1"%s>ハイスコア</input>
+  <input type="checkbox" name="achart" value="1"%s>AnnotationChart</input>
   <input type="submit" value="更新">
 </form>
-</p>`, prefill, prefill_event, checked_type[0], checked_type[1])
+</p>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
 
 	fmt.Fprintf(w, `<p>表示できる順位<br>
 	イベントpt：%d<br>ハイスコア：%d
