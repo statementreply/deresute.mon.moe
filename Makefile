@@ -8,7 +8,7 @@ clean:
 
 fmt:
 	go fmt
-	go fmt apiclient resource_mgr datafetcher rijndael_wrapper
+	go fmt apiclient resource_mgr datafetcher rijndael_wrapper timestamp
 
 server: rankserver
 	./rankserver

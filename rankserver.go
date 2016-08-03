@@ -17,6 +17,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	ts "timestamp"
 	"unicode/utf8"
 )
 
@@ -221,7 +222,7 @@ func (r *RankServer) checkData(timestamp string) {
 	latest := r.latestTimestamp()
 	latest_time := time.Unix(0, 0)
 	if latest != "" {
-		latest_time = r.timestampToTime(latest)
+		latest_time = ts.TimestampToTime(latest)
 	}
 	// check new res_ver
 	// FIXME need some test
@@ -295,32 +296,10 @@ func (r *RankServer) RankingType(fileName string) int {
 }
 
 // FIXME duplicate in datafetcher
-func (r *RankServer) timestampToTime(timestamp string) time.Time {
-	itime, err := strconv.ParseInt(timestamp, 10, 64)
-	if err != nil {
-		r.logger.Println("timestamp format incorrect?", err)
-		itime = 0
-	}
-	t := time.Unix(itime, 0).In(r.tz)
-	return t
-}
-
 func (r *RankServer) timeToTimestamp(t time.Time) string {
 	itime := t.Unix()
 	timestamp := fmt.Sprintf("%d", itime)
 	return timestamp
-}
-
-func (r *RankServer) formatTimestamp(timestamp string) string {
-	t := r.timestampToTime(timestamp)
-	st := t.Format(time.RFC3339)
-	return st
-}
-
-func (r *RankServer) formatTimestamp_short(timestamp string) string {
-	t := r.timestampToTime(timestamp)
-	st := t.Format("01/02 15:04")
-	return st
 }
 
 func (r *RankServer) formatTime(t time.Time) string {
@@ -332,7 +311,7 @@ func (r *RankServer) inEvent(timestamp string, event *resource_mgr.EventDetail) 
 	if event == nil {
 		return true
 	}
-	t := r.timestampToTime(timestamp)
+	t := ts.TimestampToTime(timestamp)
 	if (!t.Before(event.EventStart())) && (!t.After(event.ResultEnd())) {
 		return true
 	} else {
@@ -440,7 +419,7 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
 			return val
 		}
 	}
-	t_i := r.timestampToTime(timestamp)
+	t_i := ts.TimestampToTime(timestamp)
 	t_prev := t_i.Add(-INTERVAL)
 	prev_timestamp := r.timeToTimestamp(t_prev)
 
@@ -506,7 +485,7 @@ func (r *RankServer) showData(timestamp string) string {
 		return ""
 	}
 	yy, _ := yaml.Marshal(item)
-	st := r.formatTimestamp(timestamp)
+	st := ts.FormatTimestamp(timestamp)
 	return timestamp + "\n" + st + "\n" + string(yy)
 }
 
@@ -724,7 +703,7 @@ func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 
 	local_timestamp := r.get_list_timestamp()
 	for _, timestamp := range local_timestamp {
-		fmt.Fprintf(w, "<a href=\"q?t=%s\">%s</a><br>\n", timestamp, r.formatTimestamp(timestamp))
+		fmt.Fprintf(w, "<a href=\"q?t=%s\">%s</a><br>\n", timestamp, ts.FormatTimestamp(timestamp))
 	}
 }
 
@@ -847,10 +826,10 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	r.init_req(w, req)
 	var title string
 
-	timestamp_str := r.formatTimestamp_short(timestamp)
+	timestamp_str := ts.FormatTimestamp_short(timestamp)
 
 	if r.currentEvent != nil {
-		t := r.timestampToTime(timestamp)
+		t := ts.TimestampToTime(timestamp)
 		// FIXME wait only after 2 hour
 		if r.currentEvent.IsCalc(time.Now().Add(-2 * time.Hour)) {
 			timestamp_str = "WAITING"
@@ -871,7 +850,7 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	for _, rank := range list_rank {
 		border := r.fetchData(timestamp, rankingType, rank)
 		name_rank := map_rank[rank]
-		t := r.timestampToTime(timestamp)
+		t := ts.TimestampToTime(timestamp)
 		t_prev := t.Add(-param.interval)
 		timestamp_prev := r.timeToTimestamp(t_prev)
 		border_prev := r.fetchData(timestamp_prev, rankingType, rank)
