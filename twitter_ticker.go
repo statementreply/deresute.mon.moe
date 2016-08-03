@@ -34,7 +34,7 @@ func main() {
 		url:            "https://deresuteborder.mon.moe/twitter",
 		interval:       30 * time.Second,
 		div:            15 * 60 * time.Second,
-		rem:            (2 * 60 + 15) * time.Second,
+		rem:            (2*60 + 15) * time.Second,
 	}
 	twitter2 := &Periodic{
 		cache_filename: "cached_status_emblem",

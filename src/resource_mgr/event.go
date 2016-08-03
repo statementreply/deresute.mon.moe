@@ -1,8 +1,8 @@
 package resource_mgr
 
 import (
-	"time"
 	"regexp"
+	"time"
 )
 
 var grooveFilter = regexp.MustCompile("LIVE Groove")
@@ -111,7 +111,6 @@ func (e *EventDetail) IsFinal(t time.Time) bool {
 		return false
 	}
 }
-
 
 func FindCurrentEvent(eventList []*EventDetail) *EventDetail {
 	now := time.Now()

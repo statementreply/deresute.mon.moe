@@ -2,9 +2,9 @@ package datafetcher
 
 import (
 	"fmt"
-	"time"
-	"strconv"
 	"log"
+	"strconv"
+	"time"
 )
 
 func RoundTimestamp(in time.Time) time.Time {

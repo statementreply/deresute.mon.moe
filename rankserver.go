@@ -226,7 +226,7 @@ func (r *RankServer) checkData(timestamp string) {
 	// check new res_ver
 	// FIXME need some test
 	//r.logger.Println("test recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
-	if ( time.Now().Sub(r.lastCheck) >= 5 * time.Hour / 2 ) || ( (r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 2 * time.Hour) ) {
+	if (time.Now().Sub(r.lastCheck) >= 5*time.Hour/2) || ((r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 2*time.Hour)) {
 		r.logger.Println("recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
 		r.client.LoadCheck()
 		rv := r.client.Get_res_ver()
@@ -801,18 +801,18 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 
 type twitterParam struct {
 	title_alt, title_suffix string
-	list_rank []int
-	map_rank map[int]string
-	rankingType int
-	interval time.Duration
+	list_rank               []int
+	map_rank                map[int]string
+	rankingType             int
+	interval                time.Duration
 }
 
 func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	param := twitterParam{
-		title_alt: "デレステボーダーbotβ",
+		title_alt:    "デレステボーダーbotβ",
 		title_suffix: "",
-		list_rank: []int{2001, 10001, 20001, 60001, 120001},
-		map_rank : map[int]string{
+		list_rank:    []int{2001, 10001, 20001, 60001, 120001},
+		map_rank: map[int]string{
 			2001:   "2千位",
 			10001:  "1万位",
 			20001:  "2万位",
@@ -820,24 +820,24 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 			120001: "12万位",
 		},
 		rankingType: 0,
-		interval: INTERVAL0,
+		interval:    INTERVAL0,
 	}
 	r.twitterHandler_common(w, req, param)
 }
 
 func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Request) {
 	param := twitterParam{
-		title_alt : "デレステボーダーbotβ",
-		title_suffix:  "\n" + "イベント称号ボーダー（時速）",
-		list_rank : []int{501, 5001, 50001, 500001},
-		map_rank : map[int]string{
+		title_alt:    "デレステボーダーbotβ",
+		title_suffix: "\n" + "イベント称号ボーダー（時速）",
+		list_rank:    []int{501, 5001, 50001, 500001},
+		map_rank: map[int]string{
 			501:    "5百位",
 			5001:   "5千位",
 			50001:  "5万位",
 			500001: "50万位",
 		},
-		rankingType : 0,
-		interval: INTERVAL0 * 4,
+		rankingType: 0,
+		interval:    INTERVAL0 * 4,
 	}
 	r.twitterHandler_common(w, req, param)
 }
@@ -861,7 +861,7 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 		if r.currentEvent.IsFinal(t) {
 			timestamp_str = "【結果発表】"
 		}
-		title = r.currentEvent.ShortName() + " " + timestamp_str +  param.title_suffix + "\n"
+		title = r.currentEvent.ShortName() + " " + timestamp_str + param.title_suffix + "\n"
 	} else {
 		r.logger.Println("no event")
 		fmt.Fprint(w, "EMPTY")
@@ -901,11 +901,11 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	tail2 := "\n" + fmt.Sprint("#デレステ")
 	tail2Len := utf8.RuneCountInString(tail2)
 
-	if statusLen + tail1Len <= 140 {
+	if statusLen+tail1Len <= 140 {
 		status += tail1
 		statusLenFinal += tail1Len
 	}
-	if statusLen + tail1Len + tail2Len <= 140 {
+	if statusLen+tail1Len+tail2Len <= 140 {
 		status += tail2
 		statusLenFinal += tail2Len
 	}
@@ -919,7 +919,6 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 		r.logger.Println("[WARN] twitter status limit exceeded", "<"+status+">")
 	}
 }
-
 
 func (r *RankServer) res_verHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
