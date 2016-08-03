@@ -553,9 +553,9 @@ func (r *RankServer) init_req(w http.ResponseWriter, req *http.Request) {
 
 type qchartParam struct {
 	rankingType int
-	list_rank []int
-	event *resource_mgr.EventDetail
-	fancyChart bool
+	list_rank   []int
+	event       *resource_mgr.EventDetail
+	fancyChart  bool
 }
 
 func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
@@ -603,8 +603,8 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 		`)
 
 		// doesn't work
-			//$("#myLineChart").html("");
-			//$("#mySpeedChart").html("");
+		//$("#myLineChart").html("");
+		//$("#mySpeedChart").html("");
 		fmt.Fprint(w, `function drawLineChart() {`)
 		fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(rankingType, list_rank, event), ")")
 		fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ")")
@@ -677,9 +677,9 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload_html(w, req, &qchartParam{
 		rankingType: 0,
-		list_rank: []int{120001},
-		event: r.currentEvent,
-		fancyChart: false,
+		list_rank:   []int{120001},
+		event:       r.currentEvent,
+		fancyChart:  false,
 	})
 	defer r.postload_html(w, req)
 	fmt.Fprint(w, `<div id="wrapper">`)
@@ -835,9 +835,9 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	// generate html
 	r.preload_html(w, req, &qchartParam{
 		rankingType: rankingType,
-		list_rank: list_rank,
-		event: event,
-		fancyChart: fancyChart,
+		list_rank:   list_rank,
+		event:       event,
+		fancyChart:  fancyChart,
 	})
 	defer r.postload_html(w, req)
 	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
@@ -851,7 +851,6 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
   <input class="s0" type="submit" value="更新">
 </form>
 </p></div>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
-
 
 	fmt.Fprint(w, `
     <table class="columns">
