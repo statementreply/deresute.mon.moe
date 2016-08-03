@@ -295,18 +295,6 @@ func (r *RankServer) RankingType(fileName string) int {
 	}
 }
 
-// FIXME duplicate in datafetcher
-func (r *RankServer) timeToTimestamp(t time.Time) string {
-	itime := t.Unix()
-	timestamp := fmt.Sprintf("%d", itime)
-	return timestamp
-}
-
-func (r *RankServer) formatTime(t time.Time) string {
-	st := t.Format("2006-01-02 15:04")
-	return st
-}
-
 func (r *RankServer) inEvent(timestamp string, event *resource_mgr.EventDetail) bool {
 	if event == nil {
 		return true
@@ -421,7 +409,7 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
 	}
 	t_i := ts.TimestampToTime(timestamp)
 	t_prev := t_i.Add(-INTERVAL)
-	prev_timestamp := r.timeToTimestamp(t_prev)
+	prev_timestamp := ts.TimeToTimestamp(t_prev)
 
 	cur_score := r.fetchData(timestamp, rankingType, rank)
 	prev_score := r.fetchData(prev_timestamp, rankingType, rank)
@@ -689,7 +677,7 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 			// ranking information available
 			name = fmt.Sprintf(`<a href="qchart?event=%d">%s</a>`, e.Id(), name)
 		}
-		fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n", name, r.formatTime(e.EventStart()), r.formatTime(e.SecondHalfStart()), r.formatTime(e.EventEnd()))
+		fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n", name, ts.FormatTime(e.EventStart()), ts.FormatTime(e.SecondHalfStart()), ts.FormatTime(e.EventEnd()))
 	}
 	fmt.Fprintf(w, `</table>`)
 }
@@ -852,7 +840,7 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 		name_rank := map_rank[rank]
 		t := ts.TimestampToTime(timestamp)
 		t_prev := t.Add(-param.interval)
-		timestamp_prev := r.timeToTimestamp(t_prev)
+		timestamp_prev := ts.TimeToTimestamp(t_prev)
 		border_prev := r.fetchData(timestamp_prev, rankingType, rank)
 		delta := -1
 		if border < 0 {
