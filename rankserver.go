@@ -800,16 +800,15 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 type twitterParam struct {
-	title_alt, title_suffix string
-	list_rank               []int
-	map_rank                map[int]string
-	rankingType             int
-	interval                time.Duration
+	title_suffix string
+	list_rank    []int
+	map_rank     map[int]string
+	rankingType  int
+	interval     time.Duration
 }
 
 func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	param := twitterParam{
-		title_alt:    "デレステボーダーbotβ",
 		title_suffix: "",
 		list_rank:    []int{2001, 10001, 20001, 60001, 120001},
 		map_rank: map[int]string{
@@ -827,7 +826,6 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 
 func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Request) {
 	param := twitterParam{
-		title_alt:    "デレステボーダーbotβ",
 		title_suffix: "\n" + "イベント称号ボーダー（時速）",
 		list_rank:    []int{501, 5001, 50001, 500001},
 		map_rank: map[int]string{
@@ -847,8 +845,7 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	r.checkData("")
 	timestamp := r.latestTimestamp()
 	r.init_req(w, req)
-	// FIXME useless
-	title := param.title_alt
+	var title string
 
 	timestamp_str := r.formatTimestamp_short(timestamp)
 
