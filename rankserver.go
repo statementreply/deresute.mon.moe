@@ -627,7 +627,8 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 		}
 		fmt.Fprintf(w, "</p>")
 	}
-	fmt.Fprintf(w, `twitter bot: <a href="https://twitter/deresuteborder0">@deresuteborder0</a><br>`)
+	fmt.Fprintf(w, `<p>twitter bot：十五分毎にイベントptボーダーを更新し、一時間毎にトロフィーと称号ボーダーを更新します。
+	<a href="https://twitter/deresuteborder0">@deresuteborder0</a></p>`)
 
 	fmt.Fprintf(w, "<a href=\"event\">%s</a><br>\n", "過去のイベント (new)")
 	fmt.Fprintf(w, "<a href=\"log\">%s</a><br>\n", "過去のデータ")
