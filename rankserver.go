@@ -536,7 +536,7 @@ func (r *RankServer) init_req(w http.ResponseWriter, req *http.Request) {
 	r.logger.Printf("[INFO] %T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
 }
 
-func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, list_rank []int, event *resource_mgr.EventDetail) {
+func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, rankingType int, list_rank []int, event *resource_mgr.EventDetail) {
 	r.init_req(w, req)
 	fmt.Fprint(w, "<!DOCTYPE html>")
 	fmt.Fprint(w, "<head>")
@@ -550,8 +550,8 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, li
 google.charts.load('current', {packages: ['corechart']});
 google.charts.setOnLoadCallback(drawLineChart);`)
 		fmt.Fprint(w, `function drawLineChart() {`)
-		fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(0, list_rank, event), ")")
-		fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(0, list_rank, event), ")")
+		fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(rankingType, list_rank, event), ")")
+		fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ")")
 		fmt.Fprint(w, `
 	var options = {
 		width: 900,
@@ -599,7 +599,7 @@ func (r *RankServer) postload(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
-	r.preload_qchart(w, req, nil, nil)
+	r.preload_qchart(w, req, 0, nil, nil)
 	defer r.postload(w, req)
 	fmt.Fprint(w, "<pre>")
 	defer fmt.Fprint(w, "</pre>")
@@ -616,7 +616,7 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
-	r.preload_qchart(w, req, []int{120001}, r.currentEvent)
+	r.preload_qchart(w, req, 0, []int{120001}, r.currentEvent)
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<h2>デレステイベントボーダーbotβ+</h2>")
 	if r.currentEvent != nil {
@@ -654,7 +654,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
-	r.preload_qchart(w, req, nil, nil)
+	r.preload_qchart(w, req, 0, nil, nil)
 	defer r.postload(w, req)
 	fmt.Fprintf(w, `<table class="columns">`)
 	fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n", "event", "start", "second-half", "end")
@@ -671,7 +671,7 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 
 func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	r.updateTimestamp()
-	r.preload_qchart(w, req, nil, nil)
+	r.preload_qchart(w, req, 0, nil, nil)
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<br>デレステイベントボーダー<br><br>")
 	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "最新ボーダー")
@@ -732,7 +732,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// generate html
-	r.preload_qchart(w, req, list_rank, event)
+	r.preload_qchart(w, req, 0, list_rank, event)
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "ホームページ")
 	fmt.Fprintf(w, `
