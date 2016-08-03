@@ -1,0 +1,23 @@
+html {
+    font-size: 20px;
+    font-family:"メイリオ", Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "Noto", "Noto Regular", "Noto Sans CJK JP", "IPA Pゴシック","IPA PGothic", sans-serif;
+}
+
+div.note {
+    font-size: 16px;
+}
+
+div.form {
+    font-size: 40px;
+}
+
+input.r0, input.c0, input.t0, input.s0 {
+    font-size: 40px;
+    border: 2px solid black;
+    border-radius: 4px;
+}
+
+input.c0, input.r0 {
+    width: 40px;
+    height: 40px;
+}

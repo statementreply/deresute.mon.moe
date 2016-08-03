@@ -141,6 +141,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/q", r.qHandler)
 	http.HandleFunc("/log", r.logHandler)
 	http.HandleFunc("/qchart", r.qchartHandler)
+	http.HandleFunc("/static/", r.staticHandler)
 	// API/plaintext
 	http.HandleFunc("/twitter", r.twitterHandler)
 	http.HandleFunc("/twitter_emblem", r.twitterEmblemHandler)
@@ -569,11 +570,13 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, pa
 		fancyChart = param.fancyChart
 	}
 	r.init_req(w, req)
-	fmt.Fprint(w, "<!DOCTYPE html>")
-	fmt.Fprint(w, "<head>")
+	fmt.Fprint(w, "<!DOCTYPE html>\n")
+	fmt.Fprint(w, "<head>\n")
 	fmt.Fprint(w, `<meta charset="UTF-8">
 <meta name="keywords" content="デレステ, イベントランキング, ボーダー, アイマス, アイドルマスターシンデレラガールズスターライトステージ">
 <title>デレステボーダーbotβ+</title>`)
+	fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/style.css" />
+`)
 	if list_rank != nil {
 		fmt.Fprint(w, `
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -606,6 +609,7 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, pa
         },
         interpolateNulls: true,
         explorer: {maxZoomIn: 0.1},
+		fontSize: 20,
     };
 	var options_speed = {
 		width: 900,
@@ -620,6 +624,7 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, pa
         },
         interpolateNulls: false,
         explorer: {maxZoomIn: 0.1},
+		fontSize: 20,
 	};
     var chart = new google.visualization.%s(document.getElementById('myLineChart'));
     var chart_speed = new google.visualization.%s(document.getElementById('mySpeedChart'));
@@ -663,6 +668,8 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 		fancyChart: false,
 	})
 	defer r.postload(w, req)
+	fmt.Fprint(w, `<div id="wrapper">`)
+	defer fmt.Fprint(w, `</div`)
 	fmt.Fprintf(w, "<h2>デレステイベントボーダーbotβ+</h2>")
 	if r.currentEvent != nil {
 		fmt.Fprintf(w, "<p>")
@@ -820,20 +827,20 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	})
 	defer r.postload(w, req)
 	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
-	fmt.Fprintf(w, `<p>
+	fmt.Fprintf(w, `<div class="form"><p>
 <form action="qchart" method="get">customized border graph：<br>
-  順位：<input type="text" name="rank" size=35 value="%s"></input><br>
+  順位：<input class="t0" type="text" name="rank" size=35 value="%s"></input><br>
   <input type="hidden" name="event" value="%s"></input>
-  <input type="radio" name="type" value="0"%s>イベントpt</input>
-  <input type="radio" name="type" value="1"%s>ハイスコア</input><br>
-  <input type="checkbox" name="achart" value="1"%s>AnnotationChart</input><br>
-  <input type="submit" value="更新">
+  <input class="r0" type="radio" name="type" value="0"%s>イベントpt</input>
+  <input class="r0" type="radio" name="type" value="1"%s>ハイスコア</input><br>
+  <input class="c0" type="checkbox" name="achart" value="1"%s>AnnotationChart</input><br>
+  <input class="s0" type="submit" value="更新">
 </form>
-</p>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
+</p></div>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
 
-	fmt.Fprintf(w, `<p>表示できる順位<br>
+	fmt.Fprintf(w, `<div class="note"><p>表示できる順位<br>
 	イベントpt：%d<br>ハイスコア：%d
-	</p>`,
+	</p></div>`,
 		r.get_list_rank(r.latestTimestamp(), 0),
 		r.get_list_rank(r.latestTimestamp(), 1))
 	fmt.Fprint(w, `
@@ -851,13 +858,15 @@ var staticFilter = regexp.MustCompile("^/static")
 func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	if !staticFilter.MatchString(req.URL.Path) {
-		log.Println("bad req url path", req.URL.Path)
+		r.logger.Println("bad req url path", req.URL.Path)
 		return
 	}
 	path := req.URL.Path
-	strings.Replace(path, "/static", "", 1)
+	path = strings.Replace(path, "/static", "", 1)
 	filename := r.config["staticdir"] + "/" + path
-	log.Println("serverfile", filename)
+
+	//r.logger.Println(req.URL, filename, "<"+path+">")
+	r.logger.Println("serverfile", filename)
 	http.ServeFile(w, req, filename)
 }
 
