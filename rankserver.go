@@ -601,7 +601,11 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 		};
 		`)
 
-		fmt.Fprint(w, `function drawLineChart() {`)
+		// doesn't work
+		fmt.Fprint(w, `function drawLineChart() {
+			//$("#myLineChart").html("");
+			//$("#mySpeedChart").html("");
+			`)
 		fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(rankingType, list_rank, event), ")")
 		fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ")")
 		fmt.Fprintf(w, `
