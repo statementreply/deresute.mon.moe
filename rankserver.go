@@ -883,8 +883,8 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 		statusLenFinal += tail2Len
 	}
 
-	log.Println("len/twitter of status", statusLenFinal)
-	log.Println("status: <" + status + ">")
+	r.logger.Println("[INFO] len/twitter of status", statusLenFinal, "status", "<"+strings.Replace(status, "\n", "<NL>", -1)+">")
+	//log.Println("status: <" + status + ">")
 	fmt.Fprint(w, status)
 	if statusLenFinal > 140 {
 		r.logger.Println("[WARN] twitter status limit exceeded", "<"+status+">")
