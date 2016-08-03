@@ -54,7 +54,6 @@ type RankServer struct {
 	plainServer   *http.Server
 	tlsServer     *http.Server
 	hostname      string
-	tz            *time.Location
 	resourceMgr   *resource_mgr.ResourceMgr
 	currentEvent  *resource_mgr.EventDetail
 	client        *apiclient.ApiClient
@@ -68,12 +67,6 @@ func MakeRankServer() *RankServer {
 	//r.list_timestamp doesn't need initialization
 	r.plainServer = nil
 	r.tlsServer = nil
-
-	tz, err := time.LoadLocation("Asia/Tokyo")
-	r.tz = tz
-	if err != nil {
-		log.Fatalln("load timezone", err)
-	}
 
 	content, err := ioutil.ReadFile(CONFIG_FILE)
 	if err != nil {
