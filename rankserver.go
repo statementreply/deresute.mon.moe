@@ -142,6 +142,7 @@ func (r *RankServer) setHandleFunc() {
 	// API/plaintext
 	http.HandleFunc("/twitter", r.twitterHandler)
 	http.HandleFunc("/twitter_emblem", r.twitterEmblemHandler)
+	http.HandleFunc("/twitter_trophy", r.twitterTrophyHandler)
 	http.HandleFunc("/res_ver", r.res_verHandler)
 }
 
@@ -788,6 +789,30 @@ func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Reque
 		rankingType: 0,
 		interval:    INTERVAL0 * 4,
 	}
+	r.twitterHandler_common(w, req, param)
+}
+
+func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Request) {
+	param := twitterParam{
+		title_suffix: "\n" + "トロフィーボーダー（時速）",
+		//list_rank:    []int{5001, 10001, 50001},
+		map_rank: map[int]string{
+			5001:   "5千位",
+			10001:  "1万位",
+			40001:  "4万位",
+			50001:  "5万位",
+		},
+		rankingType: 1,
+		interval:    INTERVAL0 * 4,
+	}
+	if r.currentEvent != nil {
+		if r.currentEvent.Type() == 1 {
+			param.list_rank = []int{5001, 10001, 40001}
+		} else if r.currentEvent.Type() == 3 {
+			param.list_rank = []int{5001, 10001, 50001}
+		}
+	}
+
 	r.twitterHandler_common(w, req, param)
 }
 
