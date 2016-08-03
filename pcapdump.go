@@ -3,6 +3,8 @@
 // capture from network interface:
 //sudo setcap cap_net_raw,cap_net_admin=eip ./pcapdump
 
+//./pcapdump  -f 'tcp and port 80' -i eth0
+
 // Copyright 2012 Google, Inc. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style license
@@ -43,6 +45,7 @@ var iface = flag.String("i", "", "Interface to get packets from")
 var snaplen = flag.Int("s", 1600, "SnapLen for pcap packet capture")
 var filter = flag.String("f", "tcp", "BPF filter for pcap")
 var logAllPackets = flag.Bool("v", false, "Logs every packet in great detail")
+var showAllHTTP = flag.Bool("a", false, "Show every http request/response")
 var wg sync.WaitGroup
 
 // FIXME use lock to prevent concurrent rw
@@ -169,6 +172,7 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 	var udid string
 	list_udid, ok := req.Header["Udid"]
 	var content map[string]interface{}
+	var isDereAPI bool
 	if ok {
 		udid = list_udid[0]
 		msg_iv := apiclient.Unlolfuscate(udid)
@@ -178,23 +182,26 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 		if err != nil {
 			log.Fatal("yaml error", err)
 		}
+		isDereAPI = true
 	} else {
 		// cannot decrypt without UDID
 		// normal http packet
 		// print request
 	}
 
-	outputLock.Lock()
-	fmt.Println("=======================================================")
-	fmt.Println(t+" URL:", Host, URL, h.net, h.transport)
-	//fmt.Println("bodylen: ", len(body))
-	//fmt.Println("msg_iv ", msg_iv)
-	//fmt.Println("yamllen:", len(yy))
-	//fmt.Println(string(yy))
-	if content != nil {
-		fmt.Println(content)
+	if isDereAPI || *showAllHTTP {
+		outputLock.Lock()
+		fmt.Println("=======================================================")
+		fmt.Println(t+" URL:", Host, URL, h.net, h.transport)
+		//fmt.Println("bodylen: ", len(body))
+		//fmt.Println("msg_iv ", msg_iv)
+		//fmt.Println("yamllen:", len(yy))
+		//fmt.Println(string(yy))
+		if content != nil {
+			fmt.Println(content)
+		}
+		outputLock.Unlock()
 	}
-	outputLock.Unlock()
 }
 
 func main() {
