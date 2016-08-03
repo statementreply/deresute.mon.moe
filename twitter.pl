@@ -8,7 +8,7 @@ use utf8;
 
 my $config = LoadFile("secret.yaml");
 #print "$config\n";
-if (exists $$config{"twitter_dummy"}) {
+if ((exists $$config{"twitter_dummy"}) and ($$config{"twitter_dummy"} != 0)) {
     # testmode
     print "twitter.pl called: <@ARGV>\n";
     exit 0;
