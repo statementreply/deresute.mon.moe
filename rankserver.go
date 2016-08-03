@@ -59,6 +59,7 @@ type RankServer struct {
 	currentEvent  *resource_mgr.EventDetail
 	client        *apiclient.ApiClient
 	lastCheck     time.Time
+	config        map[string]string
 }
 
 func MakeRankServer() *RankServer {
@@ -75,6 +76,7 @@ func MakeRankServer() *RankServer {
 	}
 	var config map[string]string
 	yaml.Unmarshal(content, &config)
+	r.config = config
 	fmt.Println(config)
 
 	confLOG_FILE, ok := config["LOG_FILE"]
@@ -842,6 +844,21 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
     </table>
     `)
 	fmt.Fprint(w, `javascript library from <code>https://www.gstatic.com/charts/loader.js</code><br>`)
+}
+
+var staticFilter = regexp.MustCompile("^/static")
+
+func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
+	if !staticFilter.MatchString(req.URL.Path) {
+		log.Println("bad req url path", req.URL.Path)
+		return
+	}
+	path := req.URL.Path
+	strings.Replace(path, "/static", "", 1)
+	filename := r.config["staticdir"] + "/" + path
+	log.Println("serverfile", filename)
+	http.ServeFile(w, req, filename)
 }
 
 type twitterParam struct {
