@@ -21,3 +21,8 @@ input.c0, input.r0 {
     width: 4vmin;
     height: 4vmin;
 }
+
+#myLineChart, #mySpeedChart {
+    border: 1px solid #ccc;
+}
+

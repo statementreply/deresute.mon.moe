@@ -701,9 +701,9 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	// insert graph here
 	fmt.Fprint(w, `
     <table class="columns">
-<tr><td><div id="myLineChart" style="border: 1px solid #ccc"/></td></tr>
+<tr><td><div id="myLineChart"/></td></tr>
 <tr><td>時速</td></tr>
-<tr><td><div id="mySpeedChart" style="border: 1px solid #ccc"/></td></tr>
+<tr><td><div id="mySpeedChart"/></td></tr>
     </table>
     `)
 
