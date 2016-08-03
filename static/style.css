@@ -1,23 +1,23 @@
 html {
-    font-size: 20px;
+    font-size: 3.5vmin;
     font-family:"メイリオ", Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "Noto", "Noto Regular", "Noto Sans CJK JP", "IPA Pゴシック","IPA PGothic", sans-serif;
 }
 
 div.note {
-    font-size: 16px;
+    font-size: 1.5vmin;
 }
 
 div.form {
-    font-size: 40px;
+    font-size: 4vmin;
 }
 
 input.r0, input.c0, input.t0, input.s0 {
-    font-size: 40px;
-    border: 2px solid black;
-    border-radius: 4px;
+    font-size: 4vmin;
+    border: 0.4vmin solid black;
+    border-radius: 1vmin;
 }
 
 input.c0, input.r0 {
-    width: 40px;
-    height: 40px;
+    width: 4vmin;
+    height: 4vmin;
 }
