@@ -814,11 +814,11 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
 	fmt.Fprintf(w, `<p>
 <form action="qchart" method="get">customized border graph：<br>
-  順位：<input type="text" name="rank" size=35 value="%s"></input>
+  順位：<input type="text" name="rank" size=35 value="%s"></input><br>
   <input type="hidden" name="event" value="%s"></input>
   <input type="radio" name="type" value="0"%s>イベントpt</input>
-  <input type="radio" name="type" value="1"%s>ハイスコア</input>
-  <input type="checkbox" name="achart" value="1"%s>AnnotationChart</input>
+  <input type="radio" name="type" value="1"%s>ハイスコア</input><br>
+  <input type="checkbox" name="achart" value="1"%s>AnnotationChart</input><br>
   <input type="submit" value="更新">
 </form>
 </p>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
