@@ -7,6 +7,7 @@ import (
 	"log"
 	"resource_mgr"
 	//"time"
+	"unicode/utf8"
 )
 
 var CONFIG_FILE = "secret.yaml"
@@ -20,14 +21,15 @@ func main() {
 	yaml.Unmarshal(content, &config)
 
 	r := resource_mgr.NewResourceMgr(config["res_ver"], "data/resourcesbeta")
-	r.LoadMaster()
+	fmt.Println("master is", r.LoadMaster())
 	r.ParseEvent()
 	for _, e := range r.EventList {
-		log.Println(e.NoticeStart(), e.EventStart(), e.Name())
+		//fmt.Println(e.NoticeStart(), e.EventStart(), e.Name())
+		fmt.Println(utf8.RuneCountInString(e.Name()), e.Name())
 	}
 	currentEvent := resource_mgr.FindCurrentEvent(r.EventList)
 	if currentEvent != nil {
-		log.Println(currentEvent.Name())
+		fmt.Println(currentEvent.Name())
 	}
 
 	// download musicscores
