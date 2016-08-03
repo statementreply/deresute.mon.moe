@@ -558,7 +558,7 @@ type qchartParam struct {
 	fancyChart bool
 }
 
-func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, param *qchartParam) {
+func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
 	rankingType := 0
 	fancyChart := false
 	var list_rank []int
@@ -638,14 +638,14 @@ func (r *RankServer) preload_qchart(w http.ResponseWriter, req *http.Request, pa
 	fmt.Fprint(w, "<body>")
 }
 
-func (r *RankServer) postload(w http.ResponseWriter, req *http.Request) {
+func (r *RankServer) postload_html(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "</body>")
 	fmt.Fprint(w, "</html>")
 }
 
 func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
-	r.preload_qchart(w, req, nil)
-	defer r.postload(w, req)
+	r.preload_html(w, req, nil)
+	defer r.postload_html(w, req)
 	fmt.Fprint(w, "<pre>")
 	defer fmt.Fprint(w, "</pre>")
 	//fmt.Fprint( w, r.dumpData() )
@@ -661,13 +661,13 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
-	r.preload_qchart(w, req, &qchartParam{
+	r.preload_html(w, req, &qchartParam{
 		rankingType: 0,
 		list_rank: []int{120001},
 		event: r.currentEvent,
 		fancyChart: false,
 	})
-	defer r.postload(w, req)
+	defer r.postload_html(w, req)
 	fmt.Fprint(w, `<div id="wrapper">`)
 	defer fmt.Fprint(w, `</div`)
 	fmt.Fprintf(w, "<h2>デレステイベントボーダーbotβ+</h2>")
@@ -706,8 +706,8 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
-	r.preload_qchart(w, req, nil)
-	defer r.postload(w, req)
+	r.preload_html(w, req, nil)
+	defer r.postload_html(w, req)
 	fmt.Fprintf(w, `<table class="columns">`)
 	fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n", "event", "start", "second-half", "end")
 	for _, e := range r.resourceMgr.EventList {
@@ -723,8 +723,8 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 
 func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	r.updateTimestamp()
-	r.preload_qchart(w, req, nil)
-	defer r.postload(w, req)
+	r.preload_html(w, req, nil)
+	defer r.postload_html(w, req)
 	fmt.Fprintf(w, "<br>デレステイベントボーダー<br><br>")
 	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "最新ボーダー")
 
@@ -819,13 +819,13 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// generate html
-	r.preload_qchart(w, req, &qchartParam{
+	r.preload_html(w, req, &qchartParam{
 		rankingType: rankingType,
 		list_rank: list_rank,
 		event: event,
 		fancyChart: fancyChart,
 	})
-	defer r.postload(w, req)
+	defer r.postload_html(w, req)
 	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
 	fmt.Fprintf(w, `<div class="form"><p>
 <form action="qchart" method="get">customized border graph：<br>
