@@ -42,9 +42,9 @@ var rankingTypeFilter = regexp.MustCompile("r01\\.\\d+$")
 type RankServer struct {
 	//    map[timestamp][rankingType][rank] = score
 	// {"1467555420":   [{10: 2034} ,{30: 203021} ]  }
-	data  map[string][]map[int]int     // need mux
-	speed map[string][]map[int]float32 // need mux
-	list_timestamp []string // need mutex?
+	data           map[string][]map[int]int     // need mux
+	speed          map[string][]map[int]float32 // need mux
+	list_timestamp []string                     // need mutex?
 	// for both read and write
 	mux           sync.RWMutex
 	mux_speed     sync.RWMutex
@@ -458,11 +458,11 @@ func (r *RankServer) latestData() string {
 func (r *RankServer) showData(timestamp string) string {
 	r.mux.RLock()
 	item, ok := r.data[timestamp]
-	r.mux.RUnlock()
 	if !ok {
 		return ""
 	}
 	yy, _ := yaml.Marshal(item)
+	r.mux.RUnlock()
 	st := ts.FormatTimestamp(timestamp)
 	return timestamp + "\n" + st + "\n" + string(yy)
 }
@@ -473,6 +473,18 @@ func (r *RankServer) get_list_timestamp() []string {
 	copy(local_timestamp, r.list_timestamp)
 	r.mux_timestamp.RUnlock()
 	return local_timestamp
+}
+
+func (r *RankServer) get_list_rank(timestamp string, rankingType int) []int {
+	r.mux.RLock()
+	local_map := r.data[timestamp][rankingType]
+	list_rank := make([]int, 0, len(local_map))
+	for k := range local_map {
+		list_rank = append(list_rank, k)
+	}
+	r.mux.RUnlock()
+	sort.Ints(list_rank)
+	return list_rank
 }
 
 // js map syntax
@@ -731,17 +743,43 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 		prefill = strings.Join(n_rank, " ")
 	}
 
+	var rankingType int
+	rankingType_str_list, ok := req.Form["type"]
+	if ok {
+		rankingType_str := rankingType_str_list[0]
+		rankingType_i, err := strconv.Atoi(rankingType_str)
+		if err == nil {
+			if rankingType_i > 0 {
+				rankingType = 1
+			}
+		} else {
+			rankingType = 0
+		}
+	} else {
+		rankingType = 0
+	}
+	checked_type := []string{"", ""}
+	checked_type[rankingType] = " checked"
+
 	// generate html
-	r.preload_qchart(w, req, 0, list_rank, event)
+	r.preload_qchart(w, req, rankingType, list_rank, event)
 	defer r.postload(w, req)
-	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "ホームページ")
-	fmt.Fprintf(w, `
+	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
+	fmt.Fprintf(w, `<p>
 <form action="qchart" method="get">customized border graph：<br>
-<input type="text" name="rank" size=35 value="%s"></input>
-<input type="hidden" name="event" value="%s"></input>
-<input type="submit" value="更新">
+  順位：<input type="text" name="rank" size=35 value="%s"></input>
+  <input type="hidden" name="event" value="%s"></input>
+  <input type="radio" name="type" value="0"%s>イベントpt</input>
+  <input type="radio" name="type" value="1"%s>ハイスコア</input>
+  <input type="submit" value="更新">
 </form>
-	`, prefill, prefill_event)
+</p>`, prefill, prefill_event, checked_type[0], checked_type[1])
+
+	fmt.Fprintf(w, `<p>表示できる順位<br>
+	イベントpt：%d<br>ハイスコア：%d
+	</p>`,
+		r.get_list_rank(r.latestTimestamp(), 0),
+		r.get_list_rank(r.latestTimestamp(), 1))
 	fmt.Fprint(w, `
     <table class="columns">
 <tr><td><div id="myLineChart" style="border: 1px solid #ccc"/></td></tr>
@@ -798,10 +836,10 @@ func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Reque
 		title_suffix: "\n" + "トロフィーボーダー（時速）",
 		//list_rank:    []int{5001, 10001, 50001},
 		map_rank: map[int]string{
-			5001:   "5千位",
-			10001:  "1万位",
-			40001:  "4万位",
-			50001:  "5万位",
+			5001:  "5千位",
+			10001: "1万位",
+			40001: "4万位",
+			50001: "5万位",
 		},
 		rankingType: 1,
 		interval:    INTERVAL0 * 4,
