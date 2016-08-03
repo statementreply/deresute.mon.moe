@@ -752,17 +752,23 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	event_id_str_list, ok := req.Form["event"]
 	event := r.currentEvent
 	var prefill_event string = ""
+	// this block output: prefill_event, event
 	if ok {
 		event_id_str := event_id_str_list[0]
-		event_id, err := strconv.Atoi(event_id_str)
-		if err == nil {
-			prefill_event = event_id_str
-			event = r.resourceMgr.FindEventById(event_id)
-			if event == nil {
-				event = r.currentEvent
-			}
+		// skip empty string
+		if event_id_str == "" {
+			event = r.currentEvent
 		} else {
-			r.logger.Println("bad event id", err, event_id_str)
+			event_id, err := strconv.Atoi(event_id_str)
+			if err == nil {
+				prefill_event = event_id_str
+				event = r.resourceMgr.FindEventById(event_id)
+				if event == nil {
+					event = r.currentEvent
+				}
+			} else {
+				r.logger.Println("bad event id", err, event_id_str)
+			}
 		}
 	}
 	var prefill string = "2001 10001 20001 60001 120001"
