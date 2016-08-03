@@ -611,7 +611,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 		width: window.innerWidth || document.body.clientWidth,
 		height: window.innerHeight || document.body.clientHeight,
 	};
-	size_m = Math.min(size.width, size.height)
+	size_min = Math.min(size.width, size.height)
 	var options = {
 		width: size.width * 0.9,
 		height: size.width * 0.5,
@@ -626,7 +626,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
         },
         interpolateNulls: true,
         explorer: {maxZoomIn: 0.1},
-		fontSize: 16,
+		fontSize: 0.035 * size_min,
 		chartArea: {width: '100%%', height: '80%%'},
 
 		legend: {position: 'top', alignment: 'center'},
@@ -851,9 +851,9 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 
 	fmt.Fprint(w, `
     <table class="columns">
-<tr><td><div id="myLineChart" style="border: 1px solid #ccc"/></td></tr>
+<tr><td><div id="myLineChart"/></td></tr>
 <tr><td>時速</td></tr>
-<tr><td><div id="mySpeedChart" style="border: 1px solid #ccc"/></td></tr>
+<tr><td><div id="mySpeedChart"/></td></tr>
     </table>
     `)
 	fmt.Fprintf(w, `<div class="note"><p>表示できる順位<br>
@@ -861,7 +861,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	</p></div>`,
 		r.get_list_rank(r.latestTimestamp(), 0),
 		r.get_list_rank(r.latestTimestamp(), 1))
-	fmt.Fprint(w, `javascript library from <code>https://www.gstatic.com/charts/loader.js</code><br>`)
+	fmt.Fprint(w, `<div class="note"><p>javascript library from <code>https://www.gstatic.com/charts/loader.js</code></p></div>`)
 }
 
 var staticFilter = regexp.MustCompile("^/static")
