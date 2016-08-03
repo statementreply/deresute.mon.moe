@@ -838,11 +838,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 </form>
 </p></div>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
 
-	fmt.Fprintf(w, `<div class="note"><p>表示できる順位<br>
-	イベントpt：%d<br>ハイスコア：%d
-	</p></div>`,
-		r.get_list_rank(r.latestTimestamp(), 0),
-		r.get_list_rank(r.latestTimestamp(), 1))
+
 	fmt.Fprint(w, `
     <table class="columns">
 <tr><td><div id="myLineChart" style="border: 1px solid #ccc"/></td></tr>
@@ -850,6 +846,11 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 <tr><td><div id="mySpeedChart" style="border: 1px solid #ccc"/></td></tr>
     </table>
     `)
+	fmt.Fprintf(w, `<div class="note"><p>表示できる順位<br>
+	イベントpt：%d<br>ハイスコア：%d
+	</p></div>`,
+		r.get_list_rank(r.latestTimestamp(), 0),
+		r.get_list_rank(r.latestTimestamp(), 1))
 	fmt.Fprint(w, `javascript library from <code>https://www.gstatic.com/charts/loader.js</code><br>`)
 }
 
