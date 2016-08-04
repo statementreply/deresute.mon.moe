@@ -737,12 +737,31 @@ func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w,`
 <script type="text/javascript">
 
+  $("#mform").on("change", function() {
+  console.log("cnage");
+  });
+
+  $("#slider2").change(function() {
+  console.log("cnage");
+  });
+  $(".xch").change(function() {
+  console.log("cnxxxoeofkrage");
+  });
+  console.log("cnagexxxx");
+  var cv = $("#slider2").get(0).value;
+
 </script>
 `)
 	fmt.Fprintf(w,`
 <form id="mform" action="#">
-  <label for="switch">pt/score</label>
-  <input type="checkbox" data-role="flipswitch" name="switch" id="switch"></input>
+  <div data-role="fieldcontain">
+    <label for="slider2">Flip switch:</label>
+    <select name="slider2" id="slider2" data-role="slider" class="xch">
+    <option value="pt">pt</option>
+    <option value="score">score</option>
+    </select>
+  </div>
+  <input type="submit" data-inline="true" value="Submit"></input>
 </form>
 `)
 }
