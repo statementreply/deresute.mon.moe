@@ -578,9 +578,9 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 <meta name="keywords" content="デレステ, イベントランキング, ボーダー, アイマス, アイドルマスターシンデレラガールズスターライトステージ">
 <title>デレステボーダーbotβ+</title>`)
 	fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/style.css" />`)
-	fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/jquery.mobile-1.2.0.min.css" />`)
+	fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/jquery.mobile-1.4.5.min.css" />`)
 	fmt.Fprint(w, `<script language="javascript" type="text/javascript" src="/static/jquery-1.12.3.min.js"></script>`)
-	fmt.Fprint(w, `<script language="javascript" type="text/javascript" src="/static/jquery.mobile-1.2.0.min.js"></script>`)
+	fmt.Fprint(w, `<script language="javascript" type="text/javascript" src="/static/jquery.mobile-1.4.5.min.js"></script>`)
 
 	if list_rank != nil {
 		fmt.Fprint(w, `
