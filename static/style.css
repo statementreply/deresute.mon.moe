@@ -1,25 +1,25 @@
 html {
-    font-size: 5vmin;
+    font-size: 5vh;
     font-family:"メイリオ", Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "Noto", "Noto Regular", "Noto Sans CJK JP", "IPA Pゴシック","IPA PGothic", sans-serif;
 }
 
 div.note {
-    font-size: 3vmin;
+    font-size: 3vh;
 }
 
 div.form {
-    font-size: 4vmin;
+    font-size: 4vh;
 }
 
 input.r0, input.c0, input.t0, input.s0 {
-    font-size: 4vmin;
-    border: 0.4vmin solid black;
-    border-radius: 1vmin;
+    font-size: 4vh;
+    border: 0.4vh solid black;
+    border-radius: 1vh;
 }
 
 input.c0, input.r0 {
-    width: 4vmin;
-    height: 4vmin;
+    width: 4vh;
+    height: 4vh;
 }
 
 #myLineChart, #mySpeedChart {
