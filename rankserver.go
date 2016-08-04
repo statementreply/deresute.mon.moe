@@ -838,7 +838,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	})
 	defer r.postload_html(w, req)
 	fmt.Fprint(w, `<div id="wrapper">`)
-	defer fmt.Fprint(w, `</div`)
+	defer fmt.Fprint(w, `</div>`)
 	fmt.Fprintf(w, "<h2>デレステイベントボーダーbotβ+</h2>")
 	if r.currentEvent != nil {
 		fmt.Fprintf(w, "<p>")
