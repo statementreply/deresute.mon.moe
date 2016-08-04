@@ -629,6 +629,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 
 	r.init_req(w, req)
 	fmt.Fprint(w, "<!DOCTYPE html>\n")
+	fmt.Fprint(w, `<html lang="ja">`)
 	fmt.Fprint(w, "<head>\n")
 	fmt.Fprint(w, `<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -795,7 +796,8 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	fmt.Fprint(w, `</script>`)
 	//}
 	fmt.Fprint(w, "</head>\n")
-	fmt.Fprint(w, `<html lang="ja">`)
+	// wrong place
+	//fmt.Fprint(w, `<html lang="ja">`)
 	fmt.Fprint(w, "<body>")
 	// data provided to script
 	// the only dynamic part of this function
