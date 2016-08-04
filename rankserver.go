@@ -747,17 +747,16 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	}
 	myLineChart = $("#myLineChart", currentPage)
 	mySpeedChart = $("#mySpeedChart", currentPage)
-	myLineChart0 = $("#myLineChart", currentPage).get(0)
 	// loading preset width
 	console.log(options["width"]);
-	//myLineChart.css("width", options["width"]);
-	//myLineChart.css("height", options["height"]);
-	//mySpeedChart.css("width", options_speed["width"]);
-	//mySpeedChart.css("height", options_speed["height"]);
+	myLineChart.css("width", options["width"]);
+	myLineChart.css("height", options["height"]);
+	mySpeedChart.css("width", options_speed["width"]);
+	mySpeedChart.css("height", options_speed["height"]);
 	var chart
 	var chart_speed
 	if (fancychart == 0) {
-		chart = new google.visualization.LineChart(myLineChart0);
+		chart = new google.visualization.LineChart(myLineChart.get(0));
 		chart_speed = new google.visualization.LineChart(mySpeedChart.get(0));
 	} else {
 		chart = eval("new google.visualization.AnnotationChart(myLineChart.get(0))");
