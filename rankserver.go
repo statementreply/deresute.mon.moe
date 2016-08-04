@@ -1140,7 +1140,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
   customized border graph：<br>
 
   <label for="textinput-rank">順位：</label>
-  <input class="t0" id="textinput-rank" type="text" name="rank" size=35 value="%s"><br>
+  <input class="t0" id="textinput-rank" type="text" name="rank" size=35 value="%s">
 
   <input type="hidden" name="event" value="%s">
 
@@ -1148,7 +1148,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
   <input class="r0" id="radio-pt" type="radio" name="type" value="0"%s>
 
   <label for="radio-score">ハイスコア</label>
-  <input class="r0" id="radio-score" type="radio" name="type" value="1"%s><br>
+  <input class="r0" id="radio-score" type="radio" name="type" value="1"%s>
 
   <label for="checkbox-achart">AnnotationChart</label>
   <input class="c0" id="checkbox-achart" type="checkbox" name="achart" value="1"%s>
