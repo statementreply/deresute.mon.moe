@@ -624,11 +624,11 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
 	//rankingType := 0
 	fancyChart := false
-	var list_rank []int
+	//var list_rank []int
 	//var event *resource_mgr.EventDetail
 	if param != nil {
 		//rankingType = param.rankingType
-		list_rank = param.list_rank
+		//list_rank = param.list_rank
 		//event = param.event
 		fancyChart = param.fancyChart
 	}
@@ -646,20 +646,20 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	fmt.Fprint(w, `<script language="javascript" type="text/javascript" src="/static/jquery.mobile-1.4.5.min.js"></script>`)
 	//fmt.Fprintf(w, `<script language="javascript" type="text/javascript" src="%s"></script>`, r.generateDURL(param))
 
-	if list_rank != nil {
+	//if list_rank != nil {
 		fmt.Fprint(w, `
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
 `)
 
 		//chartType := ""
-		if fancyChart {
+		//if fancyChart {
 			//chartType = "AnnotationChart"
 			//fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart', 'annotationchart']});`)
-		} else {
+		//} else {
 			//chartType = "LineChart"
 			//fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart']});`)
-		}
+		//}
 		fmt.Fprint(w, `
 	currentPage = $("body").pagecontainer("getActivePage");
 	dataurl = $("#dataurl", currentPage).text();
@@ -797,7 +797,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	})
     }`)
 		fmt.Fprint(w, `</script>`)
-	}
+	//}
 	fmt.Fprint(w, "</head>")
 	fmt.Fprint(w, `<html lang="ja">`)
 	fmt.Fprint(w, "<body>")
