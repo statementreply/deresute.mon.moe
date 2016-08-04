@@ -745,6 +745,9 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	options_speed['interpolateNulls'] = false;
 	//console.log(options);
 	//console.log(options_speed);
+	if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
+		return;
+	}
 	myLineChart = $("#myLineChart", currentPage).get(0)
 	mySpeedChart = $("#mySpeedChart", currentPage).get(0)
 	var chart
