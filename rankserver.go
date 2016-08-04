@@ -622,14 +622,8 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 
 // now the script is totally static
 func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
-	//rankingType := 0
 	fancyChart := false
-	//var list_rank []int
-	//var event *resource_mgr.EventDetail
 	if param != nil {
-		//rankingType = param.rankingType
-		//list_rank = param.list_rank
-		//event = param.event
 		fancyChart = param.fancyChart
 	}
 
@@ -652,14 +646,6 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 <script type="text/javascript">
 `)
 
-	//chartType := ""
-	//if fancyChart {
-	//chartType = "AnnotationChart"
-	//fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart', 'annotationchart']});`)
-	//} else {
-	//chartType = "LineChart"
-	//fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart']});`)
-	//}
 	fmt.Fprint(w, `
 	currentPage = $("body").pagecontainer("getActivePage");
 	function setAspectRatio() {
@@ -692,11 +678,6 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 
 	fmt.Fprint(w, `google.charts.setOnLoadCallback(drawLineChart);`)
 
-	/*
-		fmt.Fprint(w, `google.charts.setOnLoadCallback(orientationChange);
-		function orientationChange() {
-		};`)
-	*/
 	fmt.Fprint(w, `google.charts.setOnLoadCallback(pageChange);
 		function pageChange() {
 			console.log("pagechange");
@@ -730,9 +711,6 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	currentPage = $("body").pagecontainer("getActivePage");
 	dataurl = $("#dataurl", currentPage).text();
 	fancychart = $("#fancychart", currentPage).text();
-	var data_rank = new google.visualization.DataTable();
-	var data_speed = new google.visualization.DataTable();
-	var data_list = [];
 
 	// first get the size from the window
 	// if that didn't work, get it from the body
@@ -769,14 +747,6 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	}
 	myLineChart = $("#myLineChart", currentPage)
 	mySpeedChart = $("#mySpeedChart", currentPage)
-	// loading preset width
-	if (false) {
-		console.log(options["width"]);
-		myLineChart.css("width", options["width"]);
-		myLineChart.css("height", options["height"]);
-		mySpeedChart.css("width", options_speed["width"]);
-		mySpeedChart.css("height", options_speed["height"]);
-	}
 	setAspectRatio();
 	var chart
 	var chart_speed
@@ -790,6 +760,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 
 	$.getJSON(dataurl, "", function (data) {
 		console.log("drawLineChart")
+		var data_list = [];
 		for (t=0; t<2; t++) {
 			dt = {"cols": [{"id":"timestamp","label":"timestamp","type":"datetime"}],
 			"rows":[]}
@@ -815,8 +786,8 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 		}
 		//console.log("dtl",data_list);
 
-		data_rank = new google.visualization.DataTable(data_list[0]);
-		data_speed = new google.visualization.DataTable(data_list[1]);
+		var data_rank = new google.visualization.DataTable(data_list[0]);
+		var data_speed = new google.visualization.DataTable(data_list[1]);
 		chart.draw(data_rank, options);
 	    chart_speed.draw(data_speed, options_speed);
 	})
@@ -827,6 +798,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	fmt.Fprint(w, `<html lang="ja">`)
 	fmt.Fprint(w, "<body>")
 	// data provided to script
+	// the only dynamic part of this function
 	fmt.Fprintf(w, `<div id="dataurl" style="display:none;">%s</div>`, r.generateDURL(param))
 	fancyChart_i := 0
 	if fancyChart {
