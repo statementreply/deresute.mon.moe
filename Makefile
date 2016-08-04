@@ -12,8 +12,12 @@ fmt:
 
 server: rankserver
 	./rankserver
+
 fetch: dfticker
-	./dfticker
+	#./dfticker
+	# protect against crash
+	time ./dfticker; while sleep 120; do time ./dfticker; done
+
 twitter: twitter_ticker
 	./twitter_ticker
 #	perl periodic_twitter.pl cached_status https://deresuteborder.mon.moe/twitter 60
