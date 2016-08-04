@@ -131,6 +131,11 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	resp, _ := client.httpclient.Do(req)
 
 	// Processing response
+	if resp.Body == nil {
+		log.Println("resp.Body is nil")
+		return nil
+	}
+
 	resp_body, err := ioutil.ReadAll(resp.Body)
 	// FIXME
 	if err != nil {
