@@ -620,7 +620,6 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 	return u
 }
 
-
 // now the script is totally static
 func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
 	//rankingType := 0
@@ -648,20 +647,20 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	//fmt.Fprintf(w, `<script language="javascript" type="text/javascript" src="%s"></script>`, r.generateDURL(param))
 
 	//if list_rank != nil {
-		fmt.Fprint(w, `
+	fmt.Fprint(w, `
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
 `)
 
-		//chartType := ""
-		//if fancyChart {
-			//chartType = "AnnotationChart"
-			//fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart', 'annotationchart']});`)
-		//} else {
-			//chartType = "LineChart"
-			//fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart']});`)
-		//}
-		fmt.Fprint(w, `
+	//chartType := ""
+	//if fancyChart {
+	//chartType = "AnnotationChart"
+	//fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart', 'annotationchart']});`)
+	//} else {
+	//chartType = "LineChart"
+	//fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart']});`)
+	//}
+	fmt.Fprint(w, `
 	currentPage = $("body").pagecontainer("getActivePage");
 	dataurl = $("#dataurl", currentPage).text();
 	fancychart = $("#fancychart", currentPage).text();
@@ -674,15 +673,15 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	google.charts.load('current', {packages: ['corechart', 'annotationchart']});
 	`)
 
-		fmt.Fprint(w, `google.charts.setOnLoadCallback(drawLineChart);`)
+	fmt.Fprint(w, `google.charts.setOnLoadCallback(drawLineChart);`)
 
-		/*
+	/*
 		fmt.Fprint(w, `google.charts.setOnLoadCallback(orientationChange);
 		function orientationChange() {
 			$(window).on("orientationchange",drawLineChart);
 		};`)
-		*/
-		fmt.Fprint(w, `google.charts.setOnLoadCallback(pageChange);
+	*/
+	fmt.Fprint(w, `google.charts.setOnLoadCallback(pageChange);
 		function pageChange() {
 			console.log("pagechange");
 			$(window).on("pagechange", function() {
@@ -700,14 +699,14 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 			});
 		};`)
 
-		// doesn't work
-		//$("#myLineChart").html("");
-		//$("#mySpeedChart").html("");
-		//fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(rankingType, list_rank, event), ");\n")
-		//fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ");\n")
+	// doesn't work
+	//$("#myLineChart").html("");
+	//$("#mySpeedChart").html("");
+	//fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(rankingType, list_rank, event), ");\n")
+	//fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ");\n")
 
-		// need printf for legacy reasons %%
-		fmt.Fprintf(w, `function drawLineChart() {
+	// need printf for legacy reasons %%
+	fmt.Fprintf(w, `function drawLineChart() {
 	currentPage = $("body").pagecontainer("getActivePage");
 	dataurl = $("#dataurl", currentPage).text();
 	fancychart = $("#fancychart", currentPage).text();
@@ -797,7 +796,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	    chart_speed.draw(data_speed, options_speed);
 	})
     }`)
-		fmt.Fprint(w, `</script>`)
+	fmt.Fprint(w, `</script>`)
 	//}
 	fmt.Fprint(w, "</head>")
 	fmt.Fprint(w, `<html lang="ja">`)
@@ -888,13 +887,12 @@ func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
 		fancyChart:  false,
 	})
 	defer r.postload_html(w, req)
-	fmt.Fprintf(w,`<div data-role="page"><div data-role="main" class="ui-content">`)
-	defer fmt.Fprintf(w,`</div></div>`)
+	fmt.Fprintf(w, `<div data-role="page"><div data-role="main" class="ui-content">`)
+	defer fmt.Fprintf(w, `</div></div>`)
 
 	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
 
-
-	fmt.Fprintf(w,`
+	fmt.Fprintf(w, `
 <form id="mform" action="#">
   <label for="flip-checkbox-1" class="ui-hidden-accessible">Flip toggle switch checkbox:</label>
   <input type="checkbox" data-role="flipswitch" data-on-text="score" data-off-text="pt" data-wrapper-class="custom-size-flipswitch" name="flip-checkbox-1" id="flip-checkbox-1">
@@ -904,7 +902,7 @@ func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
 	<div id="myLineChart">aa</div>
 	<div id="mySpeedChart" style="display:none">bb</div></div>`)
 
-	fmt.Fprintf(w,`
+	fmt.Fprintf(w, `
 <script type="text/javascript">
 
 function setMForm () {
