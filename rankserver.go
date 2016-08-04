@@ -634,11 +634,11 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	fmt.Fprint(w, `<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="keywords" content="デレステ, イベントランキング, ボーダー, アイマス, アイドルマスターシンデレラガールズスターライトステージ">
-<title>デレステボーダーbotβ+</title>`)
-	fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/style.css" />`)
-	fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/jquery.mobile-1.4.5.min.css" />`)
-	fmt.Fprint(w, `<script language="javascript" type="text/javascript" src="/static/jquery-1.12.3.min.js"></script>`)
-	fmt.Fprint(w, `<script language="javascript" type="text/javascript" src="/static/jquery.mobile-1.4.5.min.js"></script>`)
+<title>デレステボーダーbotβ+</title>`, "\n")
+	fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/style.css" />`, "\n")
+	fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/jquery.mobile-1.4.5.min.css" />`, "\n")
+	fmt.Fprint(w, `<script language="javascript" type="text/javascript" src="/static/jquery-1.12.3.min.js"></script>`, "\n")
+	fmt.Fprint(w, `<script language="javascript" type="text/javascript" src="/static/jquery.mobile-1.4.5.min.js"></script>`, "\n")
 	//fmt.Fprintf(w, `<script language="javascript" type="text/javascript" src="%s"></script>`, r.generateDURL(param))
 
 	//if list_rank != nil {
