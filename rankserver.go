@@ -621,6 +621,7 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 }
 
 
+// now the script is totally static
 func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
 	//rankingType := 0
 	fancyChart := false
