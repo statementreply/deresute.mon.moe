@@ -688,6 +688,15 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 
 
 		fmt.Fprintf(w, `
+	currentPage = $("body").pagecontainer("getActivePage");
+	console.log($("#dataurl", currentPage).text());
+	dataurl = $("#dataurl", currentPage).text();
+	console.log("--drawlinechart called");
+	console.log(window.location.href);
+	var data_rank = new google.visualization.DataTable();
+	var data_speed = new google.visualization.DataTable();
+	var data_list = [];
+
 	// first get the size from the window
 	// if that didn't work, get it from the body
 	var size = {
@@ -703,7 +712,6 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
             gridlines: {count: 12}
         },
         vAxis: {
-            //gridlines: {color: 'none'},
             minValue: 0,
 			textPosition: 'in',
         },
@@ -711,29 +719,56 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
         explorer: {maxZoomIn: 0.1},
 		fontSize: 0.035 * size_min,
 		chartArea: {width: '100%%', height: '80%%'},
-
 		legend: {position: 'top', alignment: 'center'},
-		//theme: "maximized",
     };
 	var options_speed = $.extend({}, options);
 	options_speed['interpolateNulls'] = false;
 	console.log(options);
 	console.log(options_speed);
-	currentPage = $("body").pagecontainer("getActivePage");
 	myLineChart = $("#myLineChart", currentPage).get(0)
 	mySpeedChart = $("#mySpeedChart", currentPage).get(0)
-
     var chart = new google.visualization.%s(myLineChart);
     var chart_speed = new google.visualization.%s(mySpeedChart);
-    chart.draw(data_rank, options);
-    chart_speed.draw(data_speed, options_speed);
-	console.log("drawlinechart called");
+
+	$.getJSON(dataurl, "", function (data) {
+		console.log("success")
+		for (t=0; t<2; t++) {
+			dt = {"cols": [{"id":"timestamp","label":"timestamp","type":"datetime"}],
+			"rows":[]}
+			cur = data[t];
+			//console.log("r", cur[0]);
+			// cols
+			for (i=0; i<cur[0].length; i++) {
+				dt["cols"].push({"id":cur[0][i], "label":cur[0][i], "type":"number"})
+			}
+			// rows
+			for (i=1; i<cur.length; i++) {
+				row = cur[i]
+				row_map = {"c":[{"v":new Date(row[0] * 1000)}]}
+				for (j=1; j<row.length; j++) {
+					row_map["c"].push({"v": row[j]})
+				}
+				dt["rows"].push(row_map)
+			}
+			//console.log(dt)
+			// t=0: dt: ranklist
+			// t=1: dt: speedlist
+			data_list[t] = dt;
+		}
+		console.log("dtl",data_list);
+
+		data_rank = new google.visualization.DataTable(data_list[0]);
+		data_speed = new google.visualization.DataTable(data_list[1]);
+		chart.draw(data_rank, options);
+	    chart_speed.draw(data_speed, options_speed);
+	})
     }`, chartType, chartType)
 		fmt.Fprint(w, `</script>`)
 	}
 	fmt.Fprint(w, "</head>")
 	fmt.Fprint(w, `<html lang="ja">`)
 	fmt.Fprint(w, "<body>")
+	fmt.Fprintf(w, `<div id="dataurl" style="display:none;">%s</div>`, r.generateDURL(param))
 }
 
 func (r *RankServer) postload_html(w http.ResponseWriter, req *http.Request) {
