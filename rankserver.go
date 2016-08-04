@@ -860,9 +860,9 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	// insert graph here
 	fmt.Fprint(w, `
     <table class="columns">
-<tr><td><div id="myLineChart"/></td></tr>
+<tr><td><div id="myLineChart">loading...</div></td></tr>
 <tr><td>時速</td></tr>
-<tr><td><div id="mySpeedChart"/></td></tr>
+<tr><td><div id="mySpeedChart">loading...</div></td></tr>
     </table>
     `)
 
@@ -1145,9 +1145,9 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 
 	fmt.Fprint(w, `
     <table class="columns">
-<tr><td><div id="myLineChart"/></td></tr>
+<tr><td><div id="myLineChart">loading...</div></td></tr>
 <tr><td>時速</td></tr>
-<tr><td><div id="mySpeedChart"/></td></tr>
+<tr><td><div id="mySpeedChart">loading...</div></td></tr>
     </table>
     `)
 	fmt.Fprintf(w, `<div class="note"><p>表示できる順位<br>
