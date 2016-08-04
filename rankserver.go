@@ -705,11 +705,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 		//fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(rankingType, list_rank, event), ");\n")
 		//fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ");\n")
 
-		fmt.Fprint(w, `function drawLineChart() {`)
-		//fmt.Fprintf(w, `jQuery.getScript("%s");`, r.generateDURL(param))
-
-
-		fmt.Fprintf(w, `
+		fmt.Fprint(w, `function drawLineChart() {
 	currentPage = $("body").pagecontainer("getActivePage");
 	dataurl = $("#dataurl", currentPage).text();
 	fancychart = $("#fancychart", currentPage).text();
