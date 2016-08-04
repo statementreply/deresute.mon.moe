@@ -662,6 +662,23 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	//}
 	fmt.Fprint(w, `
 	currentPage = $("body").pagecontainer("getActivePage");
+	function setAspectRatio() {
+		aratio = 0.75;
+		if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
+			console.log("shorted");
+			return;
+		}
+		myLineChart = $("#myLineChart", currentPage)
+		mySpeedChart = $("#mySpeedChart", currentPage)
+		console.log(myLineChart.width())
+		console.log(myLineChart.height())
+		myLineChart.height(myLineChart.width() * aratio);
+		mySpeedChart.height(mySpeedChart.width() * aratio);
+	}
+	$(window).on("pagecreate pageload pagechange pageshow throttledresize", function(e) {
+		console.log("pagecreate/throttledresize", e);
+		setAspectRatio();
+	});
 	dataurl = $("#dataurl", currentPage).text();
 	fancychart = $("#fancychart", currentPage).text();
 	// this doesn't work
@@ -678,7 +695,6 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	/*
 		fmt.Fprint(w, `google.charts.setOnLoadCallback(orientationChange);
 		function orientationChange() {
-			$(window).on("orientationchange",drawLineChart);
 		};`)
 	*/
 	fmt.Fprint(w, `google.charts.setOnLoadCallback(pageChange);
@@ -696,6 +712,10 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 			$("body").on("pageshow", function () {
 				//drawLineChart();
 				console.log("pageshow");
+			});
+			$(window).on("orientationchange", function() {
+				drawLineChart();
+				console.log("orientationchange");
 			});
 		};`)
 
@@ -722,8 +742,9 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	};
 	size_min = Math.min(size.width, size.height)
 	var options = {
-		width: size.width * 1.0,
-		height: size.width * 0.5625,
+		title: "累計",
+		//width: size.width * 1.0,
+		//height: size.width * 0.5625,
         hAxis: {
             format: 'MM/dd HH:mm',
             gridlines: {count: 12}
@@ -735,11 +756,12 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
         interpolateNulls: true,
         explorer: {maxZoomIn: 0.1},
 		fontSize: 0.035 * size_min,
-		chartArea: {width: '100%%', height: '80%%'},
+		chartArea: {width: '100%%', height: '65%%'},
 		legend: {position: 'top', alignment: 'center'},
     };
 	var options_speed = $.extend({}, options);
 	options_speed['interpolateNulls'] = false;
+	options_speed['title'] = "時速";
 	//console.log(options);
 	//console.log(options_speed);
 	if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
@@ -748,11 +770,14 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	myLineChart = $("#myLineChart", currentPage)
 	mySpeedChart = $("#mySpeedChart", currentPage)
 	// loading preset width
-	console.log(options["width"]);
-	myLineChart.css("width", options["width"]);
-	myLineChart.css("height", options["height"]);
-	mySpeedChart.css("width", options_speed["width"]);
-	mySpeedChart.css("height", options_speed["height"]);
+	if (false) {
+		console.log(options["width"]);
+		myLineChart.css("width", options["width"]);
+		myLineChart.css("height", options["height"]);
+		mySpeedChart.css("width", options_speed["width"]);
+		mySpeedChart.css("height", options_speed["height"]);
+	}
+	setAspectRatio();
 	var chart
 	var chart_speed
 	if (fancychart == 0) {
@@ -861,12 +886,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "<h3>%s</h3>\n", "12万位ボーダーグラフ")
 	fmt.Fprintf(w, "（<a href=\"qchart?rank=2001&rank=10001&rank=20001&rank=60001&rank=120001\">%s</a>）<br>\n", "他のボーダーはここ")
 	fmt.Fprintf(w, "（<a href=\"qchart?rank=501&rank=5001&rank=50001&rank=500001\">%s</a>）<br>\n", "イベント称号ボーダー")
-	// insert graph here
-	fmt.Fprint(w, `
-<div id="myLineChart">loading...</div>
-時速
-<div id="mySpeedChart">loading...</div>
-    `)
+	fmt.Fprint(w, r.chartSnippet())
 
 	fmt.Fprint(w, "<hr>")
 	fmt.Fprintf(w, "<h3>%s</h3>\n", "最新ボーダー")
@@ -874,6 +894,15 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "<pre>")
 	defer fmt.Fprint(w, "</pre>")
 	fmt.Fprint(w, r.latestData())
+}
+
+func (r *RankServer) chartSnippet() string {
+	// insert graph here
+	return `
+<div class="ui-grid-a ui-responsive">
+<div class="ui-block-a" id="myLineChart">loading...</div>
+<div class="ui-block-b" id="mySpeedChart">loading...</div>
+</div>`
 }
 
 // mobile landscape optimized
@@ -1144,11 +1173,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 </form>
 </p></div>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
 
-	fmt.Fprint(w, `
-<div id="myLineChart">loading...</div>
-時速
-<div id="mySpeedChart">loading...</div>
-    `)
+	fmt.Fprint(w, r.chartSnippet())
 	fmt.Fprintf(w, `<div class="note"><p>表示できる順位<br>
 	イベントpt：%d<br>ハイスコア：%d
 	</p></div>`,
