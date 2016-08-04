@@ -142,6 +142,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/q", r.qHandler)
 	http.HandleFunc("/log", r.logHandler)
 	http.HandleFunc("/qchart", r.qchartHandler)
+	http.HandleFunc("/d", r.dataHandler)
 	http.HandleFunc("/static/", r.staticHandler)
 	// API/plaintext
 	http.HandleFunc("/twitter", r.twitterHandler)
@@ -559,17 +560,29 @@ type qchartParam struct {
 	fancyChart  bool
 }
 
+func (r *RankServer) generateDURL(param *qchartParam) string {
+	u := "/d?"
+	u += "event=" + fmt.Sprintf("%d", param.event.Id()) + "&"
+	u += "type=" + fmt.Sprintf("%d", param.rankingType) + "&"
+	for _, rank := range param.list_rank {
+		u += "rank=" + strconv.Itoa(rank) + "&"
+	}
+	return u
+}
+
+
 func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
-	rankingType := 0
+	//rankingType := 0
 	fancyChart := false
 	var list_rank []int
-	var event *resource_mgr.EventDetail
+	//var event *resource_mgr.EventDetail
 	if param != nil {
-		rankingType = param.rankingType
+		//rankingType = param.rankingType
 		list_rank = param.list_rank
-		event = param.event
+		//event = param.event
 		fancyChart = param.fancyChart
 	}
+
 	r.init_req(w, req)
 	fmt.Fprint(w, "<!DOCTYPE html>\n")
 	fmt.Fprint(w, "<head>\n")
@@ -581,6 +594,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/jquery.mobile-1.4.5.min.css" />`)
 	fmt.Fprint(w, `<script language="javascript" type="text/javascript" src="/static/jquery-1.12.3.min.js"></script>`)
 	fmt.Fprint(w, `<script language="javascript" type="text/javascript" src="/static/jquery.mobile-1.4.5.min.js"></script>`)
+	//fmt.Fprintf(w, `<script language="javascript" type="text/javascript" src="%s"></script>`, r.generateDURL(param))
 
 	if list_rank != nil {
 		fmt.Fprint(w, `
@@ -619,9 +633,13 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 		// doesn't work
 		//$("#myLineChart").html("");
 		//$("#mySpeedChart").html("");
+		//fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(rankingType, list_rank, event), ");\n")
+		//fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ");\n")
+
 		fmt.Fprint(w, `function drawLineChart() {`)
-		fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(rankingType, list_rank, event), ")")
-		fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ")")
+		fmt.Fprintf(w, `jQuery.getScript("%s");`, r.generateDURL(param))
+
+
 		fmt.Fprintf(w, `
 	// first get the size from the window
 	// if that didn't work, get it from the body
@@ -818,6 +836,80 @@ func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	for _, timestamp := range local_timestamp {
 		fmt.Fprintf(w, "<a href=\"q?t=%s\">%s</a><br>\n", timestamp, ts.FormatTimestamp(timestamp))
 	}
+}
+
+func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
+	r.checkData("")
+
+	// parse parameters
+	req.ParseForm()
+	list_rank_str, ok := req.Form["rank"]
+	var list_rank []int
+	if ok {
+		list_rank = make([]int, 0, len(list_rank_str))
+		for _, v := range list_rank_str {
+			// now v can contain more than one number
+			//fmt.Println("str<"+v+">")
+			subv := strings.Split(v, " ")
+			for _, vv := range subv {
+				n, err := strconv.Atoi(vv)
+				if (err == nil) && (n >= 1) && (n <= 1000001) {
+					list_rank = append(list_rank, n)
+				}
+			}
+		}
+	} else {
+		list_rank = []int{60001, 120001}
+	}
+
+	event_id_str_list, ok := req.Form["event"]
+	event := r.currentEvent
+	// this block output: prefill_event, event
+	if ok {
+		event_id_str := event_id_str_list[0]
+		// skip empty string
+		if event_id_str == "" {
+			event = r.currentEvent
+		} else {
+			event_id, err := strconv.Atoi(event_id_str)
+			if err == nil {
+				event = r.resourceMgr.FindEventById(event_id)
+				if event == nil {
+					event = r.currentEvent
+				}
+			} else {
+				r.logger.Println("bad event id", err, event_id_str)
+			}
+		}
+	}
+	{
+		n_rank := []string{}
+		for _, n := range list_rank {
+			n_rank = append(n_rank, fmt.Sprintf("%d", n))
+		}
+	}
+
+	var rankingType int
+	rankingType_str_list, ok := req.Form["type"]
+	if ok {
+		rankingType_str := rankingType_str_list[0]
+		rankingType_i, err := strconv.Atoi(rankingType_str)
+		if err == nil {
+			if rankingType_i > 0 {
+				rankingType = 1
+			}
+		} else {
+			rankingType = 0
+		}
+	} else {
+		rankingType = 0
+	}
+	checked_type := []string{"", ""}
+	checked_type[rankingType] = " checked"
+
+	// generate js
+	fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(rankingType, list_rank, event), ")")
+	fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ")")
 }
 
 func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
