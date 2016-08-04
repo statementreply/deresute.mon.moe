@@ -540,6 +540,53 @@ func (r *RankServer) rankData_list_f_e(rankingType int, list_rank []int, dataSou
 	return raw
 }
 
+func (r *RankServer) jsonData(rankingType int, list_rank []int, dataSource func(string, int, int) interface{}, event *resource_mgr.EventDetail) string {
+	r.updateTimestamp()
+	// begin list
+	raw := "[["
+	for _, rank := range list_rank {
+		raw += fmt.Sprintf(`"%d",`, rank)
+	}
+	raw = strings.TrimSuffix(raw, ",")
+	raw += "],\n"
+
+	local_timestamp := r.get_list_timestamp()
+	for _, timestamp := range local_timestamp {
+		if !r.inEvent(timestamp, event) {
+			continue
+		}
+		// time in milliseconds
+		raw += fmt.Sprintf(`["%s",`, timestamp)
+		for _, rank := range list_rank {
+			score := dataSource(timestamp, rankingType, rank)
+			switch score.(type) {
+			case int:
+				score_i := score.(int)
+				if score_i >= 0 {
+					raw += fmt.Sprintf(`%d,`, score_i)
+				} else {
+					// null: missing point
+					raw += fmt.Sprintf(`null,`)
+				}
+			case float32:
+				score_f := score.(float32)
+				if score_f >= 0 {
+					raw += fmt.Sprintf(`%f,`, score_f)
+				} else {
+					// null: missing point
+					raw += fmt.Sprintf(`null,`)
+				}
+			}
+		}
+		raw = strings.TrimSuffix(raw, ",")
+		raw += fmt.Sprintf("]\n,")
+		//raw += "\n"
+	}
+	raw = strings.TrimSuffix(raw, ",")
+	raw += `]`
+	return raw
+}
+
 func (r *RankServer) rankData_list_e(rankingType int, list_rank []int, event *resource_mgr.EventDetail) string {
 	return r.rankData_list_f_e(rankingType, list_rank, r.fetchData_i, event)
 }
@@ -907,9 +954,14 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 	checked_type := []string{"", ""}
 	checked_type[rankingType] = " checked"
 
-	// generate js
-	fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(rankingType, list_rank, event), ")")
-	fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ")")
+	// generate json
+
+	fmt.Fprint(w,
+		"[\n",
+		r.jsonData(rankingType, list_rank, r.fetchData_i, event),
+		",\n",
+		r.jsonData(rankingType, list_rank, r.getSpeed_i, event),
+		"]\n")
 }
 
 func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
