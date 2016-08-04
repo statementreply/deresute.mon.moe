@@ -794,17 +794,19 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
     }`)
 	fmt.Fprint(w, `</script>`)
 	//}
-	fmt.Fprint(w, "</head>")
+	fmt.Fprint(w, "</head>\n")
 	fmt.Fprint(w, `<html lang="ja">`)
 	fmt.Fprint(w, "<body>")
 	// data provided to script
 	// the only dynamic part of this function
 	fmt.Fprintf(w, `<div id="dataurl" style="display:none;">%s</div>`, r.generateDURL(param))
+	fmt.Fprint(w, "\n")
 	fancyChart_i := 0
 	if fancyChart {
 		fancyChart_i = 1
 	}
 	fmt.Fprintf(w, `<div id="fancychart" style="display:none;">%d</div>`, fancyChart_i)
+	fmt.Fprint(w, "\n")
 }
 
 func (r *RankServer) postload_html(w http.ResponseWriter, req *http.Request) {
@@ -836,10 +838,12 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 		event:       r.currentEvent,
 		fancyChart:  false,
 	})
+	fmt.Fprint(w, "\n")
 	defer r.postload_html(w, req)
 	fmt.Fprint(w, `<div id="wrapper">`)
 	defer fmt.Fprint(w, `</div>`)
 	fmt.Fprintf(w, "<h2>デレステイベントボーダーbotβ+</h2>")
+	fmt.Fprint(w, "\n")
 	if r.currentEvent != nil {
 		fmt.Fprintf(w, "<p>")
 		fmt.Fprintf(w, "イベント開催中：%s", r.currentEvent.Name())
