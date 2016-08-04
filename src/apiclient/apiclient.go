@@ -142,6 +142,7 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 		log.Println("Read resp.Body", err)
 		return nil
 	}
+	resp.Body.Close()
 
 	//var content map[string]interface{}
 	content := DecodeBody(resp_body, string(client.msg_iv))
