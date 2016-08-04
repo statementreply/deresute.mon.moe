@@ -748,8 +748,15 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
 		return;
 	}
-	myLineChart = $("#myLineChart", currentPage).get(0)
-	mySpeedChart = $("#mySpeedChart", currentPage).get(0)
+	myLineChart = $("#myLineChart", currentPage)
+	mySpeedChart = $("#mySpeedChart", currentPage)
+	myLineChart0 = $("#myLineChart", currentPage).get(0)
+	// loading preset width
+	console.log(options["width"]);
+	//myLineChart.css("width", options["width"]);
+	//myLineChart.css("height", options["height"]);
+	//mySpeedChart.css("width", options_speed["width"]);
+	//mySpeedChart.css("height", options_speed["height"]);
 	var chart
 	var chart_speed
 	if (fancychart == 0) {
