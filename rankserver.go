@@ -761,7 +761,6 @@ func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
     <option value="score">score</option>
     </select>
   </div>
-  <input type="submit" data-inline="true" value="Submit"></input>
 </form>
 `)
 }
