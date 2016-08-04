@@ -760,8 +760,8 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	var chart
 	var chart_speed
 	if (fancychart == 0) {
-		chart = new google.visualization.LineChart(myLineChart);
-		chart_speed = new google.visualization.LineChart(mySpeedChart);
+		chart = new google.visualization.LineChart(myLineChart0);
+		chart_speed = new google.visualization.LineChart(mySpeedChart.get(0));
 	} else {
 		chart = eval("new google.visualization.AnnotationChart(myLineChart)");
 		chart_speed = eval("new google.visualization.AnnotationChart(mySpeedChart)");
