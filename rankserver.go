@@ -1164,7 +1164,7 @@ func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	path := req.URL.Path
 	path = strings.Replace(path, "/static", "", 1)
-	filename := r.config["staticdir"] + "/" + path
+	filename := r.config["staticdir"] + path
 
 	//r.logger.Println(req.URL, filename, "<"+path+">")
 	r.logger.Println("[INFO] servefile", filename)
