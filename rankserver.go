@@ -733,35 +733,35 @@ func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
 	})
 	defer r.postload_html(w, req)
 	fmt.Fprintf(w,`<div data-role="page"><div data-role="main" class="ui-content">`)
-	defer fmt.Fprintf(w,`</div></div>`)
-	fmt.Fprintf(w,`
-<script type="text/javascript">
+	defer fmt.Fprintf(w,`</div>
+	<div id="myLineChart">aa</div><div id="mySpeedChart" style="display:none">bb</div>
+	</div>`)
 
-  $("#mform").on("change", function() {
-  console.log("cnage");
-  });
 
-  $("#slider2").change(function() {
-  console.log("cnage");
-  });
-  $(".xch").change(function() {
-  console.log("cnxxxoeofkrage");
-  });
-  console.log("cnagexxxx");
-  var cv = $("#slider2").get(0).value;
-
-</script>
-`)
 	fmt.Fprintf(w,`
 <form id="mform" action="#">
-  <div data-role="fieldcontain">
-    <label for="slider2">Flip switch:</label>
-    <select name="slider2" id="slider2" data-role="slider" class="xch">
-    <option value="pt">pt</option>
-    <option value="score">score</option>
-    </select>
-  </div>
+  <label for="flip-checkbox-1" class="ui-hidden-accessible">Flip toggle switch checkbox:</label>
+  <input type="checkbox" data-role="flipswitch" data-on-text="score" data-off-text="pt" data-wrapper-class="custom-size-flipswitch" name="flip-checkbox-1" id="flip-checkbox-1">
 </form>
+`)
+    fmt.Fprintf(w,`<div id="preplot"></div>`)
+	fmt.Fprintf(w,`
+<script type="text/javascript">
+$("#mform").on("change", function() {
+  console.log("cnagemform");
+  var cv = $("#flip-checkbox-1").get(0).checked;
+  console.log(cv);
+  if (cv) {
+	  $("#myLineChart").css("display","none")
+	  $("#mySpeedChart").css("display","block")
+  } else {
+	  $("#mySpeedChart").css("display","none")
+	  $("#myLineChart").css("display","block")
+  }
+
+});
+
+</script>
 `)
 }
 
@@ -888,7 +888,8 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	defer r.postload_html(w, req)
 	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
 	fmt.Fprintf(w, `<div class="form"><p>
-<form action="qchart" method="get">customized border graph：<br>
+<form action="qchart" method="get">
+  customized border graph：<br>
   順位：<input class="t0" type="text" name="rank" size=35 value="%s"></input><br>
   <input type="hidden" name="event" value="%s"></input>
   <input class="r0" type="radio" name="type" value="0"%s>イベントpt</input>
