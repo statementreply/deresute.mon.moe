@@ -137,6 +137,7 @@ func MakeRankServer() *RankServer {
 func (r *RankServer) setHandleFunc() {
 	// for DefaultServeMux
 	http.HandleFunc("/", r.homeHandler)
+	http.HandleFunc("/m/", r.homeMHandler)
 	http.HandleFunc("/event", r.eventHandler)
 	http.HandleFunc("/q", r.qHandler)
 	http.HandleFunc("/log", r.logHandler)
@@ -720,6 +721,30 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "<pre>")
 	defer fmt.Fprint(w, "</pre>")
 	fmt.Fprint(w, r.latestData())
+}
+
+// mobile landscape optimized
+func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
+	r.preload_html(w, req, &qchartParam{
+		rankingType: 0,
+		list_rank:   []int{120001},
+		event:       r.currentEvent,
+		fancyChart:  false,
+	})
+	defer r.postload_html(w, req)
+	fmt.Fprintf(w,`<div data-role="page"><div data-role="main" class="ui-content">`)
+	defer fmt.Fprintf(w,`</div></div>`)
+	fmt.Fprintf(w,`
+<script type="text/javascript">
+
+</script>
+`)
+	fmt.Fprintf(w,`
+<form id="mform" action="#">
+  <label for="switch">pt/score</label>
+  <input type="checkbox" data-role="flipswitch" name="switch" id="switch"></input>
+</form>
+`)
 }
 
 func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
