@@ -805,6 +805,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	fmt.Fprint(w, "</head>")
 	fmt.Fprint(w, `<html lang="ja">`)
 	fmt.Fprint(w, "<body>")
+	// data provided to script
 	fmt.Fprintf(w, `<div id="dataurl" style="display:none;">%s</div>`, r.generateDURL(param))
 	fancyChart_i := 0
 	if fancyChart {
