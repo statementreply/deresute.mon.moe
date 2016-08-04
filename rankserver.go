@@ -1138,15 +1138,21 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, `<div class="form"><p>
 <form action="qchart" method="get">
   customized border graph：<br>
+
   <label for="textinput-rank">順位：</label>
-  <input class="t0" id="textinput-rank" type="text" name="rank" size=35 value="%s"></input><br>
-  <input type="hidden" name="event" value="%s"></input>
+  <input class="t0" id="textinput-rank" type="text" name="rank" size=35 value="%s"><br>
+
+  <input type="hidden" name="event" value="%s">
+
   <label for="radio-pt">イベントpt</label>
-  <input class="r0" id="radio-pt" type="radio" name="type" value="0"%s></input>
+  <input class="r0" id="radio-pt" type="radio" name="type" value="0"%s>
+
   <label for="radio-score">ハイスコア</label>
-  <input class="r0" id="radio-score" type="radio" name="type" value="1"%s></input><br>
+  <input class="r0" id="radio-score" type="radio" name="type" value="1"%s><br>
+
   <label for="checkbox-achart">AnnotationChart</label>
-  <input class="c0" id="checkbox-achart" type="checkbox" name="achart" value="1"%s></input>
+  <input class="c0" id="checkbox-achart" type="checkbox" name="achart" value="1"%s>
+
   <input class="s0" type="submit" value="更新">
 </form>
 </p></div>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
