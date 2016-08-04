@@ -722,8 +722,8 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	};
 	size_min = Math.min(size.width, size.height)
 	var options = {
-		width: size.width * 0.9,
-		height: size.width * 0.5,
+		width: size.width * 1.0,
+		height: size.width * 0.5625,
         hAxis: {
             format: 'MM/dd HH:mm',
             gridlines: {count: 12}
@@ -863,11 +863,9 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "（<a href=\"qchart?rank=501&rank=5001&rank=50001&rank=500001\">%s</a>）<br>\n", "イベント称号ボーダー")
 	// insert graph here
 	fmt.Fprint(w, `
-    <table class="columns">
-<tr><td><div id="myLineChart">loading...</div></td></tr>
-<tr><td>時速</td></tr>
-<tr><td><div id="mySpeedChart">loading...</div></td></tr>
-    </table>
+<div id="myLineChart">loading...</div>
+時速
+<div id="mySpeedChart">loading...</div>
     `)
 
 	fmt.Fprint(w, "<hr>")
@@ -1147,11 +1145,9 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 </p></div>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
 
 	fmt.Fprint(w, `
-    <table class="columns">
-<tr><td><div id="myLineChart">loading...</div></td></tr>
-<tr><td>時速</td></tr>
-<tr><td><div id="mySpeedChart">loading...</div></td></tr>
-    </table>
+<div id="myLineChart">loading...</div>
+時速
+<div id="mySpeedChart">loading...</div>
     `)
 	fmt.Fprintf(w, `<div class="note"><p>表示できる順位<br>
 	イベントpt：%d<br>ハイスコア：%d
