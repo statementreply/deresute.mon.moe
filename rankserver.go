@@ -752,9 +752,6 @@ func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
 	defer fmt.Fprintf(w,`</div></div>`)
 
 	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
-	fmt.Fprintf(w, `
-	<div id="myLineChart">aa</div>
-	<div id="mySpeedChart" style="display:none">bb</div>`)
 
 
 	fmt.Fprintf(w,`
@@ -763,22 +760,32 @@ func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
   <input type="checkbox" data-role="flipswitch" data-on-text="score" data-off-text="pt" data-wrapper-class="custom-size-flipswitch" name="flip-checkbox-1" id="flip-checkbox-1">
 </form>
 `)
-    fmt.Fprintf(w,`<div id="preplot"></div>`)
+	fmt.Fprintf(w, `<div>
+	<div id="myLineChart">aa</div>
+	<div id="mySpeedChart" style="display:none">bb</div></div>`)
+
 	fmt.Fprintf(w,`
 <script type="text/javascript">
-$("#mform").on("change", function() {
-  console.log("cnagemform");
+
+function setMForm () {
+  $("#mform").on("change", function() {
+  console.log("changemform");
   var cv = $("#flip-checkbox-1").get(0).checked;
   console.log(cv);
+  currentPage = $("body").pagecontainer("getActivePage");
   if (cv) {
-	  $("#myLineChart").css("display","none")
-	  $("#mySpeedChart").css("display","block")
+	  $("#myLineChart", currentPage).css("display","none");
+	  $("#mySpeedChart", currentPage).css("display","block");
   } else {
-	  $("#mySpeedChart").css("display","none")
-	  $("#myLineChart").css("display","block")
+	  $("#mySpeedChart", currentPage).css("display","none");
+	  $("#myLineChart", currentPage).css("display","block");
   }
+  });
+}
 
-});
+//$("body").on("beforeshow", setMForm);
+$("body").on("pagechange", setMForm);
+setMForm();
 
 </script>
 `)
