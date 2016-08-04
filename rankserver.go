@@ -596,11 +596,14 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 			fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart']});`)
 		}
 		fmt.Fprint(w, `google.charts.setOnLoadCallback(drawLineChart);`)
+
+		/*
 		fmt.Fprint(w, `google.charts.setOnLoadCallback(orientationChange);
 		function orientationChange() {
 			$(window).on("orientationchange",drawLineChart);
 		};
 		`)
+		*/
 
 		// doesn't work
 		//$("#myLineChart").html("");
