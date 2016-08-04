@@ -609,6 +609,9 @@ type qchartParam struct {
 
 func (r *RankServer) generateDURL(param *qchartParam) string {
 	u := "/d?"
+	if param == nil {
+		return u
+	}
 	u += "event=" + fmt.Sprintf("%d", param.event.Id()) + "&"
 	u += "type=" + fmt.Sprintf("%d", param.rankingType) + "&"
 	for _, rank := range param.list_rank {
@@ -649,14 +652,27 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 <script type="text/javascript">
 `)
 
-		chartType := ""
+		//chartType := ""
 		if fancyChart {
-			chartType = "AnnotationChart"
-			fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart', 'annotationchart']});`)
+			//chartType = "AnnotationChart"
+			//fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart', 'annotationchart']});`)
 		} else {
-			chartType = "LineChart"
-			fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart']});`)
+			//chartType = "LineChart"
+			//fmt.Fprint(w, `google.charts.load('current', {packages: ['corechart']});`)
 		}
+		fmt.Fprint(w, `
+	currentPage = $("body").pagecontainer("getActivePage");
+	dataurl = $("#dataurl", currentPage).text();
+	fancychart = $("#fancychart", currentPage).text();
+	// this doesn't work
+	if (fancychart == 0) {
+		//google.charts.load('current', {packages: ['corechart']});
+	} else {
+		//google.charts.load('current', {packages: ['corechart', 'annotationchart']});
+	}
+	google.charts.load('current', {packages: ['corechart', 'annotationchart']});
+	`)
+
 		fmt.Fprint(w, `google.charts.setOnLoadCallback(drawLineChart);`)
 
 		/*
@@ -668,11 +684,17 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 		fmt.Fprint(w, `google.charts.setOnLoadCallback(pageChange);
 		function pageChange() {
 			console.log("pagechange");
-			$(window).on("pagechange",drawLineChart);
+			$(window).on("pagechange", function() {
+				drawLineChart()
+				console.log("pagechange");
+			});
 			//$("body").pagecontainer()
-			$("body").on("pagecontainerload", drawLineChart);
+			$("body").on("pagecontainerload", function () {
+				//drawLineChart();
+				console.log("pagecontainerload");
+			});
 			$("body").on("pageshow", function () {
-				drawLineChart();
+				//drawLineChart();
 				console.log("pageshow");
 			});
 		};`)
@@ -684,15 +706,13 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 		//fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ");\n")
 
 		fmt.Fprint(w, `function drawLineChart() {`)
-		fmt.Fprintf(w, `jQuery.getScript("%s");`, r.generateDURL(param))
+		//fmt.Fprintf(w, `jQuery.getScript("%s");`, r.generateDURL(param))
 
 
 		fmt.Fprintf(w, `
 	currentPage = $("body").pagecontainer("getActivePage");
-	console.log($("#dataurl", currentPage).text());
 	dataurl = $("#dataurl", currentPage).text();
-	console.log("--drawlinechart called");
-	console.log(window.location.href);
+	fancychart = $("#fancychart", currentPage).text();
 	var data_rank = new google.visualization.DataTable();
 	var data_speed = new google.visualization.DataTable();
 	var data_list = [];
@@ -723,15 +743,22 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
     };
 	var options_speed = $.extend({}, options);
 	options_speed['interpolateNulls'] = false;
-	console.log(options);
-	console.log(options_speed);
+	//console.log(options);
+	//console.log(options_speed);
 	myLineChart = $("#myLineChart", currentPage).get(0)
 	mySpeedChart = $("#mySpeedChart", currentPage).get(0)
-    var chart = new google.visualization.%s(myLineChart);
-    var chart_speed = new google.visualization.%s(mySpeedChart);
+	var chart
+	var chart_speed
+	if (fancychart == 0) {
+		chart = new google.visualization.LineChart(myLineChart);
+		chart_speed = new google.visualization.LineChart(mySpeedChart);
+	} else {
+		chart = eval("new google.visualization.AnnotationChart(myLineChart)");
+		chart_speed = eval("new google.visualization.AnnotationChart(mySpeedChart)");
+	}
 
 	$.getJSON(dataurl, "", function (data) {
-		console.log("success")
+		console.log("drawLineChart")
 		for (t=0; t<2; t++) {
 			dt = {"cols": [{"id":"timestamp","label":"timestamp","type":"datetime"}],
 			"rows":[]}
@@ -755,20 +782,25 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 			// t=1: dt: speedlist
 			data_list[t] = dt;
 		}
-		console.log("dtl",data_list);
+		//console.log("dtl",data_list);
 
 		data_rank = new google.visualization.DataTable(data_list[0]);
 		data_speed = new google.visualization.DataTable(data_list[1]);
 		chart.draw(data_rank, options);
 	    chart_speed.draw(data_speed, options_speed);
 	})
-    }`, chartType, chartType)
+    }`)
 		fmt.Fprint(w, `</script>`)
 	}
 	fmt.Fprint(w, "</head>")
 	fmt.Fprint(w, `<html lang="ja">`)
 	fmt.Fprint(w, "<body>")
 	fmt.Fprintf(w, `<div id="dataurl" style="display:none;">%s</div>`, r.generateDURL(param))
+	fancyChart_i := 0
+	if fancyChart {
+		fancyChart_i = 1
+	}
+	fmt.Fprintf(w, `<div id="fancychart" style="display:none;">%d</div>`, fancyChart_i)
 }
 
 func (r *RankServer) postload_html(w http.ResponseWriter, req *http.Request) {
