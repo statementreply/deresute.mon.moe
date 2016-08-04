@@ -1135,7 +1135,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	})
 	defer r.postload_html(w, req)
 	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
-	fmt.Fprintf(w, `<div class="form"><p>
+	fmt.Fprintf(w, `<div class="form">
 <form action="qchart" method="get">
   customized border graph：<br>
 
@@ -1155,7 +1155,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 
   <input class="s0" type="submit" value="更新">
 </form>
-</p></div>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
+</div>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
 
 	fmt.Fprint(w, r.chartSnippet())
 	fmt.Fprintf(w, `<div class="note"><p>表示できる順位<br>
