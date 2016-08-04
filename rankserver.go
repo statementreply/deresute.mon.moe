@@ -602,9 +602,19 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 		fmt.Fprint(w, `google.charts.setOnLoadCallback(orientationChange);
 		function orientationChange() {
 			$(window).on("orientationchange",drawLineChart);
-		};
-		`)
+		};`)
 		*/
+		fmt.Fprint(w, `google.charts.setOnLoadCallback(pageChange);
+		function pageChange() {
+			console.log("pagechange");
+			$(window).on("pagechange",drawLineChart);
+			//$("body").pagecontainer()
+			$("body").on("pagecontainerload", drawLineChart);
+			$("body").on("pageshow", function () {
+				drawLineChart();
+				console.log("pageshow");
+			});
+		};`)
 
 		// doesn't work
 		//$("#myLineChart").html("");
@@ -644,10 +654,15 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	options_speed['interpolateNulls'] = false;
 	console.log(options);
 	console.log(options_speed);
-    var chart = new google.visualization.%s(document.getElementById('myLineChart'));
-    var chart_speed = new google.visualization.%s(document.getElementById('mySpeedChart'));
+	currentPage = $("body").pagecontainer("getActivePage");
+	myLineChart = $("#myLineChart", currentPage).get(0)
+	mySpeedChart = $("#mySpeedChart", currentPage).get(0)
+
+    var chart = new google.visualization.%s(myLineChart);
+    var chart_speed = new google.visualization.%s(mySpeedChart);
     chart.draw(data_rank, options);
     chart_speed.draw(data_speed, options_speed);
+	console.log("drawlinechart called");
     }`, chartType, chartType)
 		fmt.Fprint(w, `</script>`)
 	}
@@ -702,6 +717,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 
 	fmt.Fprintf(w, "<a href=\"event\">%s</a><br>\n", "過去のイベント (new)")
 	fmt.Fprintf(w, "<a href=\"log\">%s</a><br>\n", "過去のデータ")
+	fmt.Fprintf(w, "<a href=\"m\">%s</a><br>\n", "m-test")
 	fmt.Fprint(w, "<hr>")
 	fmt.Fprintf(w, "<h3>%s</h3>\n", "12万位ボーダーグラフ")
 	fmt.Fprintf(w, "（<a href=\"qchart?rank=2001&rank=10001&rank=20001&rank=60001&rank=120001\">%s</a>）<br>\n", "他のボーダーはここ")
@@ -733,9 +749,12 @@ func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
 	})
 	defer r.postload_html(w, req)
 	fmt.Fprintf(w,`<div data-role="page"><div data-role="main" class="ui-content">`)
-	defer fmt.Fprintf(w,`</div>
-	<div id="myLineChart">aa</div><div id="mySpeedChart" style="display:none">bb</div>
-	</div>`)
+	defer fmt.Fprintf(w,`</div></div>`)
+
+	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
+	fmt.Fprintf(w, `
+	<div id="myLineChart">aa</div>
+	<div id="mySpeedChart" style="display:none">bb</div>`)
 
 
 	fmt.Fprintf(w,`
@@ -890,11 +909,15 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, `<div class="form"><p>
 <form action="qchart" method="get">
   customized border graph：<br>
-  順位：<input class="t0" type="text" name="rank" size=35 value="%s"></input><br>
+  <label for="textinput-rank">順位：</label>
+  <input class="t0" id="textinput-rank" type="text" name="rank" size=35 value="%s"></input><br>
   <input type="hidden" name="event" value="%s"></input>
-  <input class="r0" type="radio" name="type" value="0"%s>イベントpt</input>
-  <input class="r0" type="radio" name="type" value="1"%s>ハイスコア</input><br>
-  <input class="c0" type="checkbox" name="achart" value="1"%s>AnnotationChart</input><br>
+  <label for="radio-pt">イベントpt</label>
+  <input class="r0" id="radio-pt" type="radio" name="type" value="0"%s></input>
+  <label for="radio-score">ハイスコア</label>
+  <input class="r0" id="radio-score" type="radio" name="type" value="1"%s></input><br>
+  <label for="checkbox-achart">AnnotationChart</label>
+  <input class="c0" id="checkbox-achart" type="checkbox" name="achart" value="1"%s></input>
   <input class="s0" type="submit" value="更新">
 </form>
 </p></div>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
