@@ -763,8 +763,8 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 		chart = new google.visualization.LineChart(myLineChart0);
 		chart_speed = new google.visualization.LineChart(mySpeedChart.get(0));
 	} else {
-		chart = eval("new google.visualization.AnnotationChart(myLineChart)");
-		chart_speed = eval("new google.visualization.AnnotationChart(mySpeedChart)");
+		chart = eval("new google.visualization.AnnotationChart(myLineChart.get(0))");
+		chart_speed = eval("new google.visualization.AnnotationChart(mySpeedChart.get(0))");
 	}
 
 	$.getJSON(dataurl, "", function (data) {
