@@ -55,6 +55,11 @@ func FormatTime(t time.Time) string {
 	return st
 }
 
+func FormatTime_short(t time.Time) string {
+	st := t.Format("060102 15:04")
+	return st
+}
+
 // for datafetcher
 func RoundTimestamp(in time.Time) time.Time {
 	s := in.Unix()

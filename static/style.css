@@ -53,3 +53,11 @@ input.c0, input.r0 {
     padding-left: 7em;
     width: 1.875em;
 }
+
+/* table */
+td {
+    padding: 5px;
+}
+tr {
+    padding: 3px;
+}
