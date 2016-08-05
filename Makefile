@@ -62,3 +62,7 @@ prevent_update:
 	curl https://deresuteborder.mon.moe/twitter >cached_status
 	curl https://deresuteborder.mon.moe/twitter_emblem >cached_status_emblem
 	curl https://deresuteborder.mon.moe/twitter_trophy >cached_status_trophy
+
+
+check_err:
+	ag '(?<!\w)_(?!\w).*?:?=' -G 'go'
