@@ -9,13 +9,13 @@ html {
     font-weight: normal;
 }
 
-div.note {
-    font-size: 3vw;
-}
 
 @media (max-width: 400px) {
     div.form, input.r0, input.c0, input.t0, input.s0 {
         font-size: 16px;
+    }
+    div.note {
+        font-size: 12px;
     }
 }
 
@@ -23,11 +23,17 @@ div.note {
     div.form, input.r0, input.c0, input.t0, input.s0 {
         font-size: 4vw;
     }
+    div.note {
+        font-size: 3vw;
+    }
 }
 
 @media (min-width: 600px) {
     div.form, input.r0, input.c0, input.t0, input.s0 {
         font-size: 24px;
+    }
+    div.note {
+        font-size: 18px;
     }
 }
 
