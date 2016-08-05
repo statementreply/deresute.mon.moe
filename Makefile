@@ -65,5 +65,5 @@ prevent_update:
 
 
 check_err:
-	#ag '(?<!\w)_(?!\w).*?:?=' -G 'go'
-	ag '(?<!\w)_(?!\w).*?:?=' *.go src/apiclient/*.go src/datafetcher/*.go src/resource_mgr/*.go src/rijndael_wrapper/*.go src/timestamp/* src/util/*
+	ag '(?<!\w)_(?!\w).*?:?=' -G 'go'
+	#ag '(?<!\w)_(?!\w).*?:?=' *.go src/apiclient/*.go src/datafetcher/*.go src/resource_mgr/*.go src/rijndael_wrapper/*.go src/timestamp/* src/util/*
