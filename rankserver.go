@@ -279,7 +279,11 @@ func (r *RankServer) FilenameToRank(fileName string) int {
 	if len(submatch) == 0 {
 		return 0
 	}
-	n, _ := strconv.Atoi(submatch[1])
+	n, err := strconv.Atoi(submatch[1])
+	if err != nil {
+		log.Println(err)
+		return 0
+	}
 	//log.Print("fileName", fileName, "n", n, "submatch", submatch)
 	return (n-1)*10 + 1
 }
@@ -450,8 +454,12 @@ func (r *RankServer) run() {
 
 func (r *RankServer) dumpData() string {
 	r.mux.RLock()
-	yy, _ := yaml.Marshal(r.data)
+	yy, err := yaml.Marshal(r.data)
 	r.mux.RUnlock()
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
 	return string(yy)
 }
 
@@ -466,8 +474,12 @@ func (r *RankServer) showData(timestamp string) string {
 	if !ok {
 		return ""
 	}
-	yy, _ := yaml.Marshal(item)
+	yy, err := yaml.Marshal(item)
 	r.mux.RUnlock()
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
 	st := ts.FormatTimestamp(timestamp)
 	return timestamp + "\n" + st + "\n" + string(yy)
 }

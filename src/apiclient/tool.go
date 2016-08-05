@@ -26,7 +26,11 @@ func Lolfuscate(s string) string {
 func Unlolfuscate(s string) string {
 	var r string
 	r = ""
-	r_len, _ := strconv.ParseInt(s[:4], 16, 16)
+	r_len, err := strconv.ParseInt(s[:4], 16, 16)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
 	//fmt.Println("rlen", int(r_len))
 	for i := 6; (i < len(s)) && (len(r) < int(r_len)); i += 4 {
 		r += string(s[i] - 10)
@@ -44,7 +48,11 @@ func Decrypt_cbc(s, iv, key []byte) []byte {
 		s_new = make([]byte, s_len+32-(s_len%32))
 		copy(s_new, s)
 	}
-	c, _ := rijndael_wrapper.NewCipher(key)
+	c, err := rijndael_wrapper.NewCipher(key)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
 	bm := cipher.NewCBCDecrypter(c, iv)
 	dst := make([]byte, len(s_new))
 	bm.CryptBlocks(dst, s_new)
@@ -58,7 +66,11 @@ func Encrypt_cbc(s, iv, key []byte) []byte {
 		s_new = make([]byte, s_len+32-(s_len%32))
 		copy(s_new, s)
 	}
-	c, _ := rijndael_wrapper.NewCipher(key)
+	c, err := rijndael_wrapper.NewCipher(key)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
 	bm := cipher.NewCBCEncrypter(c, iv)
 	dst := make([]byte, len(s_new))
 	bm.CryptBlocks(dst, s_new)
