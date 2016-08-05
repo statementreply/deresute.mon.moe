@@ -128,7 +128,12 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 
 	// Do request
 	//hclient := &http.Client{}
-	resp, _ := client.httpclient.Do(req)
+	resp, err := client.httpclient.Do(req)
+
+	if err != nil {
+		log.Println("http request error", err)
+		return nil
+	}
 
 	// Processing response
 	if resp.Body == nil {
