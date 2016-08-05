@@ -98,12 +98,20 @@ func RankToPage(rank int) int {
 }
 
 func DumpToStdout(v interface{}) {
-	yy, _ := yaml.Marshal(v)
+	yy, err := yaml.Marshal(v)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	log.Println(string(yy))
 }
 
 func DumpToFile(v interface{}, fileName string) {
-	yy, _ := yaml.Marshal(v)
+	yy, err := yaml.Marshal(v)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	ioutil.WriteFile(fileName, yy, 0644)
 }
 

@@ -71,6 +71,7 @@ func (p *Periodic) Run() {
 	for {
 		select {
 		case t := <-ticker.C:
+			// discard...
 			_ = t
 			quotient_new := (time.Duration(time.Now().UnixNano()) - p.rem) / p.div
 			if quotient_new <= quotient {
