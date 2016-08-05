@@ -178,7 +178,6 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 		msg_iv := apiclient.Unlolfuscate(udid)
 		content = apiclient.DecodeBody(body, msg_iv)
 		//yy, err := yaml.Marshal(content)
-		//_ = yy
 		if err != nil {
 			log.Fatal("yaml error", err)
 		}

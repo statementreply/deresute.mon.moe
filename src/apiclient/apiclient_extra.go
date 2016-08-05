@@ -16,7 +16,7 @@ func Test1() {
 	fmt.Println("here2")
 	// old lib
 	// don't use
-	//mp, _ := msgpack.Marshal(args)
+	//mp, err := msgpack.Marshal(args)
 	//msgpack.Unmarshal(mp, &content, nil)
 	//fmt.Println(args, content)
 

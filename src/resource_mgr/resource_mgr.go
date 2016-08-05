@@ -94,7 +94,7 @@ func (r *ResourceMgr) Set_res_ver(res_ver string) {
 
 func (r *ResourceMgr) LoadManifest() string {
 	base := fmt.Sprintf("dl/%s/", r.res_ver)
-	//content, _ := ioutil.ReadFile(r.Fetch(base + "manifests/all_dbmanifest"))
+	//content, err := ioutil.ReadFile(r.Fetch(base + "manifests/all_dbmanifest"))
 	//log.Println(string(content))
 	list, err := r.Fetch(base + "manifests/all_dbmanifest")
 	if err != nil {
