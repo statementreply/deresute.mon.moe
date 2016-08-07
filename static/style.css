@@ -4,8 +4,7 @@ html {
 
 /* override font here */
 .ui-page-theme-a {
-    font-family: "メイリオ", Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "Noto Sans JP Regular", "IPA Pゴシック","IPA PGothic", sans-serif;
-    /*font-family: sans-serif;*/
+    font-family: "メイリオ", Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "Noto Sans", "Noto Sans CJK JP", "IPA Pゴシック","IPA PGothic", sans-serif;
     font-weight: normal;
 }
 

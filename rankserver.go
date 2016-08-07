@@ -766,7 +766,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
         },
         interpolateNulls: true,
         explorer: {maxZoomIn: 0.1},
-		fontSize: 0.035 * size_min,
+		//fontSize: 0.035 * size_min,
 		chartArea: {width: '100%%', height: '65%%'},
 		legend: {position: 'top', alignment: 'center'},
     };
@@ -831,9 +831,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	fmt.Fprint(w, `</script>`)
 	//}
 	fmt.Fprint(w, "</head>\n")
-	// wrong place
-	//fmt.Fprint(w, `<html lang="ja">`)
-	fmt.Fprint(w, "<body>")
+	fmt.Fprint(w, `<body>`)
 
 	//fmt.Fprint(w, `<div data-role="page">`)
 	// doesn't work, data-dom-cache=false is the default
