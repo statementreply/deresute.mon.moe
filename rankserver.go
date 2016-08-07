@@ -149,6 +149,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/twitter_emblem", r.twitterEmblemHandler)
 	http.HandleFunc("/twitter_trophy", r.twitterTrophyHandler)
 	http.HandleFunc("/res_ver", r.res_verHandler)
+	http.HandleFunc("/latest_data", r.latestDataHandler)
 }
 
 func (r *RankServer) updateTimestamp() {
@@ -468,6 +469,10 @@ func (r *RankServer) latestData() string {
 	return r.showData(timestamp)
 }
 
+func (r *RankServer) latestDataHandler(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprint(w, r.latestData())
+}
+
 func (r *RankServer) showData(timestamp string) string {
 	r.mux.RLock()
 	item, ok := r.data[timestamp]
@@ -720,8 +725,19 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	//fmt.Fprint(w, "\nvar data_rank = new google.visualization.DataTable(", r.rankData_list_e(rankingType, list_rank, event), ");\n")
 	//fmt.Fprint(w, "\nvar data_speed = new google.visualization.DataTable(", r.speedData_list_e(rankingType, list_rank, event), ");\n")
 
+	fmt.Fprint(w, `function updateLatestData() {
+		currentPage = $("body").pagecontainer("getActivePage");
+		latestdata = $("#latestdata", currentPage);
+		if (latestdata.length == 0) {
+			return;
+		}
+		jQuery.get("/latest_data", "", function (data) {
+			latestdata.html(data);
+		}, "text");
+	}`)
 	// need printf for legacy reasons %%
 	fmt.Fprintf(w, `function drawLineChart() {
+	updateLatestData();
 	currentPage = $("body").pagecontainer("getActivePage");
 	dataurl = $("#dataurl", currentPage).text();
 	console.log("dataurl", dataurl);
@@ -889,11 +905,20 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, r.chartSnippet())
 
 	fmt.Fprint(w, "<hr>")
-	fmt.Fprintf(w, "<h3>%s</h3>\n", "最新ボーダー")
+
 	r.checkData("")
+
+	/*
+	fmt.Fprintf(w, "<h3>%s</h3>\n", "最新ボーダー")
 	fmt.Fprint(w, "<pre>")
-	defer fmt.Fprint(w, "</pre>")
 	fmt.Fprint(w, r.latestData())
+	fmt.Fprint(w, "</pre>")
+	*/
+
+	// ajax version
+	fmt.Fprintf(w, "<h3>%s</h3>\n", "最新ボーダー")
+	fmt.Fprint(w, "<pre id=\"latestdata\">")
+	fmt.Fprint(w, "</pre>")
 }
 
 func (r *RankServer) chartSnippet() string {
