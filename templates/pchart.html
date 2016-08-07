@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="デレステ, イベントランキング, ボーダー, アイマス, アイドルマスターシンデレラガールズスターライトステージ">
+<title>デレステボーダーbotβ+</title>
+<link rel="stylesheet" type="text/css" href="/static/style.css" />
+<link rel="stylesheet" type="text/css" href="/static/jquery.mobile-1.4.5.min.css" />
+<script type="text/javascript" src="/static/jquery-1.12.3.min.js"></script>
+<script type="text/javascript" src="/static/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="/static/jquery.flot-0.8.3.min.js"></script>
+<script type="text/javascript" src="/static/jquery.flot.time-0.8.3.min.js"></script>
+<script type="text/javascript" src="/static/date-1.0.0.js"></script>
+
+<script type="text/javascript">
+currentPage = $("body").pagecontainer("getActivePage");
+function setAspectRatio() {
+    aratio = 0.75;
+    if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
+        console.log("shorted setAspectRatio()");
+        return;
+    }
+    myLineChart = $("#myLineChart", currentPage);
+    mySpeedChart = $("#mySpeedChart", currentPage);
+    console.log("setAspectRatio()", myLineChart.width());
+    console.log("setAspectRatio()", myLineChart.height());
+    myLineChart.height(myLineChart.width() * aratio);
+    mySpeedChart.height(mySpeedChart.width() * aratio);
+}
+$(window).on("pagecreate pageload pagechange pageshow throttledresize", function(e) {
+    console.log("pagecreate/throttledresize", e);
+    setAspectRatio();
+});
+dataurl = $("#dataurl", currentPage).text();
+console.log("dataurl", dataurl);
+fancychart = $("#fancychart", currentPage).text();
+$(drawLineChart);
+// FIXME
+//google.charts.setOnLoadCallback(pageChange);
+function pageChange() {
+    console.log("pagechange");
+    $(window).on("pagechange", function() {
+        drawLineChart();
+        console.log("pagechange");
+    });
+    //$("body").pagecontainer()
+    $("body").on("pagecontainerload", function () {
+        //drawLineChart();
+        console.log("pagecontainerload");
+    });
+    $("body").on("pageshow", function () {
+        //drawLineChart();
+        console.log("pageshow");
+    });
+    $(window).on("orientationchange", function() {
+        drawLineChart();
+        console.log("orientationchange");
+    });
+};
+function updateLatestData() {
+    currentPage = $("body").pagecontainer("getActivePage");
+    latestdata = $("#latestdata", currentPage);
+    if (latestdata.length == 0) {
+        return;
+    }
+    jQuery.get("/latest_data", "", function (data) {
+        latestdata.html(data);
+    }, "text");
+};
+function drawLineChart() {
+    updateLatestData();
+    currentPage = $("body").pagecontainer("getActivePage");
+    dataurl = $("#dataurl", currentPage).text();
+    console.log("dataurl", dataurl);
+    fancychart = $("#fancychart", currentPage).text();
+
+    // first get the size from the window
+    // if that didn't work, get it from the body
+    var size = {
+        width: window.innerWidth || document.body.clientWidth,
+        height: window.innerHeight || document.body.clientHeight,
+    };
+    size_min = Math.min(size.width, size.height);
+    var options = {
+        title: "累計",
+        //width: size.width * 1.0,
+        //height: size.width * 0.5625,
+        hAxis: {
+            format: 'MM/dd HH:mm',
+            gridlines: {count: 12}
+        },
+        vAxis: {
+            minValue: 0,
+            textPosition: 'in',
+        },
+        interpolateNulls: true,
+        explorer: {maxZoomIn: 0.1},
+        //fontSize: 0.035 * size_min,
+        chartArea: {width: '100%', height: '65%'},
+        legend: {position: 'top', alignment: 'center'},
+    };
+    var options_speed = $.extend({}, options);
+    options_speed['interpolateNulls'] = false;
+    options_speed['title'] = "時速";
+    //console.log(options);
+    //console.log(options_speed);
+    if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
+        return;
+    }
+    myLineChart = $("#myLineChart", currentPage);
+    mySpeedChart = $("#mySpeedChart", currentPage);
+    console.log("drawLineChart, call setAspectRatio()");
+    setAspectRatio();
+    console.log("drawLineChart, call setAspectRatio() return");
+    console.log("drawLineChart,", myLineChart, mySpeedChart);
+    var chart;
+    var chart_speed;
+
+    $.getJSON(dataurl, "", function (data) {
+        var data_list = [];
+        for (t=0; t<2; t++) {
+            dt = [];
+            cur = data[t];
+            //console.log("r", cur[0]);
+            // cols
+            for (i=0; i<cur[0].length; i++) {
+                //dt["cols"].push({"id":cur[0][i], "label":cur[0][i], "type":"number"})
+                dt.push({data: [], label: cur[0][i]});
+            }
+            // rows
+            for (i=1; i<cur.length; i++) {
+                row = cur[i];
+                //row_map = {"c":[{"v":new Date(row[0] * 1000)}]};
+                for (j=1; j<row.length; j++) {
+                    dt[j-1]["data"].push([row[0] * 1000, row[j]]);
+                }
+                //console.log(dt)
+                // t=0: dt: ranklist
+                // t=1: dt: speedlist
+            }
+            data_list[t] = dt;
+
+        }
+        //console.log("dtl", JSON.stringify(data_list[0][0]));
+        //console.log("dtl", JSON.stringify(data_list[1]));
+        options = {
+            series: {
+                lines: { show: true },
+                points: { show: true },
+            },
+            xaxis: {
+                mode: "time",
+                timezone: "Asia/Tokyo",
+            },
+            grid: {
+                hoverable: true,
+                clickable: true,
+            },
+        };
+
+        timezoneJS.timezone.zoneFileBasePath = "/static/tz";
+        timezoneJS.timezone.defaultZoneFile = [];
+        timezoneJS.timezone.init({async: false});
+        console.log("draw");
+        myLineChart.html("");
+        $.plot(myLineChart, data_list[0], options);
+        mySpeedChart.html("");
+        
+        // highlight doesn't work
+        //mySpeedChart.plot(data_list[1], options);
+        $.plot(mySpeedChart, data_list[1], options);
+
+
+        $("<div id='tooltip'></div>").css({
+        position: "absolute",
+        display: "none",
+        border: "1px solid #fdd",
+        padding: "2px",
+        "background-color": "#fee",
+        opacity: 0.80
+        }).appendTo("body");
+
+        myLineChart.bind("plothover", plotHover);
+
+        function plotHover (event, pos, item) {
+            var str = "(" + pos.x.toFixed(2) + ", " + pos.y.toFixed(2) + ")";
+            $("#hoverdata").text(str);
+
+            if (item) {
+                var x = item.datapoint[0].toFixed(2),
+                    y = item.datapoint[1].toFixed(2);
+
+                $("#tooltip").html(item.series.label + " of " + x + " = " + y)
+                    .css({top: item.pageY+5, left: item.pageX+5})
+                    .fadeIn(200);
+            } else {
+                $("#tooltip").hide();
+            }
+        };
+
+        myLineChart.bind("plotclick", plotClick);
+        function plotClick (event, pos, item) {
+        var target = $(event.target);
+        console.log(target);
+        console.log(JSON.stringify(event));
+        console.log(JSON.stringify(p1));
+        console.log((p1));
+        console.log(JSON.stringify(myLineChart));
+            if (item) {
+                $("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
+                target.data("plot").highlight(item.series, item.datapoint);
+            }
+        };
+    });
+}
+</script></head>
+            <body>
+                <div data-role="page" data-dom-cache="false"><div id="dataurl" style="display:none;">/d?event=3010&type=0&rank=60001&rank=120001&</div>
+                    <div id="fancychart" style="display:none;">0</div>
+                    <p><a href="..">ホームページ</a></p>
+                    <div class="form">
+                        <form action="qchart" method="get">
+                            customized border graph：<br>
+
+                            <label for="textinput-rank">順位：</label>
+                            <input class="t0" id="textinput-rank" type="text" name="rank" size=35 value="60001 120001">
+
+                            <input type="hidden" name="event" value="">
+
+                            <label for="radio-pt">イベントpt</label>
+                            <input class="r0" id="radio-pt" type="radio" name="type" value="0" checked>
+
+                            <label for="radio-score">ハイスコア</label>
+                            <input class="r0" id="radio-score" type="radio" name="type" value="1">
+
+                            <label for="checkbox-achart">AnnotationChart</label>
+                            <input class="c0" id="checkbox-achart" type="checkbox" name="achart" value="1">
+
+                            <input class="s0" type="submit" value="更新">
+                        </form>
+                    </div>
+                    <div class="ui-grid-a ui-responsive">
+                        <div class="ui-block-a" id="myLineChart">loading...</div>
+                        <div class="ui-block-b" id="mySpeedChart">loading...</div>
+                    </div><div class="note"><p>表示できる順位<br>
+                        イベントpt：[1 501 2001 5001 10001 20001 30001 40001 50001 60001 70001 80001 90001 100001 110001 120001 130001 140001 150001 160001 170001 180001 190001 200001 210001 220001 230001 240001 250001 260001 270001 280001 290001 300001 310001 320001 330001 340001 350001 360001 370001 380001 390001 400001 410001 420001 430001 440001 450001 460001 470001 480001 490001 500001 510001 520001 530001 540001 550001 560001 570001 580001 590001 600001 1000001]<br>ハイスコア：[1 5001 10001 20001 30001 40001 50001 60001 70001 80001 90001 100001 110001 120001 130001 140001 150001 160001 170001 180001 190001 200001 210001 220001 230001 240001 250001 260001 270001 280001 290001 300001 310001 320001 330001 340001 350001 360001 370001 380001 390001 400001 410001 420001 430001 440001 450001 460001 470001 480001 490001 500001 510001 520001 530001 540001 550001 560001 570001 580001 590001 600001]
+                        </p></div><div class="note"><p>javascript library from <code>https://www.gstatic.com/charts/loader.js</code></p></div></div></body></html>
