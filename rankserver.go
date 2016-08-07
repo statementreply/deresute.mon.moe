@@ -664,13 +664,13 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	function setAspectRatio() {
 		aratio = 0.75;
 		if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
-			console.log("shorted");
+			console.log("shorted setAspectRatio()");
 			return;
 		}
 		myLineChart = $("#myLineChart", currentPage)
 		mySpeedChart = $("#mySpeedChart", currentPage)
-		console.log(myLineChart.width())
-		console.log(myLineChart.height())
+		console.log("setAspectRatio()", myLineChart.width())
+		console.log("setAspectRatio()", myLineChart.height())
 		myLineChart.height(myLineChart.width() * aratio);
 		mySpeedChart.height(mySpeedChart.width() * aratio);
 	}
@@ -679,6 +679,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 		setAspectRatio();
 	});
 	dataurl = $("#dataurl", currentPage).text();
+	console.log("dataurl", dataurl);
 	fancychart = $("#fancychart", currentPage).text();
 	// this doesn't work
 	if (fancychart == 0) {
@@ -723,6 +724,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	fmt.Fprintf(w, `function drawLineChart() {
 	currentPage = $("body").pagecontainer("getActivePage");
 	dataurl = $("#dataurl", currentPage).text();
+	console.log("dataurl", dataurl);
 	fancychart = $("#fancychart", currentPage).text();
 
 	// first get the size from the window
@@ -760,7 +762,10 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	}
 	myLineChart = $("#myLineChart", currentPage)
 	mySpeedChart = $("#mySpeedChart", currentPage)
+	console.log("drawLineChart, call setAspectRatio()")
 	setAspectRatio();
+	console.log("drawLineChart, call setAspectRatio() return")
+	console.log("drawLineChart,", myLineChart, mySpeedChart)
 	var chart
 	var chart_speed
 	if (fancychart == 0) {
@@ -772,7 +777,6 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	}
 
 	$.getJSON(dataurl, "", function (data) {
-		console.log("drawLineChart")
 		var data_list = [];
 		for (t=0; t<2; t++) {
 			dt = {"cols": [{"id":"timestamp","label":"timestamp","type":"datetime"}],
@@ -797,10 +801,11 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 			// t=1: dt: speedlist
 			data_list[t] = dt;
 		}
-		//console.log("dtl",data_list);
 
 		var data_rank = new google.visualization.DataTable(data_list[0]);
 		var data_speed = new google.visualization.DataTable(data_list[1]);
+		console.log("dtl",data_list);
+		console.log("draw");
 		chart.draw(data_rank, options);
 	    chart_speed.draw(data_speed, options_speed);
 	})
@@ -811,6 +816,10 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	// wrong place
 	//fmt.Fprint(w, `<html lang="ja">`)
 	fmt.Fprint(w, "<body>")
+
+	//fmt.Fprint(w, `<div data-role="page">`)
+	// doesn't work, data-dom-cache=false is the default
+	fmt.Fprint(w, `<div data-role="page" data-dom-cache="false">`)
 	// data provided to script
 	// the only dynamic part of this function
 	fmt.Fprintf(w, `<div id="dataurl" style="display:none;">%s</div>`, r.generateDURL(param))
@@ -824,6 +833,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 }
 
 func (r *RankServer) postload_html(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprint(w, `</div>`)
 	fmt.Fprint(w, "</body>")
 	fmt.Fprint(w, "</html>")
 }
