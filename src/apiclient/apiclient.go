@@ -231,6 +231,7 @@ func (client *ApiClient) LoadCheck() {
 
 	check := client.Call("/load/check", args)
 	//log.Print(check)
+	// FIXME interface conversion
 	new_res_ver, ok := check["data_headers"].(map[interface{}]interface{})["required_res_ver"]
 	if ok {
 		s := new_res_ver.(string)
