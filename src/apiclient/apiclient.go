@@ -230,9 +230,19 @@ func (client *ApiClient) LoadCheck() {
 		"app_type":      0}
 
 	check := client.Call("/load/check", args)
-	//log.Print(check)
+	if check == nil {
+		log.Println("LoadCheck Failed")
+		log.Print(check)
+		return
+	}
 	// FIXME interface conversion
-	new_res_ver, ok := check["data_headers"].(map[interface{}]interface{})["required_res_ver"]
+	data_headers, ok := check["data_headers"].(map[interface{}]interface{})
+	if !ok {
+		log.Println("data_header type incorrect")
+		log.Print(check)
+		return
+	}
+	new_res_ver, ok := data_headers["required_res_ver"]
 	if ok {
 		s := new_res_ver.(string)
 		client.Set_res_ver(s)
