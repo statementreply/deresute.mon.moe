@@ -910,10 +910,10 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	r.checkData("")
 
 	/*
-	fmt.Fprintf(w, "<h3>%s</h3>\n", "最新ボーダー")
-	fmt.Fprint(w, "<pre>")
-	fmt.Fprint(w, r.latestData())
-	fmt.Fprint(w, "</pre>")
+		fmt.Fprintf(w, "<h3>%s</h3>\n", "最新ボーダー")
+		fmt.Fprint(w, "<pre>")
+		fmt.Fprint(w, r.latestData())
+		fmt.Fprint(w, "</pre>")
 	*/
 
 	// ajax version
