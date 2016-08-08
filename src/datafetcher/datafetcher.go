@@ -81,14 +81,14 @@ func (df *DataFetcher) Run() error {
 	defer db.Close()
 	df.db = db
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS rank (timestamp TEXT, type INTEGER, rank INTEGER, score INTEGER, viewer_id INTEGER);")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS rank (timestamp TEXT, type INTEGER, rank INTEGER, score INTEGER, viewer_id INTEGER, PRIMARY KEY(timestamp, type, rank));")
 	if err != nil {
 		log.Println("create table", err)
 		log.Printf("%#v", err)
 		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
 	}
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS timestamp (timestamp TEXT UNIQUE);")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS timestamp (timestamp TEXT, PRIMARY KEY(timestamp));")
 	if err != nil {
 		log.Println("create table", err)
 		log.Printf("%#v", err)
@@ -207,7 +207,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 				log.Fatalln(err)
 			}
 		}
-		_, err := df.db.Exec("INSERT INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
+		_, err := df.db.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
 			server_timestamp,
 			ranking_type,
 			rank,
