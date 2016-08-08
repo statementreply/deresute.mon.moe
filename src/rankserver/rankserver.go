@@ -4,8 +4,8 @@ import (
 	"apiclient"
 	"crypto/tls"
 	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
 	"fmt"
+	_ "github.com/mattn/go-sqlite3"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -47,19 +47,19 @@ type RankServer struct {
 	mux_speed     sync.RWMutex
 	mux_timestamp sync.RWMutex
 	// sql
-	rankDB        string
-	db			  *sql.DB
-	logger        *log.Logger
-	keyFile       string
-	certFile      string
-	plainServer   *http.Server
-	tlsServer     *http.Server
-	hostname      string
-	resourceMgr   *resource_mgr.ResourceMgr
-	currentEvent  *resource_mgr.EventDetail
-	client        *apiclient.ApiClient
-	lastCheck     time.Time
-	config        map[string]string
+	rankDB       string
+	db           *sql.DB
+	logger       *log.Logger
+	keyFile      string
+	certFile     string
+	plainServer  *http.Server
+	tlsServer    *http.Server
+	hostname     string
+	resourceMgr  *resource_mgr.ResourceMgr
+	currentEvent *resource_mgr.EventDetail
+	client       *apiclient.ApiClient
+	lastCheck    time.Time
+	config       map[string]string
 }
 
 func MakeRankServer() *RankServer {
@@ -90,7 +90,7 @@ func MakeRankServer() *RankServer {
 	r.logger = log.New(fh, "", log.LstdFlags)
 
 	r.rankDB = RANK_DB
-	r.db, err = sql.Open("sqlite3", "file:" + r.rankDB + "?mode=ro")
+	r.db, err = sql.Open("sqlite3", "file:"+r.rankDB+"?mode=ro")
 	if err != nil {
 		r.logger.Fatalln("sql error", err)
 	}
@@ -273,7 +273,7 @@ func (r *RankServer) inEventActive(timestamp string, event *resource_mgr.EventDe
 // tag: database
 func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int {
 	var score int
-	row := r.db.QueryRow("SELECT score FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3", timestamp, rankingType + 1, rank)
+	row := r.db.QueryRow("SELECT score FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3", timestamp, rankingType+1, rank)
 	err := row.Scan(&score)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -292,7 +292,7 @@ func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int 
 // tag: database
 func (r *RankServer) fetchDataListRank(timestamp string, rankingType int) []int {
 	var listRank []int
-	rows, err := r.db.Query("SELECT rank FROM rank WHERE timestamp == $1 AND type == $2", timestamp, rankingType + 1)
+	rows, err := r.db.Query("SELECT rank FROM rank WHERE timestamp == $1 AND type == $2", timestamp, rankingType+1)
 	if err != nil {
 		r.logger.Println("sql error", err)
 		return nil
@@ -305,7 +305,7 @@ func (r *RankServer) fetchDataListRank(timestamp string, rankingType int) []int 
 			r.logger.Println("sql error", err)
 			return nil
 		}
-		if rank % 10 == 1 {
+		if rank%10 == 1 {
 			listRank = append(listRank, rank)
 		}
 	}
@@ -339,7 +339,7 @@ func (r *RankServer) fetchDataSlice(timestamp string) []map[int]int {
 			return nil
 		}
 		rankingType -= 1
-		if rank % 10 == 1 {
+		if rank%10 == 1 {
 			slice[rankingType][rank] = score
 		}
 	}
@@ -800,6 +800,7 @@ func (r *RankServer) postload_html(w http.ResponseWriter, req *http.Request) {
 }
 
 var timestampFilter = regexp.MustCompile("^\\d+$")
+
 func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload_html(w, req, nil)
 	defer r.postload_html(w, req)
@@ -807,7 +808,7 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 	defer fmt.Fprint(w, "</pre>")
 	//fmt.Fprint( w, r.dumpData() )
 	req.ParseForm()
-	timestamp, ok := req.Form["t"]  // format checked
+	timestamp, ok := req.Form["t"] // format checked
 	if !ok {
 		r.CheckData("")
 		fmt.Fprint(w, r.latestData())
@@ -985,7 +986,7 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 		list_rank = []int{60001, 120001}
 	}
 
-	event_id_str_list, ok := req.Form["event"]  // checked Atoi
+	event_id_str_list, ok := req.Form["event"] // checked Atoi
 	event := r.currentEvent
 	// this block output: prefill_event, event
 	if ok {
@@ -1064,7 +1065,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 		list_rank = []int{60001, 120001}
 	}
 
-	event_id_str_list, ok := req.Form["event"]  // checked Atoi
+	event_id_str_list, ok := req.Form["event"] // checked Atoi
 	event := r.currentEvent
 	var prefill_event string = ""
 	// this block output: prefill_event, event
@@ -1193,7 +1194,7 @@ type twitterParam struct {
 func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	param := twitterParam{
 		title_suffix: "",
-		title_speed: "",
+		title_speed:  "",
 		list_rank:    []int{2001, 10001, 20001, 60001, 120001},
 		map_rank: map[int]string{
 			2001:   "2千位",
@@ -1211,7 +1212,7 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Request) {
 	param := twitterParam{
 		title_suffix: "\n" + "イベント称号ボーダー",
-		title_speed: "（時速）",
+		title_speed:  "（時速）",
 		list_rank:    []int{501, 5001, 50001, 500001},
 		map_rank: map[int]string{
 			501:    "5百位",
@@ -1228,7 +1229,7 @@ func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Reque
 func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Request) {
 	param := twitterParam{
 		title_suffix: "\n" + "トロフィーボーダー",
-		title_speed: "（時速）",
+		title_speed:  "（時速）",
 		//list_rank:    []int{5001, 10001, 50001},
 		map_rank: map[int]string{
 			5001:  "5千位",

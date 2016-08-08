@@ -1,21 +1,20 @@
 package main
 
 import (
+	"database/sql"
+	sqlite3 "github.com/mattn/go-sqlite3"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
-	"database/sql"
-	"io/ioutil"
-	sqlite3 "github.com/mattn/go-sqlite3"
 	"regexp"
-	"gopkg.in/yaml.v2"
 	"strconv"
 )
 
 // use primary key
 // table timestamp (timestamp) key (timestamp)
 // table rank (timestamp, type, rank score id)  key (timestamp, type rank)
-
 
 var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
@@ -25,7 +24,7 @@ var fnFilter = regexp.MustCompile("r\\d{2}\\.(\\d+)$")
 var rankingTypeFilter = regexp.MustCompile("r01\\.\\d+$")
 
 func main() {
-	db, err := sql.Open("sqlite3", "file:" + RANK_DB + "?mode=rwc")
+	db, err := sql.Open("sqlite3", "file:"+RANK_DB+"?mode=rwc")
 	if err != nil {
 		log.Println("cannot open db", err)
 	}
@@ -35,7 +34,6 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 
 	_, err = tx.Exec("CREATE TABLE IF NOT EXISTS rank (timestamp TEXT, type INTEGER, rank INTEGER, score INTEGER, viewer_id INTEGER, PRIMARY KEY(timestamp, type, rank));")
 	if err != nil {
@@ -50,7 +48,6 @@ func main() {
 		log.Printf("%#v", err)
 		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
 	}
-
 
 	fiList, err := ioutil.ReadDir(RANK_CACHE_DIR)
 	if err != nil {
@@ -74,7 +71,6 @@ func main() {
 }
 
 func parseDir(tx *sql.Tx, ts string) {
-
 
 	dirPath := RANK_CACHE_DIR + ts
 	fiList, err := ioutil.ReadDir(dirPath)
@@ -115,7 +111,6 @@ func parseDir(tx *sql.Tx, ts string) {
 			log.Fatalln(err)
 		}
 
-
 		var local_rank_list []map[string]interface{}
 		err = yaml.Unmarshal(content, &local_rank_list)
 		if err != nil {
@@ -145,10 +140,10 @@ func parseDir(tx *sql.Tx, ts string) {
 		}
 
 		// fill zeros
-		for rank := (page-1)*10 + 1 + len(local_rank_list); rank <= (page-1)*10 + 10; rank++ {
+		for rank := (page-1)*10 + 1 + len(local_rank_list); rank <= (page-1)*10+10; rank++ {
 			// rank, 0, 0
 			_, err := tx.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
-			ts, rankingType, rank, 0, 0)
+				ts, rankingType, rank, 0, 0)
 			if err != nil {
 				log.Println("db insert err", err)
 			}

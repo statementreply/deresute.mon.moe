@@ -73,7 +73,7 @@ func (df *DataFetcher) Run() error {
 		return nil
 	}
 
-	db, err := sql.Open("sqlite3", "file:" + df.rankDB + "?mode=rwc")
+	db, err := sql.Open("sqlite3", "file:"+df.rankDB+"?mode=rwc")
 	if err != nil {
 		log.Println("cannot open db", err)
 	}
@@ -196,7 +196,6 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 		// sql hit
 	}
 
-
 	if Exists(path) {
 		// cache hit
 		//log.Println("hit", local_timestamp, ranking_type, page)
@@ -254,10 +253,10 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 		}
 	}
 	// fill zeros
-	for rank := (page-1)*10 + 1 + len(ranking_list); rank <= (page-1)*10 + 10; rank++ {
+	for rank := (page-1)*10 + 1 + len(ranking_list); rank <= (page-1)*10+10; rank++ {
 		// rank, 0, 0
 		_, err := df.db.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
-		server_timestamp, ranking_type, rank, 0, 0)
+			server_timestamp, ranking_type, rank, 0, 0)
 		if err != nil {
 			log.Println("db insert err", err)
 		}
