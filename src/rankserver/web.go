@@ -549,7 +549,6 @@ func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
 	http.ServeFile(w, req, filename)
 }
 
-
 func (r *RankServer) redirectHandler(w http.ResponseWriter, req *http.Request) {
 	req.URL.Host = r.hostname + ":4002"
 	req.URL.Scheme = "https"

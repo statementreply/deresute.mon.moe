@@ -1,14 +1,14 @@
 package rankserver
 
 import (
-	"resource_mgr"
-	"time"
-	"sync"
+	"apiclient"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"net/http"
-	"apiclient"
+	"resource_mgr"
+	"sync"
+	"time"
 )
 
 type qchartParam struct {
@@ -17,7 +17,6 @@ type qchartParam struct {
 	event       *resource_mgr.EventDetail
 	fancyChart  bool
 }
-
 
 type twitterParam struct {
 	title_suffix string
@@ -51,8 +50,3 @@ type RankServer struct {
 	lastCheck    time.Time
 	config       map[string]string
 }
-
-
-
-
-

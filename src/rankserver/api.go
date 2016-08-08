@@ -93,7 +93,6 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 		"]\n")
 }
 
-
 func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	param := twitterParam{
 		title_suffix: "",
@@ -153,8 +152,6 @@ func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Reque
 
 	r.twitterHandler_common(w, req, param)
 }
-
-
 
 func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Request, param twitterParam) {
 	var status string
@@ -256,4 +253,3 @@ func (r *RankServer) res_verHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	fmt.Fprint(w, r.client.Get_res_ver())
 }
-
