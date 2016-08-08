@@ -12,7 +12,7 @@ import (
 	"strconv"
 )
 
-// TODO primary key
+// use primary key
 // table timestamp (timestamp) key (timestamp)
 // table rank (timestamp, type, rank score id)  key (timestamp, type rank)
 
@@ -31,14 +31,20 @@ func main() {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS rank (timestamp TEXT, type INTEGER, rank INTEGER, score INTEGER, viewer_id INTEGER, PRIMARY KEY(timestamp, type, rank));")
+	tx, err := db.Begin()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+
+	_, err = tx.Exec("CREATE TABLE IF NOT EXISTS rank (timestamp TEXT, type INTEGER, rank INTEGER, score INTEGER, viewer_id INTEGER, PRIMARY KEY(timestamp, type, rank));")
 	if err != nil {
 		log.Println("create table", err)
 		log.Printf("%#v", err)
 		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
 	}
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS timestamp (timestamp TEXT, PRIMARY KEY('timestamp'));")
+	_, err = tx.Exec("CREATE TABLE IF NOT EXISTS timestamp (timestamp TEXT, PRIMARY KEY('timestamp'));")
 	if err != nil {
 		log.Println("create table", err)
 		log.Printf("%#v", err)
@@ -55,22 +61,19 @@ func main() {
 		if tsFilter.MatchString(fi.Name()) && fi.IsDir() {
 			ts := fi.Name()
 			log.Println(ts)
-			_, err = db.Exec("INSERT OR IGNORE INTO timestamp (timestamp) VALUES ($1)", ts)
+			_, err = tx.Exec("INSERT OR IGNORE INTO timestamp (timestamp) VALUES ($1)", ts)
 			if err != nil {
 				log.Println("db insert err", err)
 				log.Printf("%#v", err)
 				log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
 			}
-			parseDir(db, ts)
+			parseDir(tx, ts)
 		}
 	}
+	tx.Commit()
 }
 
-func parseDir(db *sql.DB, ts string) {
-	tx, err := db.Begin()
-	if err != nil {
-		log.Fatalln(err)
-	}
+func parseDir(tx *sql.Tx, ts string) {
 
 
 	dirPath := RANK_CACHE_DIR + ts
@@ -131,5 +134,4 @@ func parseDir(db *sql.DB, ts string) {
 			}
 		}
 	}
-	tx.Commit()
 }
