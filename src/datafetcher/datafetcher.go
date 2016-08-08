@@ -2,6 +2,8 @@ package datafetcher
 
 import (
 	"apiclient"
+	"database/sql"
+	sqlite3 "github.com/mattn/go-sqlite3"
 	"errors"
 	"fmt"
 	"gopkg.in/yaml.v2"
@@ -24,11 +26,13 @@ type DataFetcher struct {
 	resourceMgr    *resource_mgr.ResourceMgr
 	key_point      [][2]int
 	rank_cache_dir string
+	rankDB         string
+	db             *sql.DB
 	// prevent duplicate during [resultstart, resultend]
 	currentResultEnd time.Time
 }
 
-func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_dir, resource_cache_dir string) *DataFetcher {
+func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_dir, rank_db, resource_cache_dir string) *DataFetcher {
 	log.Println("NewDataFetcher()")
 	df := new(DataFetcher)
 
@@ -36,6 +40,7 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_
 	//client.LoadCheck()
 	df.key_point = key_point
 	df.rank_cache_dir = rank_cache_dir
+	df.rankDB = rank_db
 
 	df.Client.LoadCheck()
 	rv := client.Get_res_ver()
@@ -67,6 +72,28 @@ func (df *DataFetcher) Run() error {
 		log.Println("duplicate final result prevented")
 		return nil
 	}
+
+	db, err := sql.Open("sqlite3", df.rankDB)
+	if err != nil {
+		log.Println("cannot open db", err)
+	}
+	defer db.Close()
+	df.db = db
+
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS rank (timestamp TEXT, type INTEGER, rank INTEGER, score INTEGER, viewer_id INTEGER);")
+	if err != nil {
+		log.Println("create table", err)
+		log.Printf("%#v", err)
+		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
+	}
+
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS timestamp (timestamp TEXT UNIQUE);")
+	if err != nil {
+		log.Println("create table", err)
+		log.Printf("%#v", err)
+		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
+	}
+
 
 	for _, key := range df.key_point {
 		//log.Println("rankingtype:", key[0], "rank:", key[1])
@@ -165,6 +192,29 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	ioutil.WriteFile(lockfile, []byte(""), 0644)
 	DumpToFile(ranking_list, path)
 	os.Remove(lockfile)
+
+	// write to df.db
+	for _, value := range ranking_list {
+		vmap := value.(map[interface{}]interface{})
+		rank := vmap["rank"]
+		score := vmap["score"]
+		viewer_id := vmap["user_info"].(map[interface{}]interface{})["viewer_id"]
+		_, err := df.db.Exec("INSERT INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
+			server_timestamp,
+			ranking_type,
+			rank,
+			score,
+			viewer_id)
+		if err != nil {
+			log.Println("db insert err", err)
+		}
+	}
+	_, err = df.db.Exec("INSERT OR IGNORE INTO timestamp (timestamp) VALUES ($1)", server_timestamp)
+	if err != nil && err != sqlite3.ErrConstraintUnique {
+		log.Println("db insert err", err)
+		log.Printf("%#v", err)
+		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
+	}
 	return server_timestamp, "*", nil
 }
 

@@ -13,6 +13,7 @@ import (
 var SECRET_FILE string = "secret.yaml"
 var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
+var RANK_DB string = BASE + "/data/rank.db"
 var RESOURCE_CACHE_DIR string = BASE + "/data/resourcesbeta/"
 
 func main() {
@@ -48,7 +49,7 @@ func main() {
 		key_point = append(key_point, [2]int{1, index*10000 + 1})
 		key_point = append(key_point, [2]int{2, index*10000 + 1})
 	}
-	df := datafetcher.NewDataFetcher(client, key_point, RANK_CACHE_DIR, RESOURCE_CACHE_DIR)
+	df := datafetcher.NewDataFetcher(client, key_point, RANK_CACHE_DIR, RANK_DB, RESOURCE_CACHE_DIR)
 	//client.LoadCheck()
 	err := df.Run()
 	if err != nil {
