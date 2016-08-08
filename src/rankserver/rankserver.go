@@ -153,7 +153,7 @@ func (r *RankServer) setHandleFunc() {
 }
 
 // tag: database
-func (r *RankServer) updateTimestamp() {
+func (r *RankServer) UpdateTimestamp() {
 	dir, err := os.Open(RANK_CACHE_DIR)
 	if err != nil {
 		// FIXME
@@ -183,11 +183,11 @@ func (r *RankServer) updateTimestamp() {
 }
 
 func (r *RankServer) latestTimestamp() string {
-	r.updateTimestamp()
+	r.UpdateTimestamp()
 	var latest string
 	latest = ""
 	// skip empty timestamps
-	local_timestamp := r.get_list_timestamp()
+	local_timestamp := r.GetListTimestamp()
 	for ind := len(local_timestamp) - 1; ind >= 0; ind-- {
 		latest = local_timestamp[ind]
 		if r.checkDir(latest) {
@@ -222,7 +222,7 @@ func (r *RankServer) checkDir(timestamp string) bool {
 
 // tag: database
 func (r *RankServer) checkData(timestamp string) {
-	r.updateTimestamp()
+	r.UpdateTimestamp()
 	latest := r.latestTimestamp()
 	latest_time := time.Unix(0, 0)
 	if latest != "" {
@@ -494,7 +494,7 @@ func (r *RankServer) showData(timestamp string) string {
 	return timestamp + "\n" + st + "\n" + string(yy)
 }
 
-func (r *RankServer) get_list_timestamp() []string {
+func (r *RankServer) GetListTimestamp() []string {
 	r.mux_timestamp.RLock()
 	local_timestamp := make([]string, len(r.list_timestamp))
 	copy(local_timestamp, r.list_timestamp)
@@ -518,7 +518,7 @@ func (r *RankServer) get_list_rank(timestamp string, rankingType int) []int {
 // {"cols":  [{"id":"timestamp","label":"timestamp","type":"date"}, {"id":"score","label":"score","type":"number"}],
 //  "rows":  [{"c":[{"v":"new Date(1467770520)"}, {"v":14908}]}] }
 func (r *RankServer) rankData_list_f_e(rankingType int, list_rank []int, dataSource func(string, int, int) interface{}, event *resource_mgr.EventDetail) string {
-	r.updateTimestamp()
+	r.UpdateTimestamp()
 	raw := ""
 	raw += `{"cols":[{"id":"timestamp","label":"timestamp","type":"datetime"},`
 	for _, rank := range list_rank {
@@ -527,7 +527,7 @@ func (r *RankServer) rankData_list_f_e(rankingType int, list_rank []int, dataSou
 	raw += "\n"
 	raw += `],"rows":[`
 
-	local_timestamp := r.get_list_timestamp()
+	local_timestamp := r.GetListTimestamp()
 	for _, timestamp := range local_timestamp {
 		if !r.inEvent(timestamp, event) {
 			continue
@@ -563,7 +563,7 @@ func (r *RankServer) rankData_list_f_e(rankingType int, list_rank []int, dataSou
 }
 
 func (r *RankServer) jsonData(rankingType int, list_rank []int, dataSource func(string, int, int) interface{}, event *resource_mgr.EventDetail) string {
-	r.updateTimestamp()
+	r.UpdateTimestamp()
 	// begin list
 	raw := "[["
 	for _, rank := range list_rank {
@@ -572,7 +572,7 @@ func (r *RankServer) jsonData(rankingType int, list_rank []int, dataSource func(
 	raw = strings.TrimSuffix(raw, ",")
 	raw += "],\n"
 
-	local_timestamp := r.get_list_timestamp()
+	local_timestamp := r.GetListTimestamp()
 	for _, timestamp := range local_timestamp {
 		if !r.inEvent(timestamp, event) {
 			continue
@@ -1004,13 +1004,13 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
-	r.updateTimestamp()
+	r.UpdateTimestamp()
 	r.preload_html(w, req, nil)
 	defer r.postload_html(w, req)
 	fmt.Fprintf(w, "<br>デレステイベントボーダー<br><br>")
 	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "最新ボーダー")
 
-	local_timestamp := r.get_list_timestamp()
+	local_timestamp := r.GetListTimestamp()
 	for _, timestamp := range local_timestamp {
 		fmt.Fprintf(w, "<a href=\"q?t=%s\">%s</a><br>\n", timestamp, ts.FormatTimestamp(timestamp))
 	}
