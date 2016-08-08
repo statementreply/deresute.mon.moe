@@ -38,9 +38,6 @@ var INTERVAL time.Duration = 4 * INTERVAL0
 var LOG_FILE = "rankserver.log"
 var CONFIG_FILE = "rankserver.yaml"
 var SECRET_FILE = "secret.yaml"
-//var dirNameFilter = regexp.MustCompile("^\\d+$")
-//var fileNameFilter = regexp.MustCompile("r\\d{2}\\.(\\d+)$")
-//var rankingTypeFilter = regexp.MustCompile("r01\\.\\d+$")
 
 type RankServer struct {
 	//    map[timestamp][rankingType][rank] = score
@@ -289,47 +286,6 @@ func (r *RankServer) CheckData(timestamp string) {
 		return
 	}
 }
-
-
-/* tag: old
-func (r *RankServer) getFilename(timestamp string, rankingType, rank int) string {
-	subdirPath := RANK_CACHE_DIR + timestamp + "/"
-	a := rankingType + 1
-	b := int((rank-1)/10) + 1
-	fileName := subdirPath + fmt.Sprintf("r%02d.%06d", a, b)
-
-	return fileName
-}
-*/
-
-/* tag: old
-func (r *RankServer) FilenameToRank(fileName string) int {
-	//log.Print("fileName", fileName)
-	submatch := fileNameFilter.FindStringSubmatch(fileName)
-	if len(submatch) == 0 {
-		return 0
-	}
-	n, err := strconv.Atoi(submatch[1])
-	if err != nil {
-		log.Println(err)
-		return 0
-	}
-	//log.Print("fileName", fileName, "n", n, "submatch", submatch)
-	return (n-1)*10 + 1
-}
-*/
-
-/* tag: old
-func (r *RankServer) RankingType(fileName string) int {
-	if rankingTypeFilter.MatchString(fileName) {
-		// event pt
-		return 0 // r01.xxxxxx
-	} else {
-		// high score
-		return 1 // r02.xxxxxx
-	}
-}
-*/
 
 func (r *RankServer) inEvent(timestamp string, event *resource_mgr.EventDetail) bool {
 	if event == nil {
