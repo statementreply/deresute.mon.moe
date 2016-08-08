@@ -405,9 +405,9 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
 		r.speed[timestamp][1] = make(map[int]float32)
 		r.mux_speed.Unlock()
 	} else {
-		r.mux.RLock()
+		r.mux_speed.RLock()
 		val, ok := r.speed[timestamp][rankingType][rank]
-		r.mux.RUnlock()
+		r.mux_speed.RUnlock()
 		if ok {
 			return val
 		}
