@@ -1282,7 +1282,7 @@ func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Reque
 
 func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Request) {
 	param := twitterParam{
-		title_suffix: "\n" + "トロフィーボーダー（時速）",
+		title_suffix: "\n" + "トロフィーボーダー",
 		title_speed: "（時速）",
 		//list_rank:    []int{5001, 10001, 50001},
 		map_rank: map[int]string{
