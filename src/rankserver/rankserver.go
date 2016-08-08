@@ -162,7 +162,7 @@ func (r *RankServer) setHandleFunc() {
 
 // tag: database, sqlite
 func (r *RankServer) UpdateTimestamp() {
-	rows, err := r.db.Query("SELECT timestamp from timestamp")
+	rows, err := r.db.Query("SELECT timestamp FROM timestamp")
 	if err != nil {
 		r.logger.Println("sql error", err)
 		return
@@ -208,7 +208,7 @@ func (r *RankServer) latestTimestamp() string {
 // tag: database, sqlite
 func (r *RankServer) checkDir(timestamp string) bool {
 	var ts_discard string
-	row := r.db.QueryRow("select timestamp from rank where timestamp == $1", timestamp)
+	row := r.db.QueryRow("SELECT timestamp FROM rank WHERE timestamp == $1", timestamp)
 	err := row.Scan(&ts_discard)
 	// FIXME err
 	if err != nil {
@@ -260,7 +260,7 @@ func (r *RankServer) CheckData(timestamp string) {
 		r.mux.Unlock()
 	}
 
-	rows, err := r.db.Query("select type, rank, score from rank where timestamp == $1", timestamp)
+	rows, err := r.db.Query("SELECT type, rank, score FROM rank WHERE timestamp == $1", timestamp)
 	if err != nil {
 		r.logger.Println("sql error", err)
 		return
@@ -301,7 +301,7 @@ func (r *RankServer) inEvent(timestamp string, event *resource_mgr.EventDetail) 
 // tag: database
 func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int {
 	var score int
-	row := r.db.QueryRow("select score from rank where timestamp == $1 and type == $2 and rank == $3", timestamp, rankingType + 1, rank)
+	row := r.db.QueryRow("SELECT score FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3", timestamp, rankingType + 1, rank)
 	err := row.Scan(&score)
 	if err != nil {
 		if err == sql.ErrNoRows {
