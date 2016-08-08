@@ -298,6 +298,18 @@ func (r *RankServer) inEvent(timestamp string, event *resource_mgr.EventDetail) 
 	}
 }
 
+func (r *RankServer) inEventActive(timestamp string, event *resource_mgr.EventDetail) bool {
+	if event == nil {
+		return true
+	}
+	t := ts.TimestampToTime(timestamp)
+	if (!t.Before(event.EventStart())) && (!t.After(event.EventEnd())) {
+		return true
+	} else {
+		return false
+	}
+}
+
 // tag: database
 func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int {
 	var score int
@@ -1226,6 +1238,7 @@ func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
 
 type twitterParam struct {
 	title_suffix string
+	title_speed  string
 	list_rank    []int
 	map_rank     map[int]string
 	rankingType  int
@@ -1235,6 +1248,7 @@ type twitterParam struct {
 func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	param := twitterParam{
 		title_suffix: "",
+		title_speed: "",
 		list_rank:    []int{2001, 10001, 20001, 60001, 120001},
 		map_rank: map[int]string{
 			2001:   "2千位",
@@ -1251,7 +1265,8 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 
 func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Request) {
 	param := twitterParam{
-		title_suffix: "\n" + "イベント称号ボーダー（時速）",
+		title_suffix: "\n" + "イベント称号ボーダー",
+		title_speed: "（時速）",
 		list_rank:    []int{501, 5001, 50001, 500001},
 		map_rank: map[int]string{
 			501:    "5百位",
@@ -1268,6 +1283,7 @@ func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Reque
 func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Request) {
 	param := twitterParam{
 		title_suffix: "\n" + "トロフィーボーダー（時速）",
+		title_speed: "（時速）",
 		//list_rank:    []int{5001, 10001, 50001},
 		map_rank: map[int]string{
 			5001:  "5千位",
@@ -1297,6 +1313,7 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	var title string
 
 	timestamp_str := ts.FormatTimestamp_short(timestamp)
+	var isFinal = false
 
 	if r.currentEvent != nil {
 		t := ts.TimestampToTime(timestamp)
@@ -1306,8 +1323,13 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 		}
 		if r.currentEvent.IsFinal(t) {
 			timestamp_str = "【結果発表】"
+			isFinal = true
 		}
-		title = r.currentEvent.ShortName() + " " + timestamp_str + param.title_suffix + "\n"
+		title = r.currentEvent.ShortName() + " " + timestamp_str + param.title_suffix + param.title_speed + "\n"
+		if isFinal {
+			// remove param.title_speed
+			title = r.currentEvent.ShortName() + " " + timestamp_str + param.title_suffix + "\n"
+		}
 	} else {
 		r.logger.Println("no event")
 		fmt.Fprint(w, "EMPTY")
@@ -1323,6 +1345,16 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 		t := ts.TimestampToTime(timestamp)
 		t_prev := t.Add(-param.interval)
 		timestamp_prev := ts.TimeToTimestamp(t_prev)
+		if isFinal {
+			tsList := r.GetListTimestamp()
+			// increasing order
+			// timestamp_prev will be the final before EventEnd
+			for _, ts := range tsList {
+				if r.inEventActive(ts, r.currentEvent) {
+					timestamp_prev = ts
+				}
+			}
+		}
 		border_prev := r.fetchData(timestamp_prev, rankingType, rank)
 		delta := -1
 		if border < 0 {
