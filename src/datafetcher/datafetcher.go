@@ -199,7 +199,7 @@ func (df *DataFetcher) GetPage(event_type, ranking_type, page int) ([]interface{
 		delete(vmap, "leader_card_info")
 		viewer_id := vmap["user_info"].(map[interface{}]interface{})["viewer_id"]
 		delete(vmap, "user_info")
-		vmap["user_info"] = map[string]interface{}{"viewer_id": viewer_id}
+		vmap["user_info"] = map[interface{}]interface{}{"viewer_id": viewer_id}
 	}
 	return ranking_list, servertime, err
 }
