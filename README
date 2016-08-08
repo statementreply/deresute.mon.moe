@@ -1,7 +1,9 @@
 TODO
 - [done] event datetime filter based on sqlite3
-- [pydone] translate python/perl to go?
+- [pydone] translate python/perl to go? (perl Net::Twitter remains)
 - dfticker mem leak?
+- dfticker save less?
+- concurrent map rw?
 
 
 [outdated] Data flow           when to run
