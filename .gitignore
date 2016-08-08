@@ -2,8 +2,9 @@ secret.yaml
 rankserver.yaml
 .*.swp
 /rankserver
-rankserver.log
-dfticker
+/rankserver.log
+/dfticker
+/dfticker.log
 pcapdump
 dumpbody
 unlz4
@@ -16,3 +17,6 @@ df
 pkg/
 src/github.com
 src/gopkg.in
+cached_status*
+/compress_db
+/static/*.html
