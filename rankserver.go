@@ -152,6 +152,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/latest_data", r.latestDataHandler)
 }
 
+// tag: database
 func (r *RankServer) updateTimestamp() {
 	dir, err := os.Open(RANK_CACHE_DIR)
 	if err != nil {
@@ -197,6 +198,7 @@ func (r *RankServer) latestTimestamp() string {
 }
 
 // true: nonempty; false: empty
+// tag: database
 func (r *RankServer) checkDir(timestamp string) bool {
 	subdirPath := RANK_CACHE_DIR + timestamp + "/"
 	subdir, err := os.Open(subdirPath)
@@ -218,6 +220,7 @@ func (r *RankServer) checkDir(timestamp string) bool {
 	}
 }
 
+// tag: database
 func (r *RankServer) checkData(timestamp string) {
 	r.updateTimestamp()
 	latest := r.latestTimestamp()
@@ -320,6 +323,7 @@ func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) in
 	return r.fetchData(timestamp, rankingType, rank)
 }
 
+// tag: database
 func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank int, fileName string) int {
 	r.mux.RLock()
 	_, ok := r.data[timestamp]
