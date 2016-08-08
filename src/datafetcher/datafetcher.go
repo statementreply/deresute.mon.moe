@@ -209,6 +209,15 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 			log.Println("db insert err", err)
 		}
 	}
+	// fill zeros
+	for rank := (page-1)*10 + 1 + len(ranking_list); rank <= (page-1)*10 + 10; rank++ {
+		// rank, 0, 0
+		_, err := df.db.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
+		server_timestamp, ranking_type, rank, 0, 0)
+		if err != nil {
+			log.Println("db insert err", err)
+		}
+	}
 	_, err = df.db.Exec("INSERT OR IGNORE INTO timestamp (timestamp) VALUES ($1)", server_timestamp)
 	if err != nil && err != sqlite3.ErrConstraintUnique {
 		log.Println("db insert err", err)

@@ -97,6 +97,16 @@ func parseDir(tx *sql.Tx, ts string) {
 			rankingType = 2
 		}
 
+		// get page from fileName
+		submatch := fnFilter.FindStringSubmatch(fileName)
+		if len(submatch) < 1 {
+			log.Fatalln(fileName, "incorrect")
+		}
+		page, err := strconv.Atoi(submatch[1])
+		if err != nil {
+			log.Fatalln(err)
+		}
+
 		filePath := dirPath + "/" + fileName
 		log.Println(filePath)
 
@@ -128,7 +138,17 @@ func parseDir(tx *sql.Tx, ts string) {
 				}
 			}
 			_, err := tx.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
-				ts, rankingType, rank,score, viewer_id)
+				ts, rankingType, rank, score, viewer_id)
+			if err != nil {
+				log.Println("db insert err", err)
+			}
+		}
+
+		// fill zeros
+		for rank := (page-1)*10 + 1 + len(local_rank_list); rank <= (page-1)*10 + 10; rank++ {
+			// rank, 0, 0
+			_, err := tx.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
+			ts, rankingType, rank, 0, 0)
 			if err != nil {
 				log.Println("db insert err", err)
 			}
