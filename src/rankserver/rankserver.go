@@ -147,7 +147,6 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/q", r.qHandler)
 	http.HandleFunc("/log", r.logHandler)
 	http.HandleFunc("/qchart", r.qchartHandler)
-	http.HandleFunc("/d", r.dataHandler)
 	http.HandleFunc("/static/", r.staticHandler)
 	// API/plaintext
 	http.HandleFunc("/twitter", r.twitterHandler)
@@ -155,6 +154,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/twitter_trophy", r.twitterTrophyHandler)
 	http.HandleFunc("/res_ver", r.res_verHandler)
 	http.HandleFunc("/latest_data", r.latestDataHandler)
+	http.HandleFunc("/d", r.dataHandler)
 }
 
 // tag: database, sqlite
