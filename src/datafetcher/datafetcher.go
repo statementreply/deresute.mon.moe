@@ -11,7 +11,6 @@ import (
 	"log"
 	"os"
 	"resource_mgr"
-	"strconv"
 	"time"
 	ts "timestamp"
 )
@@ -196,17 +195,9 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	// write to df.db
 	for _, value := range ranking_list {
 		vmap := value.(map[interface{}]interface{})
-		rank := vmap["rank"].(uint64)
-		score := vmap["score"].(uint64)
-		viewer_id, ok := vmap["user_info"].(map[interface{}]interface{})["viewer_id"].(uint64)
-		if !ok {
-			// try string
-			viewer_id_str := vmap["user_info"].(map[interface{}]interface{})["viewer_id"].(string)
-			viewer_id, err = strconv.ParseUint(viewer_id_str, 10, 64)
-			if err != nil {
-				log.Fatalln(err)
-			}
-		}
+		rank := vmap["rank"]
+		score := vmap["score"]
+		viewer_id := vmap["user_info"].(map[interface{}]interface{})["viewer_id"]
 		_, err := df.db.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
 			server_timestamp,
 			ranking_type,
