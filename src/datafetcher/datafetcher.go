@@ -168,9 +168,14 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	row := df.db.QueryRow("SELECT timestamp FROM timestamp WHERE timestamp == $1", local_timestamp)
 	err := row.Scan(&ts_discard)
 	if err != nil {
-		log.Println("not exist", local_timestamp, err)
-		// sql miss
-		hit = false
+		if err == sql.ErrNoRows {
+			log.Println("not exist", local_timestamp, err)
+			// sql miss
+			hit = false
+		} else {
+			log.Println("sql error", err)
+			return "", "", err
+		}
 	} else {
 		log.Println("exist", local_timestamp)
 		// sql hit
@@ -178,9 +183,14 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	row = df.db.QueryRow("SELECT timestamp FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3", local_timestamp, ranking_type, (page-1)*10+1)
 	err = row.Scan(&ts_discard)
 	if err != nil {
-		log.Println("not exist", local_timestamp, err)
-		// sql miss
-		hit = false
+		if err == sql.ErrNoRows {
+			log.Println("not exist", local_timestamp, err)
+			// sql miss
+			hit = false
+		} else {
+			log.Println("sql error", err)
+			return "", "", err
+		}
 	} else {
 		log.Println("exist", local_timestamp)
 		// sql hit
