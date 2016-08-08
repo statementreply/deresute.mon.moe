@@ -25,7 +25,7 @@ var fnFilter = regexp.MustCompile("r\\d{2}\\.(\\d+)$")
 var rankingTypeFilter = regexp.MustCompile("r01\\.\\d+$")
 
 func main() {
-	db, err := sql.Open("sqlite3", RANK_DB)
+	db, err := sql.Open("sqlite3", "file:" + RANK_DB + "?mode=rwc")
 	if err != nil {
 		log.Println("cannot open db", err)
 	}

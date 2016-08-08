@@ -73,7 +73,7 @@ func (df *DataFetcher) Run() error {
 		return nil
 	}
 
-	db, err := sql.Open("sqlite3", df.rankDB)
+	db, err := sql.Open("sqlite3", "file:" + df.rankDB + "?mode=rwc")
 	if err != nil {
 		log.Println("cannot open db", err)
 	}
