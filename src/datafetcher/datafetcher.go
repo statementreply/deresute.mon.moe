@@ -158,6 +158,30 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	local_timestamp := ts.GetLocalTimestamp()
 	dirname := df.rank_cache_dir + local_timestamp + "/"
 	path := dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
+	// FIXME sqlite3 version
+	// query timestamp local_timestamp
+	// query rank local_timestamp, ranking_type, page-to-rank
+	var ts_discard string
+	row := df.db.QueryRow("SELECT timestamp FROM timestamp WHERE timestamp == $1", local_timestamp)
+	err := row.Scan(&ts_discard)
+	if err != nil {
+		log.Println("not exist", local_timestamp, err)
+		// sql miss
+	} else {
+		log.Println("exist", local_timestamp)
+		// sql hit
+	}
+	row = df.db.QueryRow("SELECT timestamp FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3", local_timestamp, ranking_type, (page-1)*10+1)
+	err = row.Scan(&ts_discard)
+	if err != nil {
+		log.Println("not exist", local_timestamp, err)
+		// sql miss
+	} else {
+		log.Println("exist", local_timestamp)
+		// sql hit
+	}
+
+
 	if Exists(path) {
 		// cache hit
 		//log.Println("hit", local_timestamp, ranking_type, page)
