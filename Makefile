@@ -1,4 +1,4 @@
-MAIN := rankserver dfticker twitter_ticker
+MAIN := rankserver dfticker twitter_ticker compress_db
 EXTRA := pcapdump dumpbody unlz4 res get_profile test1 ticker df
 all: ${MAIN}
 extra: ${EXTRA}
@@ -30,7 +30,8 @@ prep:
 	    ln -s ../deresuteme/data; \
 	fi
 
-rankserver: src/resource_mgr/* src/apiclient/*
+compress_db: src/rankserver/*
+rankserver: src/rankserver/* src/resource_mgr/* src/apiclient/*
 dfticker: src/datafetcher/* src/apiclient/* src/resource_mgr/*
 dumpbody: src/apiclient/*
 df: src/datafetcher/* src/apiclient/*
