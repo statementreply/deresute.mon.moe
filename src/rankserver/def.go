@@ -1,0 +1,58 @@
+package rankserver
+
+import (
+	"resource_mgr"
+	"time"
+	"sync"
+	"database/sql"
+	_ "github.com/mattn/go-sqlite3"
+	"log"
+	"net/http"
+	"apiclient"
+)
+
+type qchartParam struct {
+	rankingType int
+	list_rank   []int
+	event       *resource_mgr.EventDetail
+	fancyChart  bool
+}
+
+
+type twitterParam struct {
+	title_suffix string
+	title_speed  string
+	list_rank    []int
+	map_rank     map[int]string
+	rankingType  int
+	interval     time.Duration
+}
+
+type RankServer struct {
+	//    map[timestamp][rankingType][rank] = score
+	// {"1467555420":   [{10: 2034} ,{30: 203021} ]  }
+	speed          map[string][]map[int]float32 // need mux
+	list_timestamp []string                     // need mutex?
+	// for both read and write
+	mux_speed     sync.RWMutex
+	mux_timestamp sync.RWMutex
+	// sql
+	rankDB       string
+	db           *sql.DB
+	logger       *log.Logger
+	keyFile      string
+	certFile     string
+	plainServer  *http.Server
+	tlsServer    *http.Server
+	hostname     string
+	resourceMgr  *resource_mgr.ResourceMgr
+	currentEvent *resource_mgr.EventDetail
+	client       *apiclient.ApiClient
+	lastCheck    time.Time
+	config       map[string]string
+}
+
+
+
+
+

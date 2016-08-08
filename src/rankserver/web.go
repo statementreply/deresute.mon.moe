@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"resource_mgr"
 	"strconv"
 	"strings"
 	"time"
@@ -19,13 +18,6 @@ func (r *RankServer) latestDataHandler(w http.ResponseWriter, req *http.Request)
 func (r *RankServer) init_req(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	r.logger.Printf("[INFO] %T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
-}
-
-type qchartParam struct {
-	rankingType int
-	list_rank   []int
-	event       *resource_mgr.EventDetail
-	fancyChart  bool
 }
 
 func (r *RankServer) generateDURL(param *qchartParam) string {
@@ -639,15 +631,6 @@ func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
 	//r.logger.Println(req.URL, filename, "<"+path+">")
 	r.logger.Println("[INFO] servefile", filename)
 	http.ServeFile(w, req, filename)
-}
-
-type twitterParam struct {
-	title_suffix string
-	title_speed  string
-	list_rank    []int
-	map_rank     map[int]string
-	rankingType  int
-	interval     time.Duration
 }
 
 func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {

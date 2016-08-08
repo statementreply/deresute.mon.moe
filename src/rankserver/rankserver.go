@@ -35,30 +35,6 @@ var LOG_FILE = "rankserver.log"
 var CONFIG_FILE = "rankserver.yaml"
 var SECRET_FILE = "secret.yaml"
 
-type RankServer struct {
-	//    map[timestamp][rankingType][rank] = score
-	// {"1467555420":   [{10: 2034} ,{30: 203021} ]  }
-	speed          map[string][]map[int]float32 // need mux
-	list_timestamp []string                     // need mutex?
-	// for both read and write
-	mux_speed     sync.RWMutex
-	mux_timestamp sync.RWMutex
-	// sql
-	rankDB       string
-	db           *sql.DB
-	logger       *log.Logger
-	keyFile      string
-	certFile     string
-	plainServer  *http.Server
-	tlsServer    *http.Server
-	hostname     string
-	resourceMgr  *resource_mgr.ResourceMgr
-	currentEvent *resource_mgr.EventDetail
-	client       *apiclient.ApiClient
-	lastCheck    time.Time
-	config       map[string]string
-}
-
 func MakeRankServer() *RankServer {
 	r := &RankServer{}
 	r.speed = make(map[string][]map[int]float32)
