@@ -446,6 +446,25 @@ func (r *RankServer) inEvent(timestamp string, event *resource_mgr.EventDetail) 
 
 // tag: database
 func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int {
+	var score int
+	row := r.db.QueryRow("select score from rank where timestamp == $1 and type == $2 and rank == $3", timestamp, rankingType + 1, rank)
+	err := row.Scan(&score)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			score = -1
+		} else {
+			if err != nil {
+				r.logger.Println("sql error", err)
+				score = -1
+			}
+		}
+	}
+	//log.Println(timestamp, rankingType, rank, score)
+	return score
+}
+
+// tag: database
+func (r *RankServer) fetchData_dir(timestamp string, rankingType int, rank int) int {
 	fileName := r.getFilename(timestamp, rankingType, rank)
 	return r.fetchData_internal(timestamp, rankingType, rank, fileName)
 }
