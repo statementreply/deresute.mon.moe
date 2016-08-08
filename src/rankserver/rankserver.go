@@ -41,11 +41,9 @@ var SECRET_FILE = "secret.yaml"
 type RankServer struct {
 	//    map[timestamp][rankingType][rank] = score
 	// {"1467555420":   [{10: 2034} ,{30: 203021} ]  }
-	//data           map[string][]map[int]int     // need mux
 	speed          map[string][]map[int]float32 // need mux
 	list_timestamp []string                     // need mutex?
 	// for both read and write
-	//mux           sync.RWMutex
 	mux_speed     sync.RWMutex
 	mux_timestamp sync.RWMutex
 	// sql
@@ -66,7 +64,6 @@ type RankServer struct {
 
 func MakeRankServer() *RankServer {
 	r := &RankServer{}
-	//r.data = make(map[string][]map[int]int)
 	r.speed = make(map[string][]map[int]float32)
 	//r.list_timestamp doesn't need initialization
 	r.plainServer = nil
@@ -247,43 +244,6 @@ func (r *RankServer) CheckData(timestamp string) {
 	if timestamp == "" {
 		timestamp = latest
 	}
-
-	//r.mux.RLock()
-	//_, ok := r.data[timestamp]
-	//r.mux.RUnlock()
-	/*if !ok {
-		// initialize keyvalue
-		r.mux.Lock()
-		r.data[timestamp] = make([]map[int]int, 2)
-		r.data[timestamp][0] = make(map[int]int)
-		r.data[timestamp][1] = make(map[int]int)
-		r.mux.Unlock()
-	*/
-
-	/*rows, err := r.db.Query("SELECT type, rank, score FROM rank WHERE timestamp == $1", timestamp)
-	if err != nil {
-		r.logger.Println("sql error", err)
-		return
-	}
-	defer rows.Close()
-	//r.mux.Lock()
-	for rows.Next() {
-		var rankingType, rank, score int
-		err = rows.Scan(&rankingType, &rank, &score)
-		if err != nil {
-			r.logger.Println("sql error", err)
-			//r.mux.Unlock()
-			return
-		}
-		rankingType -= 1 // 1,2 in sqlite, 0,1 here
-		//r.data[timestamp][rankingType][rank] = score
-	}
-	//r.mux.Unlock()
-	err = rows.Err()
-	if err != nil {
-		r.logger.Println("sql error", err)
-		return
-	}*/
 }
 
 func (r *RankServer) inEvent(timestamp string, event *resource_mgr.EventDetail) bool {
@@ -460,19 +420,6 @@ func (r *RankServer) run() {
 	}()
 }
 
-/* tag: old
-func (r *RankServer) dumpData() string {
-	r.mux.RLock()
-	yy, err := yaml.Marshal(r.data)
-	r.mux.RUnlock()
-	if err != nil {
-		log.Println(err)
-		return ""
-	}
-	return string(yy)
-}
-*/
-
 func (r *RankServer) latestData() string {
 	timestamp := r.latestTimestamp()
 	return r.showData(timestamp)
@@ -502,13 +449,6 @@ func (r *RankServer) GetListTimestamp() []string {
 }
 
 func (r *RankServer) get_list_rank(timestamp string, rankingType int) []int {
-	//r.mux.RLock()
-	//local_map := r.data[timestamp][rankingType]
-	//list_rank := make([]int, 0, len(local_map))
-	//for k := range local_map {
-	//	list_rank = append(list_rank, k)
-	//}
-	//r.mux.RUnlock()
 	list_rank := r.fetchDataListRank(timestamp, rankingType)
 	sort.Ints(list_rank)
 	return list_rank
