@@ -154,7 +154,6 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/d", r.dataHandler)
 }
 
-
 func (r *RankServer) latestTimestamp() string {
 	r.UpdateTimestamp()
 	var latest string
@@ -267,8 +266,6 @@ func (r *RankServer) latestData() string {
 	timestamp := r.latestTimestamp()
 	return r.showData(timestamp)
 }
-
-
 
 func (r *RankServer) showData(timestamp string) string {
 	item := r.fetchDataSlice(timestamp)
@@ -397,7 +394,6 @@ func (r *RankServer) rankData_list_e(rankingType int, list_rank []int, event *re
 func (r *RankServer) speedData_list_e(rankingType int, list_rank []int, event *resource_mgr.EventDetail) string {
 	return r.rankData_list_f_e(rankingType, list_rank, r.getSpeed_i, event)
 }
-
 
 func Main() {
 	log.Print("RankServer running")

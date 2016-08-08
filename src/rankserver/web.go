@@ -1,6 +1,5 @@
 package rankserver
 
-
 import (
 	"fmt"
 	"net/http"
@@ -13,11 +12,9 @@ import (
 	"unicode/utf8"
 )
 
-
 func (r *RankServer) latestDataHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, r.latestData())
 }
-
 
 func (r *RankServer) init_req(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
@@ -261,10 +258,6 @@ func (r *RankServer) postload_html(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "</html>")
 }
 
-
-
-
-
 var timestampFilter = regexp.MustCompile("^\\d+$")
 
 func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
@@ -287,8 +280,6 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 }
-
-
 
 func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload_html(w, req, &qchartParam{
@@ -340,8 +331,6 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "</pre>")
 }
 
-
-
 func (r *RankServer) chartSnippet() string {
 	// insert graph here
 	return `
@@ -350,8 +339,6 @@ func (r *RankServer) chartSnippet() string {
 <div class="ui-block-b" id="mySpeedChart">loading...</div>
 </div>`
 }
-
-
 
 // mobile landscape optimized
 func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
@@ -404,7 +391,6 @@ setMForm();
 `)
 }
 
-
 func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload_html(w, req, nil)
 	defer r.postload_html(w, req)
@@ -421,8 +407,6 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	fmt.Fprintf(w, `</table>`)
 }
-
-
 
 func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	r.UpdateTimestamp()
@@ -515,8 +499,6 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 		r.jsonData(rankingType, list_rank, r.getSpeed_i, event),
 		"]\n")
 }
-
-
 
 func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	r.CheckData("")
@@ -642,8 +624,6 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, `<div class="note"><p>javascript library from <code>https://www.gstatic.com/charts/loader.js</code></p></div>`)
 }
 
-
-
 var staticFilter = regexp.MustCompile("^/static")
 
 func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
@@ -660,8 +640,6 @@ func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
 	r.logger.Println("[INFO] servefile", filename)
 	http.ServeFile(w, req, filename)
 }
-
-
 
 type twitterParam struct {
 	title_suffix string
@@ -838,4 +816,3 @@ func (r *RankServer) redirectHandler(w http.ResponseWriter, req *http.Request) {
 	req.URL.Scheme = "https"
 	http.Redirect(w, req, req.URL.String(), http.StatusMovedPermanently)
 }
-

@@ -1,9 +1,9 @@
 package rankserver
 
 import (
-	"sort"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
+	"sort"
 	"time"
 	ts "timestamp"
 )
@@ -57,7 +57,6 @@ func (r *RankServer) checkDir(timestamp string) bool {
 	}
 }
 
-
 // tag: database, sqlite
 func (r *RankServer) CheckData(timestamp string) {
 	r.UpdateTimestamp()
@@ -82,7 +81,6 @@ func (r *RankServer) CheckData(timestamp string) {
 		timestamp = latest
 	}
 }
-
 
 // tag: database
 func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int {
@@ -130,8 +128,6 @@ func (r *RankServer) fetchDataListRank(timestamp string, rankingType int) []int 
 	}
 	return listRank
 }
-
-
 
 // tag: database
 func (r *RankServer) fetchDataSlice(timestamp string) []map[int]int {
