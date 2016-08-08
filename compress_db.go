@@ -9,7 +9,13 @@ import (
 	sqlite3 "github.com/mattn/go-sqlite3"
 	"regexp"
 	"gopkg.in/yaml.v2"
+	"strconv"
 )
+
+// TODO primary key
+// table timestamp (timestamp) key (timestamp)
+// table rank (timestamp, type, rank score id)  key (timestamp, type rank)
+
 
 var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
@@ -25,14 +31,14 @@ func main() {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS rank (timestamp TEXT, type INTEGER, rank INTEGER, score INTEGER, viewer_id INTEGER);")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS rank (timestamp TEXT, type INTEGER, rank INTEGER, score INTEGER, viewer_id INTEGER, PRIMARY KEY(timestamp, type, rank));")
 	if err != nil {
 		log.Println("create table", err)
 		log.Printf("%#v", err)
 		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
 	}
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS timestamp (timestamp TEXT UNIQUE);")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS timestamp (timestamp TEXT, PRIMARY KEY('timestamp'));")
 	if err != nil {
 		log.Println("create table", err)
 		log.Printf("%#v", err)
@@ -61,6 +67,12 @@ func main() {
 }
 
 func parseDir(db *sql.DB, ts string) {
+	tx, err := db.Begin()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+
 	dirPath := RANK_CACHE_DIR + ts
 	fiList, err := ioutil.ReadDir(dirPath)
 	if err != nil {
@@ -103,12 +115,21 @@ func parseDir(db *sql.DB, ts string) {
 			var viewer_id int
 			score = user["score"].(int)
 			rank = user["rank"].(int)
-			viewer_id = user["user_info"].(map[interface{}]interface{})["viewer_id"].(int)
-			_, err := db.Exec("INSERT INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
+			viewer_id, ok := user["user_info"].(map[interface{}]interface{})["viewer_id"].(int)
+			if !ok {
+				// try string
+				viewer_id_str := user["user_info"].(map[interface{}]interface{})["viewer_id"].(string)
+				viewer_id, err = strconv.Atoi(viewer_id_str)
+				if err != nil {
+					log.Fatalln(err)
+				}
+			}
+			_, err := tx.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
 				ts, rankingType, rank,score, viewer_id)
 			if err != nil {
 				log.Println("db insert err", err)
 			}
 		}
 	}
+	tx.Commit()
 }
