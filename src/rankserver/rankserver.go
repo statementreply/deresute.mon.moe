@@ -193,6 +193,7 @@ func (r *RankServer) UpdateTimestamp() {
 	r.mux_timestamp.Unlock()
 }
 
+/*
 // tag: database
 func (r *RankServer) UpdateTimestamp_dir() {
 	dir, err := os.Open(RANK_CACHE_DIR)
@@ -222,6 +223,7 @@ func (r *RankServer) UpdateTimestamp_dir() {
 	sort.Strings(r.list_timestamp)
 	r.mux_timestamp.Unlock()
 }
+*/
 
 func (r *RankServer) latestTimestamp() string {
 	r.UpdateTimestamp()
@@ -258,6 +260,7 @@ func (r *RankServer) checkDir(timestamp string) bool {
 	}
 }
 
+/*
 // true: nonempty; false: empty
 // tag: database
 func (r *RankServer) checkDir_dir(timestamp string) bool {
@@ -280,6 +283,7 @@ func (r *RankServer) checkDir_dir(timestamp string) bool {
 		return false
 	}
 }
+*/
 
 // tag: database, sqlite
 func (r *RankServer) CheckData(timestamp string) {
@@ -344,6 +348,7 @@ func (r *RankServer) CheckData(timestamp string) {
 }
 
 
+/*
 // tag: database
 func (r *RankServer) CheckData_dir(timestamp string) {
 	r.UpdateTimestamp()
@@ -391,6 +396,7 @@ func (r *RankServer) CheckData_dir(timestamp string) {
 		r.fetchData(timestamp, rankingType, rank)
 	}
 }
+*/
 
 func (r *RankServer) getFilename(timestamp string, rankingType, rank int) string {
 	subdirPath := RANK_CACHE_DIR + timestamp + "/"
@@ -438,6 +444,7 @@ func (r *RankServer) inEvent(timestamp string, event *resource_mgr.EventDetail) 
 	}
 }
 
+// tag: database
 func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int {
 	fileName := r.getFilename(timestamp, rankingType, rank)
 	return r.fetchData_internal(timestamp, rankingType, rank, fileName)
