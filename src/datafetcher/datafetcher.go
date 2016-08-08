@@ -3,14 +3,15 @@ package datafetcher
 import (
 	"apiclient"
 	"database/sql"
-	sqlite3 "github.com/mattn/go-sqlite3"
 	"errors"
 	"fmt"
+	sqlite3 "github.com/mattn/go-sqlite3"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"os"
 	"resource_mgr"
+	"strconv"
 	"time"
 	ts "timestamp"
 )
@@ -93,7 +94,6 @@ func (df *DataFetcher) Run() error {
 		log.Printf("%#v", err)
 		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
 	}
-
 
 	for _, key := range df.key_point {
 		//log.Println("rankingtype:", key[0], "rank:", key[1])
@@ -196,9 +196,17 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	// write to df.db
 	for _, value := range ranking_list {
 		vmap := value.(map[interface{}]interface{})
-		rank := vmap["rank"]
-		score := vmap["score"]
-		viewer_id := vmap["user_info"].(map[interface{}]interface{})["viewer_id"]
+		rank := vmap["rank"].(int)
+		score := vmap["score"].(int)
+		viewer_id, ok := vmap["user_info"].(map[interface{}]interface{})["viewer_id"].(int)
+		if !ok {
+			// try string
+			viewer_id_str := vmap["user_info"].(map[interface{}]interface{})["viewer_id"].(string)
+			viewer_id, err = strconv.Atoi(viewer_id_str)
+			if err != nil {
+				log.Fatalln(err)
+			}
+		}
 		_, err := df.db.Exec("INSERT INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
 			server_timestamp,
 			ranking_type,
