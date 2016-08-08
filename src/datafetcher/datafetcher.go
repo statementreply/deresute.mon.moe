@@ -195,6 +195,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	// write to df.db
 	for _, value := range ranking_list {
 		vmap := value.(map[interface{}]interface{})
+		// interface FIXME
 		rank := vmap["rank"]
 		score := vmap["score"]
 		viewer_id := vmap["user_info"].(map[interface{}]interface{})["viewer_id"]
