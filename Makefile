@@ -30,7 +30,6 @@ prep:
 	    ln -s ../deresuteme/data; \
 	fi
 
-compress_db: src/rankserver/*
 rankserver: src/rankserver/* src/resource_mgr/* src/apiclient/*
 dfticker: src/datafetcher/* src/apiclient/* src/resource_mgr/*
 dumpbody: src/apiclient/*
