@@ -26,7 +26,6 @@ import (
 var wg sync.WaitGroup
 
 var BASE string = path.Dir(os.Args[0])
-//var RANK_CACHE_DIR string = BASE + "/data/rank/"
 var RANK_DB string = BASE + "/data/rank.db"
 var RESOURCE_CACHE_DIR string = BASE + "/data/resourcesbeta/"
 
@@ -322,20 +321,6 @@ func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) in
 	return r.fetchData(timestamp, rankingType, rank)
 }
 
-/* tag: old
-func (r *RankServer) isLocked(fileName string) bool {
-	lockFile := "lock"
-	dirname := path.Base(fileName)
-	lockPath := path.Join(dirname, lockFile)
-	_, err := os.Stat(lockPath)
-	if (err != nil) && (os.IsNotExist(err)) {
-		return false
-	} else {
-		return true
-	}
-}
-*/
-
 // speed per hour
 func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float32 {
 	r.mux_speed.RLock()
@@ -437,18 +422,6 @@ func (r *RankServer) showData(timestamp string) string {
 	st := ts.FormatTimestamp(timestamp)
 	return timestamp + "\n" + st + "\n" + string(yy)
 }
-
-/* tag: old
-// dangerous
-func (r *RankServer) GetData(timestamp string) []map[int]int {
-	r.mux.RLock()
-	//local_data := make([]map[int]int, 2)
-	//copy(local_data[0], r.data[timestamp][0])
-	//copy(local_data[1], r.data[timestamp][1])
-	r.mux.RUnlock()
-	return r.data[timestamp]
-}
-*/
 
 func (r *RankServer) GetListTimestamp() []string {
 	r.mux_timestamp.RLock()
