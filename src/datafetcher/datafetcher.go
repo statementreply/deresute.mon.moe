@@ -196,13 +196,13 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	// write to df.db
 	for _, value := range ranking_list {
 		vmap := value.(map[interface{}]interface{})
-		rank := vmap["rank"].(int)
-		score := vmap["score"].(int)
-		viewer_id, ok := vmap["user_info"].(map[interface{}]interface{})["viewer_id"].(int)
+		rank := vmap["rank"].(uint64)
+		score := vmap["score"].(uint64)
+		viewer_id, ok := vmap["user_info"].(map[interface{}]interface{})["viewer_id"].(uint64)
 		if !ok {
 			// try string
 			viewer_id_str := vmap["user_info"].(map[interface{}]interface{})["viewer_id"].(string)
-			viewer_id, err = strconv.Atoi(viewer_id_str)
+			viewer_id, err = strconv.ParseUint(viewer_id_str, 10, 64)
 			if err != nil {
 				log.Fatalln(err)
 			}
