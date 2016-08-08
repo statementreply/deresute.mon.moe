@@ -463,16 +463,19 @@ func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int 
 	return score
 }
 
+/*
 // tag: database
 func (r *RankServer) fetchData_dir(timestamp string, rankingType int, rank int) int {
 	fileName := r.getFilename(timestamp, rankingType, rank)
 	return r.fetchData_internal(timestamp, rankingType, rank, fileName)
 }
+*/
 
 func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) interface{} {
 	return r.fetchData(timestamp, rankingType, rank)
 }
 
+/*
 // tag: database
 func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank int, fileName string) int {
 	r.mux.RLock()
@@ -529,6 +532,7 @@ func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank 
 	r.mux.Unlock()
 	return score
 }
+*/
 
 func (r *RankServer) isLocked(fileName string) bool {
 	lockFile := "lock"
