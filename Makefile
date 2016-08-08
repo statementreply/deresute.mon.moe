@@ -20,9 +20,6 @@ fetch: dfticker
 
 twitter: twitter_ticker
 	./twitter_ticker
-#	perl periodic_twitter.pl cached_status https://deresuteborder.mon.moe/twitter 60
-#twitter2:
-#	perl periodic_twitter.pl cached_status_emblem https://deresuteborder.mon.moe/twitter_emblem 3600
 
 
 prep:
