@@ -193,38 +193,6 @@ func (r *RankServer) UpdateTimestamp() {
 	r.mux_timestamp.Unlock()
 }
 
-/*
-// tag: database
-func (r *RankServer) UpdateTimestamp_dir() {
-	dir, err := os.Open(RANK_CACHE_DIR)
-	if err != nil {
-		// FIXME
-		r.logger.Println("rank cache dir doesnt exist", RANK_CACHE_DIR, err)
-		os.MkdirAll(RANK_CACHE_DIR, 0755)
-		return
-	}
-	defer dir.Close()
-
-	fi, err := dir.Readdir(0)
-	if err != nil {
-		// FIXME
-		r.logger.Println(err)
-		return
-	}
-	r.mux_timestamp.Lock()
-	r.list_timestamp = make([]string, 0, len(fi))
-	// sub: dir name 1467555420
-	for _, sub := range fi {
-		subdirName := sub.Name()
-		if dirNameFilter.MatchString(subdirName) {
-			r.list_timestamp = append(r.list_timestamp, sub.Name())
-		}
-	}
-	sort.Strings(r.list_timestamp)
-	r.mux_timestamp.Unlock()
-}
-*/
-
 func (r *RankServer) latestTimestamp() string {
 	r.UpdateTimestamp()
 	var latest string
@@ -259,31 +227,6 @@ func (r *RankServer) checkDir(timestamp string) bool {
 		return true
 	}
 }
-
-/*
-// true: nonempty; false: empty
-// tag: database
-func (r *RankServer) checkDir_dir(timestamp string) bool {
-	subdirPath := RANK_CACHE_DIR + timestamp + "/"
-	subdir, err := os.Open(subdirPath)
-	if err != nil {
-		// FIXME
-		r.logger.Println("opendir", err)
-		return false
-	}
-	defer subdir.Close()
-	key, err := subdir.Readdir(0)
-	if err != nil {
-		r.logger.Println("readdir", err)
-		return false
-	}
-	if len(key) > 0 {
-		return true
-	} else {
-		return false
-	}
-}
-*/
 
 // tag: database, sqlite
 func (r *RankServer) CheckData(timestamp string) {
@@ -347,56 +290,6 @@ func (r *RankServer) CheckData(timestamp string) {
 	}
 }
 
-
-/*
-// tag: database
-func (r *RankServer) CheckData_dir(timestamp string) {
-	r.UpdateTimestamp()
-	latest := r.latestTimestamp()
-	latest_time := time.Unix(0, 0)
-	if latest != "" {
-		latest_time = ts.TimestampToTime(latest)
-	}
-	// check new res_ver
-	// FIXME need some test
-	if (time.Now().Sub(r.lastCheck) >= 5*time.Hour/2) || ((r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 2*time.Hour)) {
-		r.logger.Println("recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
-		r.client.LoadCheck()
-		rv := r.client.Get_res_ver()
-		r.resourceMgr.Set_res_ver(rv)
-		r.resourceMgr.ParseEvent()
-		r.currentEvent = r.resourceMgr.FindCurrentEvent()
-		r.lastCheck = time.Now()
-	}
-
-	if timestamp == "" {
-		timestamp = latest
-	}
-	subdirPath := RANK_CACHE_DIR + timestamp + "/"
-
-	subdir, err := os.Open(subdirPath)
-	if err != nil {
-		r.logger.Println("opendir", err)
-		return
-	}
-	defer subdir.Close()
-
-	key, err := subdir.Readdir(0)
-	if err != nil {
-		r.logger.Println("readdir", err)
-		return
-	}
-	for _, pt := range key {
-		rankingType := r.RankingType(pt.Name())
-		rank := r.FilenameToRank(pt.Name())
-		if rank == 0 {
-			// lock file
-			continue
-		}
-		r.fetchData(timestamp, rankingType, rank)
-	}
-}
-*/
 
 func (r *RankServer) getFilename(timestamp string, rankingType, rank int) string {
 	subdirPath := RANK_CACHE_DIR + timestamp + "/"
@@ -463,76 +356,9 @@ func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int 
 	return score
 }
 
-/*
-// tag: database
-func (r *RankServer) fetchData_dir(timestamp string, rankingType int, rank int) int {
-	fileName := r.getFilename(timestamp, rankingType, rank)
-	return r.fetchData_internal(timestamp, rankingType, rank, fileName)
-}
-*/
-
 func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) interface{} {
 	return r.fetchData(timestamp, rankingType, rank)
 }
-
-/*
-// tag: database
-func (r *RankServer) fetchData_internal(timestamp string, rankingType int, rank int, fileName string) int {
-	r.mux.RLock()
-	_, ok := r.data[timestamp]
-	r.mux.RUnlock()
-	if !ok {
-		// initialize keyvalue
-		r.mux.Lock()
-		r.data[timestamp] = make([]map[int]int, 2)
-		r.data[timestamp][0] = make(map[int]int)
-		r.data[timestamp][1] = make(map[int]int)
-		r.mux.Unlock()
-	} else {
-		r.mux.RLock()
-		score, ok := r.data[timestamp][rankingType][rank]
-		r.mux.RUnlock()
-		if ok {
-			return score
-		}
-	}
-
-	if r.isLocked(fileName) {
-		r.logger.Println("data/rank/... locked, return -1")
-		return -1
-	}
-
-	content, err := ioutil.ReadFile(fileName)
-	if err != nil {
-		// file doesn't exist?
-		// return -1 for missing data
-		//r.logger.Println(err, "return -1")
-		return -1
-	}
-	// potential read/write race
-	if len(content) == 0 {
-		r.logger.Println(fileName, "empty content return -1")
-		return -1
-	}
-
-	var local_rank_list []map[string]interface{}
-	err = yaml.Unmarshal(content, &local_rank_list)
-	if err != nil {
-		r.logger.Println("YAML error, return -1", err)
-		return -1
-	}
-
-	var score int
-	score = 0
-	if len(local_rank_list) > 0 {
-		score = local_rank_list[0]["score"].(int)
-	}
-	r.mux.Lock()
-	r.data[timestamp][rankingType][rank] = score
-	r.mux.Unlock()
-	return score
-}
-*/
 
 func (r *RankServer) isLocked(fileName string) bool {
 	lockFile := "lock"
