@@ -333,7 +333,9 @@ func (r *RankServer) fetchDataListRank(timestamp string, rankingType int) []int 
 			r.logger.Println("sql error", err)
 			return nil
 		}
-		listRank = append(listRank, rank)
+		if rank % 10 == 1 {
+			listRank = append(listRank, rank)
+		}
 	}
 	err = rows.Err()
 	if err != nil {
@@ -365,7 +367,9 @@ func (r *RankServer) fetchDataSlice(timestamp string) []map[int]int {
 			return nil
 		}
 		rankingType -= 1
-		slice[rankingType][rank] = score
+		if rank % 10 == 1 {
+			slice[rankingType][rank] = score
+		}
 	}
 	err = rows.Err()
 	if err != nil {
