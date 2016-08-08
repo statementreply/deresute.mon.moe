@@ -859,6 +859,7 @@ func (r *RankServer) postload_html(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "</html>")
 }
 
+var timestampFilter = regexp.MustCompile("^\\d+$")
 func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload_html(w, req, nil)
 	defer r.postload_html(w, req)
@@ -866,13 +867,17 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 	defer fmt.Fprint(w, "</pre>")
 	//fmt.Fprint( w, r.dumpData() )
 	req.ParseForm()
-	timestamp, ok := req.Form["t"]
+	timestamp, ok := req.Form["t"]  // format checked
 	if !ok {
 		r.CheckData("")
 		fmt.Fprint(w, r.latestData())
 	} else {
-		r.CheckData(timestamp[0])
-		fmt.Fprint(w, r.showData(timestamp[0]))
+		if timestampFilter.MatchString(timestamp[0]) {
+			r.CheckData(timestamp[0])
+			fmt.Fprint(w, r.showData(timestamp[0]))
+		} else {
+			r.logger.Println("bad req", req.Form)
+		}
 	}
 }
 
@@ -1021,7 +1026,7 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 
 	// parse parameters
 	req.ParseForm()
-	list_rank_str, ok := req.Form["rank"]
+	list_rank_str, ok := req.Form["rank"] // format checked, split, strconv.Atoi
 	var list_rank []int
 	if ok {
 		list_rank = make([]int, 0, len(list_rank_str))
@@ -1040,7 +1045,7 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 		list_rank = []int{60001, 120001}
 	}
 
-	event_id_str_list, ok := req.Form["event"]
+	event_id_str_list, ok := req.Form["event"]  // checked Atoi
 	event := r.currentEvent
 	// this block output: prefill_event, event
 	if ok {
@@ -1068,7 +1073,7 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	var rankingType int
-	rankingType_str_list, ok := req.Form["type"]
+	rankingType_str_list, ok := req.Form["type"] // checked Atoi
 	if ok {
 		rankingType_str := rankingType_str_list[0]
 		rankingType_i, err := strconv.Atoi(rankingType_str)
@@ -1100,7 +1105,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 
 	// parse parameters
 	req.ParseForm()
-	list_rank_str, ok := req.Form["rank"]
+	list_rank_str, ok := req.Form["rank"] // format checked split, strconv.Atoi
 	var list_rank []int
 	if ok {
 		list_rank = make([]int, 0, len(list_rank_str))
@@ -1119,7 +1124,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 		list_rank = []int{60001, 120001}
 	}
 
-	event_id_str_list, ok := req.Form["event"]
+	event_id_str_list, ok := req.Form["event"]  // checked Atoi
 	event := r.currentEvent
 	var prefill_event string = ""
 	// this block output: prefill_event, event
@@ -1151,7 +1156,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	var rankingType int
-	rankingType_str_list, ok := req.Form["type"]
+	rankingType_str_list, ok := req.Form["type"] // checked Atoi
 	if ok {
 		rankingType_str := rankingType_str_list[0]
 		rankingType_i, err := strconv.Atoi(rankingType_str)
@@ -1170,7 +1175,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 
 	fancyChart := false
 	fancyChart_checked := ""
-	fancyChart_str_list, ok := req.Form["achart"]
+	fancyChart_str_list, ok := req.Form["achart"] // ignored, len
 	if ok {
 		fancyChart_str := fancyChart_str_list[0]
 		if len(fancyChart_str) > 0 {
