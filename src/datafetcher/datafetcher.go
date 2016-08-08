@@ -158,6 +158,9 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	local_timestamp := ts.GetLocalTimestamp()
 	dirname := df.rank_cache_dir + local_timestamp + "/"
 	path := dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
+
+	hit := true
+
 	// FIXME sqlite3 version
 	// query timestamp local_timestamp
 	// query rank local_timestamp, ranking_type, page-to-rank
@@ -167,6 +170,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	if err != nil {
 		log.Println("not exist", local_timestamp, err)
 		// sql miss
+		hit = false
 	} else {
 		log.Println("exist", local_timestamp)
 		// sql hit
@@ -176,6 +180,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	if err != nil {
 		log.Println("not exist", local_timestamp, err)
 		// sql miss
+		hit = false
 	} else {
 		log.Println("exist", local_timestamp)
 		// sql hit
@@ -185,13 +190,18 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	if Exists(path) {
 		// cache hit
 		//log.Println("hit", local_timestamp, ranking_type, page)
-		return local_timestamp, "-", nil
 	} else {
+		hit = false
 		// cache miss
 		if !Exists(dirname) {
 			os.Mkdir(dirname, 0755)
 		}
 	}
+
+	if hit {
+		return local_timestamp, "-", nil
+	}
+
 	time.Sleep(1020 * time.Millisecond)
 	ranking_list, servertime, err := df.GetPage(event_type, ranking_type, page)
 	if err != nil {
