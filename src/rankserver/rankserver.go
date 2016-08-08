@@ -1355,6 +1355,11 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 				}
 			}
 		}
+		if isFinal {
+			r.logger.Println("isFinal debug", "timestamp", timestamp)
+			r.logger.Println("isFinal debug", "timestamp_prev", timestamp_prev)
+		}
+
 		border_prev := r.fetchData(timestamp_prev, rankingType, rank)
 		delta := -1
 		if border < 0 {
