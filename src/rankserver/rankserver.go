@@ -494,6 +494,16 @@ func (r *RankServer) showData(timestamp string) string {
 	return timestamp + "\n" + st + "\n" + string(yy)
 }
 
+// dangerous
+func (r *RankServer) GetData(timestamp string) []map[int]int {
+	r.mux.RLock()
+	//local_data := make([]map[int]int, 2)
+	//copy(local_data[0], r.data[timestamp][0])
+	//copy(local_data[1], r.data[timestamp][1])
+	r.mux.RUnlock()
+	return r.data[timestamp]
+}
+
 func (r *RankServer) GetListTimestamp() []string {
 	r.mux_timestamp.RLock()
 	local_timestamp := make([]string, len(r.list_timestamp))
