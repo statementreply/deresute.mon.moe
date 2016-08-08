@@ -239,8 +239,29 @@ func (r *RankServer) latestTimestamp() string {
 }
 
 // true: nonempty; false: empty
-// tag: database
+// tag: database, sqlite
 func (r *RankServer) checkDir(timestamp string) bool {
+	var ts_discard string
+	row := r.db.QueryRow("select timestamp from rank where timestamp == $1", timestamp)
+	err := row.Scan(&ts_discard)
+	// FIXME err
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false
+		} else {
+			r.logger.Println("sql error", err)
+			return false
+		}
+	} else {
+		// row exists
+		return true
+	}
+
+}
+
+// true: nonempty; false: empty
+// tag: database
+func (r *RankServer) checkDir_dir(timestamp string) bool {
 	subdirPath := RANK_CACHE_DIR + timestamp + "/"
 	subdir, err := os.Open(subdirPath)
 	if err != nil {
