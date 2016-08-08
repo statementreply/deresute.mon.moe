@@ -3,6 +3,8 @@ package rankserver
 import (
 	"apiclient"
 	"crypto/tls"
+	"database/sql"
+	_ "github.com/mattn/go-sqlite3"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -25,6 +27,7 @@ var wg sync.WaitGroup
 
 var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
+var RANK_DB string = BASE + "/data/rank.db"
 var RESOURCE_CACHE_DIR string = BASE + "/data/resourcesbeta/"
 
 // 15min update interval
@@ -49,6 +52,9 @@ type RankServer struct {
 	mux           sync.RWMutex
 	mux_speed     sync.RWMutex
 	mux_timestamp sync.RWMutex
+	// sql
+	rankDB        string
+	db			  *sql.DB
 	logger        *log.Logger
 	keyFile       string
 	certFile      string
@@ -89,6 +95,12 @@ func MakeRankServer() *RankServer {
 		log.Fatalln("open log file", err)
 	}
 	r.logger = log.New(fh, "", log.LstdFlags)
+
+	r.rankDB = RANK_DB
+	r.db, err = sql.Open("sqlite3", "file:" + r.rankDB + "?mode=ro")
+	if err != nil {
+		r.logger.Fatalln("sql error", err)
+	}
 
 	r.keyFile, ok = config["KEY_FILE"]
 	if !ok {
@@ -152,8 +164,37 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/latest_data", r.latestDataHandler)
 }
 
-// tag: database
+// tag: database, sqlite
 func (r *RankServer) UpdateTimestamp() {
+	rows, err := r.db.Query("SELECT timestamp from timestamp")
+	if err != nil {
+		r.logger.Println("sql error", err)
+		return
+	}
+	defer rows.Close()
+	var local_list_timestamp []string
+	for rows.Next() {
+		var ts string
+		err = rows.Scan(&ts)
+		if err != nil {
+			r.logger.Println("sql error", err)
+			return
+		}
+		local_list_timestamp = append(local_list_timestamp, ts)
+	}
+	err = rows.Err()
+	if err != nil {
+		r.logger.Println("sql error", err)
+		return
+	}
+	r.mux_timestamp.Lock()
+	r.list_timestamp = local_list_timestamp
+	sort.Strings(r.list_timestamp)
+	r.mux_timestamp.Unlock()
+}
+
+// tag: database
+func (r *RankServer) UpdateTimestamp_dir() {
 	dir, err := os.Open(RANK_CACHE_DIR)
 	if err != nil {
 		// FIXME
