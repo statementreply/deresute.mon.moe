@@ -256,7 +256,6 @@ func (r *RankServer) checkDir(timestamp string) bool {
 		// row exists
 		return true
 	}
-
 }
 
 // true: nonempty; false: empty
@@ -282,8 +281,71 @@ func (r *RankServer) checkDir_dir(timestamp string) bool {
 	}
 }
 
-// tag: database
+// tag: database, sqlite
 func (r *RankServer) CheckData(timestamp string) {
+	r.UpdateTimestamp()
+	latest := r.latestTimestamp()
+	latest_time := time.Unix(0, 0)
+	if latest != "" {
+		latest_time = ts.TimestampToTime(latest)
+	}
+	// check new res_ver
+	// FIXME need some test
+	if (time.Now().Sub(r.lastCheck) >= 5*time.Hour/2) || ((r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 2*time.Hour)) {
+		r.logger.Println("recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
+		r.client.LoadCheck()
+		rv := r.client.Get_res_ver()
+		r.resourceMgr.Set_res_ver(rv)
+		r.resourceMgr.ParseEvent()
+		r.currentEvent = r.resourceMgr.FindCurrentEvent()
+		r.lastCheck = time.Now()
+	}
+
+	if timestamp == "" {
+		timestamp = latest
+	}
+
+	r.mux.RLock()
+	_, ok := r.data[timestamp]
+	r.mux.RUnlock()
+	if !ok {
+		// initialize keyvalue
+		r.mux.Lock()
+		r.data[timestamp] = make([]map[int]int, 2)
+		r.data[timestamp][0] = make(map[int]int)
+		r.data[timestamp][1] = make(map[int]int)
+		r.mux.Unlock()
+	}
+
+	rows, err := r.db.Query("select type, rank, score from rank where timestamp == $1", timestamp)
+	if err != nil {
+		r.logger.Println("sql error", err)
+		return
+	}
+	defer rows.Close()
+	r.mux.Lock()
+	for rows.Next() {
+		var rankingType, rank, score int
+		err = rows.Scan(&rankingType, &rank, &score)
+		if err != nil {
+			r.logger.Println("sql error", err)
+			r.mux.Unlock()
+			return
+		}
+		rankingType -= 1 // 1,2 in sqlite, 0,1 here
+		r.data[timestamp][rankingType][rank] = score
+	}
+	r.mux.Unlock()
+	err = rows.Err()
+	if err != nil {
+		r.logger.Println("sql error", err)
+		return
+	}
+}
+
+
+// tag: database
+func (r *RankServer) CheckData_dir(timestamp string) {
 	r.UpdateTimestamp()
 	latest := r.latestTimestamp()
 	latest_time := time.Unix(0, 0)
