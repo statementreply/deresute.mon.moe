@@ -221,7 +221,7 @@ func (r *RankServer) checkDir(timestamp string) bool {
 }
 
 // tag: database
-func (r *RankServer) checkData(timestamp string) {
+func (r *RankServer) CheckData(timestamp string) {
 	r.UpdateTimestamp()
 	latest := r.latestTimestamp()
 	latest_time := time.Unix(0, 0)
@@ -878,10 +878,10 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	timestamp, ok := req.Form["t"]
 	if !ok {
-		r.checkData("")
+		r.CheckData("")
 		fmt.Fprint(w, r.latestData())
 	} else {
-		r.checkData(timestamp[0])
+		r.CheckData(timestamp[0])
 		fmt.Fprint(w, r.showData(timestamp[0]))
 	}
 }
@@ -921,7 +921,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 
 	fmt.Fprint(w, "<hr>")
 
-	r.checkData("")
+	r.CheckData("")
 
 	/*
 		fmt.Fprintf(w, "<h3>%s</h3>\n", "最新ボーダー")
@@ -1027,7 +1027,7 @@ func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
-	r.checkData("")
+	r.CheckData("")
 
 	// parse parameters
 	req.ParseForm()
@@ -1106,7 +1106,7 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
-	r.checkData("")
+	r.CheckData("")
 
 	// parse parameters
 	req.ParseForm()
@@ -1313,7 +1313,7 @@ func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Reque
 
 func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Request, param twitterParam) {
 	var status string
-	r.checkData("")
+	r.CheckData("")
 	timestamp := r.latestTimestamp()
 	r.init_req(w, req)
 	var title string
