@@ -30,8 +30,13 @@ prep:
 	    ln -s ../deresuteme/data; \
 	fi
 
-rankserver: src/rankserver/* src/resource_mgr/* src/apiclient/*
-dfticker: src/datafetcher/* src/apiclient/* src/resource_mgr/*
+MYLIB := src/rankserver/* src/resource_mgr/* \
+  src/apiclient/* src/datafetcher/* \
+  src/rijndael/* src/rijndael_wrapper/* \
+  src/timestamp/* src/util/*
+
+rankserver: $(MYLIB)
+dfticker: $(MYLIB)
 dumpbody: src/apiclient/*
 df: src/datafetcher/* src/apiclient/*
 test1: src/apiclient/*
