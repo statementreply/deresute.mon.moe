@@ -193,6 +193,14 @@ func (df *DataFetcher) GetPage(event_type, ranking_type, page int) ([]interface{
 	}
 	log.Println("[INFO] get", servertime, ranking_type, page)
 	ranking_list = resp["data"].(map[interface{}]interface{})["ranking_list"].([]interface{})
+	// save less data
+	for _, value := range ranking_list {
+		vmap := value.(map[interface{}]interface{})
+		delete(vmap, "leader_card_info")
+		viewer_id := vmap["user_info"].(map[interface{}]interface{})["viewer_id"]
+		delete(vmap, "user_info")
+		vmap["user_info"] = map[string]interface{}{"viewer_id": viewer_id}
+	}
 	return ranking_list, servertime, err
 }
 
