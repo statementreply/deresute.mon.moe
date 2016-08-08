@@ -477,6 +477,7 @@ func (r *RankServer) showData(timestamp string) string {
 	r.mux.RLock()
 	item, ok := r.data[timestamp]
 	if !ok {
+		r.mux.RUnlock()
 		return ""
 	}
 	yy, err := yaml.Marshal(item)
