@@ -169,7 +169,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	err := row.Scan(&ts_discard)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Println("not exist", local_timestamp, err)
+			//log.Println("not exist", local_timestamp, err)
 			// sql miss
 			hit = false
 		} else {
@@ -184,7 +184,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	err = row.Scan(&ts_discard)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Println("not exist", local_timestamp, err)
+			//log.Println("not exist", local_timestamp, err)
 			// sql miss
 			hit = false
 		} else {
