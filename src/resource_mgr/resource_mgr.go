@@ -184,7 +184,7 @@ func (r *ResourceMgr) LoadMusic() {
 		err = rows.Scan(&name, &hash)
 		dest, err := r.FetchLz4("dl/resources/Generic//" + hash)
 		if err == nil {
-			log.Println(name, hash, dest)
+			//log.Println(name, hash, dest)
 			r.ParseMusic(dest)
 		}
 	}
@@ -212,7 +212,7 @@ func (r *ResourceMgr) ParseMusic(fileName string) {
 			// not utf8: musicscores/m042/m042_analyzer.bytes
 			if validName.MatchString(name) {
 				dest := r.cache_dir + "/" + name
-				fmt.Println("write to file", dest)
+				//fmt.Println("write to file", dest)
 				if _, err := os.Stat(path.Dir(dest)); err != nil {
 					os.MkdirAll(path.Dir(dest), 0755)
 				}

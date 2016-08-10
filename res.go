@@ -20,6 +20,7 @@ func main() {
 	var config map[string]string
 	yaml.Unmarshal(content, &config)
 
+	log.Println("res_ver", config["res_ver"])
 	r := resource_mgr.NewResourceMgr(config["res_ver"], "data/resourcesbeta")
 	fmt.Println("master is", r.LoadMaster())
 	r.ParseEvent()
@@ -44,4 +45,9 @@ func main() {
 	// l/song_1023.acb
 	d, err = r.Fetch("dl/resources/High/Sound/Common/l/7440496164fa88f65518da9d63601d76")
 	fmt.Println("fetched", d, err)
+
+	// chara_179_00_face_01.unity3d
+	d, err = r.FetchLz4("dl/resources/High/AssetBundles/Android/286775f14f9a9331481535d72c5ede24")
+
+	fmt.Println(d, err)
 }
