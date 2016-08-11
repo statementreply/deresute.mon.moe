@@ -207,25 +207,6 @@ func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) in
 
 // speed per hour
 func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float32 {
-	//r.mux_speed.RLock()
-	//_, ok := r.speed[timestamp]
-	//r.mux_speed.RUnlock()
-
-	/*if !ok {
-		// initialize keyvalue
-		r.mux_speed.Lock()
-		r.speed[timestamp] = make([]map[int]float32, 2)
-		r.speed[timestamp][0] = make(map[int]float32)
-		r.speed[timestamp][1] = make(map[int]float32)
-		r.mux_speed.Unlock()
-	} else {
-		r.mux_speed.RLock()
-		val, ok := r.speed[timestamp][rankingType][rank]
-		r.mux_speed.RUnlock()
-		if ok {
-			return val
-		}
-	}*/
 	t_i := ts.TimestampToTime(timestamp)
 	t_prev := t_i.Add(-INTERVAL)
 	prev_timestamp := ts.TimeToTimestamp(t_prev)
@@ -236,9 +217,6 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
 		// both score are valid
 		// nanoseconds
 		speed := (float32(cur_score - prev_score)) / float32(INTERVAL) * float32(time.Hour)
-		//r.mux_speed.Lock()
-		//r.speed[timestamp][rankingType][rank] = speed
-		//r.mux_speed.Unlock()
 		return speed
 	} else {
 		// one of them is missing data
