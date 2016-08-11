@@ -25,7 +25,8 @@ type DataFetcher struct {
 	Client         *apiclient.ApiClient
 	resourceMgr    *resource_mgr.ResourceMgr
 	key_point      [][2]int
-	rank_cache_dir string
+	// tag: old
+	//rank_cache_dir string
 	rankDB         string
 	db             *sql.DB
 	// prevent duplicate during [resultstart, resultend]
@@ -39,7 +40,8 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_
 	df.Client = client
 	//client.LoadCheck()
 	df.key_point = key_point
-	df.rank_cache_dir = rank_cache_dir
+	// tag: old
+	_ = rank_cache_dir
 	df.rankDB = rank_db
 
 	df.Client.LoadCheck()
@@ -225,8 +227,10 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 
 	//localtime := float64(time.Now().UnixNano()) / 1e9 // for debug
 	local_timestamp := ts.GetLocalTimestamp()
-	dirname := df.rank_cache_dir + local_timestamp + "/"
-	path := dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
+
+	// tag: old
+	//dirname := df.rank_cache_dir + local_timestamp + "/"
+	//path := dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
 
 	hit := true
 
@@ -265,16 +269,16 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 		// sql hit
 	}
 
-	if Exists(path) {
+	//if Exists(path) {
 		// cache hit
 		//log.Println("hit", local_timestamp, ranking_type, page)
-	} else {
-		hit = false
+	//} else {
+		//hit = false
 		// cache miss
-		if !Exists(dirname) {
-			os.Mkdir(dirname, 0755)
-		}
-	}
+		//if !Exists(dirname) {
+		//	os.Mkdir(dirname, 0755)
+		//}
+	//}
 
 	if hit {
 		return local_timestamp, "-", nil
@@ -292,17 +296,17 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 
 	if server_timestamp != local_timestamp {
 		log.Println("[NOTICE] change to server:", server_timestamp, "local:", local_timestamp)
-		dirname = df.rank_cache_dir + server_timestamp + "/"
-		path = dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
-		if !Exists(dirname) {
-			os.Mkdir(dirname, 0755)
-		}
+		//dirname = df.rank_cache_dir + server_timestamp + "/"
+		//path = dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
+		//if !Exists(dirname) {
+		//	os.Mkdir(dirname, 0755)
+		//}
 	}
 	//log.Println("write to path", path)
-	lockfile := dirname + "lock"
-	ioutil.WriteFile(lockfile, []byte(""), 0644)
-	DumpToFile(ranking_list, path)
-	os.Remove(lockfile)
+	//lockfile := dirname + "lock"
+	//ioutil.WriteFile(lockfile, []byte(""), 0644)
+	//DumpToFile(ranking_list, path)
+	//os.Remove(lockfile)
 
 	// write to df.db
 	for _, value := range ranking_list {
