@@ -2,12 +2,24 @@ package rankserver
 
 import (
 	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
+	sqlite3 "github.com/mattn/go-sqlite3"
 	//"resource_mgr"
 	"sort"
 	"time"
 	ts "timestamp"
+	"log"
 )
+
+// tag: database, sqlite
+func (r *RankServer) setCacheSize() {
+	_, err := r.db.Exec("PRAGMA cache_size = -6000;")
+	if err != nil {
+		log.Println("set cache_size", err)
+		log.Printf("%#v", err)
+		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
+	}
+}
+
 
 // tag: database, sqlite
 func (r *RankServer) UpdateTimestamp() {
