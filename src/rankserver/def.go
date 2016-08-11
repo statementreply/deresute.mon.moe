@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"resource_mgr"
+	"stoppableListener"
 	"sync"
 	"time"
 )
@@ -43,6 +44,8 @@ type RankServer struct {
 	certFile     string
 	plainServer  *http.Server
 	tlsServer    *http.Server
+	slHTTP       *stoppableListener.StoppableListener
+	slTLS       *stoppableListener.StoppableListener
 	hostname     string
 	resourceMgr  *resource_mgr.ResourceMgr
 	currentEvent *resource_mgr.EventDetail

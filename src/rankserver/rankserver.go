@@ -10,6 +10,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,6 +18,7 @@ import (
 	"resource_mgr"
 	"runtime/pprof"
 	"sort"
+	"stoppableListener"
 	"strings"
 	"sync"
 	"syscall"
@@ -95,7 +97,9 @@ func MakeRankServer() *RankServer {
 		}
 		r.tlsServer = &http.Server{
 			Addr:      ":4002",
-			TLSConfig: &tls.Config{Certificates: []tls.Certificate{cert}},
+			TLSConfig: &tls.Config{
+				Certificates: []tls.Certificate{cert},
+			},
 		}
 		r.plainServer = &http.Server{Addr: ":4001", Handler: http.NewServeMux()}
 		r.plainServer.Handler.(*http.ServeMux).HandleFunc("/", r.redirectHandler)
@@ -104,6 +108,29 @@ func MakeRankServer() *RankServer {
 		r.plainServer = &http.Server{Addr: ":4001"}
 	}
 	r.setHandleFunc()
+
+	// stoppable listener prepare
+	listenerHTTP, err := net.Listen("tcp", r.plainServer.Addr)
+	if err != nil {
+		r.logger.Fatalln("listenerHTTP", err)
+	}
+	slHTTP, err := stoppableListener.New(listenerHTTP)
+	if err != nil {
+		r.logger.Fatalln("listenerHTTP", err)
+	}
+	r.slHTTP = slHTTP
+
+	if r.tlsServer != nil {
+		listenerTLS, err := net.Listen("tcp", r.tlsServer.Addr)
+		if err != nil {
+			r.logger.Fatalln("listenerTLS", err)
+		}
+		slTLS, err := stoppableListener.New(listenerTLS)
+		if err != nil {
+			r.logger.Fatalln("listenerTLS", err)
+		}
+		r.slTLS = slTLS
+	}
 
 	r.client = apiclient.NewApiClientFromConfig(SECRET_FILE)
 	r.client.LoadCheck()
@@ -228,23 +255,34 @@ func (r *RankServer) run() {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			err := r.tlsServer.ListenAndServeTLS(r.certFile, r.keyFile)
+			//err := r.tlsServer.ListenAndServeTLS(r.certFile, r.keyFile)
+			tlsListener := tls.NewListener(
+				tcpKeepAliveListener{r.slTLS},
+				r.tlsServer.TLSConfig)
+			err := r.tlsServer.Serve(tlsListener)
 			if err != nil {
-				r.logger.Fatalln("tlsServer", err)
+				r.logger.Println("tlsServer stopped", err)
 			}
 		}()
 	}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err := r.plainServer.ListenAndServe()
+		//err := r.plainServer.ListenAndServe()
+		err := r.plainServer.Serve(tcpKeepAliveListener{r.slHTTP})
 		if err != nil {
-			r.logger.Fatalln("plainServer", err)
+			r.logger.Println("plainServer stopped", err)
 		}
 	}()
 }
 
 func (r *RankServer) stop() {
+	r.logger.Println("stopping server")
+	r.slHTTP.Stop()
+	if r.slTLS != nil {
+		r.slTLS.Stop()
+	}
+	wg.Wait()
 	r.db.Close()
 }
 
@@ -398,7 +436,6 @@ func Main() {
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 	r.logger.Println(<-ch)
-
-	// 
-	//wg.Wait()
+	r.stop()
+	log.Print("RankServer exiting")
 }

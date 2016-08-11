@@ -1,3 +1,4 @@
+// from 'github.com/hydrogen18/stoppableListener'
 package stoppableListener
 
 import (
@@ -26,6 +27,15 @@ func New(l net.Listener) (*StoppableListener, error) {
 }
 
 var StoppedError = errors.New("Listener stopped")
+
+func (sl *StoppableListener) AcceptTCP() (*net.TCPConn, error) {
+	c, err := sl.Accept()
+	if err == nil {
+		return c.(*net.TCPConn), err
+	} else {
+		return nil, err
+	}
+}
 
 func (sl *StoppableListener) Accept() (net.Conn, error) {
 

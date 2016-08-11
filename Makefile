@@ -30,7 +30,7 @@ prep:
 MYLIB := src/rankserver/* src/resource_mgr/* \
   src/apiclient/* src/datafetcher/* \
   src/rijndael/* src/rijndael_wrapper/* \
-  src/timestamp/* src/util/*
+  src/timestamp/* src/util/* src/stoppableListener/*
 
 rankserver: $(MYLIB)
 dfticker: $(MYLIB)
