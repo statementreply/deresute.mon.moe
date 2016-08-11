@@ -202,6 +202,18 @@ func (r *RankServer) inEventActive(timestamp string, event *resource_mgr.EventDe
 	}
 }
 
+// return current event or the latest previous event
+func (r *RankServer) latestEvent() *resource_mgr.EventDetail {
+	// reverse pass
+	for i := len(r.resourceMgr.EventList)-1; i >= 0; i-- {
+		e := r.resourceMgr.EventList[i]
+		if e.HasRanking() && !e.EventStart().After(time.Now()) {
+			return e
+		}
+	}
+	return nil
+}
+
 func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) interface{} {
 	return r.fetchData(timestamp, rankingType, rank)
 }
