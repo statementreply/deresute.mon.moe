@@ -197,7 +197,13 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 		//fmt.Println("yamllen:", len(yy))
 		//fmt.Println(string(yy))
 		if content != nil {
-			fmt.Println(content)
+			//fmt.Println(content)
+			//fmt.Printf("%v\n", content)
+			//fmt.Printf("%#v\n", content)
+			if _, ok := content["data_headers"]; ok {
+				result_code := content["data_headers"].(map[interface{}]interface{})["result_code"]
+				fmt.Printf("%T %#v\n", result_code, result_code)
+			}
 		}
 		outputLock.Unlock()
 	}

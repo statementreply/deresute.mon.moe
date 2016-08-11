@@ -225,7 +225,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 
 	hit := true
 
-	// FIXME sqlite3 version
+	// NOTE: decide hit/miss, sqlite3 version
 	// query timestamp local_timestamp
 	// query rank local_timestamp, ranking_type, page-to-rank
 	var ts_discard string
@@ -282,7 +282,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	// write to df.db
 	for _, value := range ranking_list {
 		vmap := value.(map[interface{}]interface{})
-		// interface FIXME
+		// FIXME what interface? uint64?
 		rank := vmap["rank"]
 		score := vmap["score"]
 		viewer_id := vmap["user_info"].(map[interface{}]interface{})["viewer_id"]

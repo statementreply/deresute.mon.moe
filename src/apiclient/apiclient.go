@@ -34,6 +34,7 @@ var ErrData = errors.New("data error str8?")
 var ErrEventClose = errors.New("event closed")
 var ErrUnknown = errors.New("unknown error")
 var ErrDataHeaders = errors.New("no data_headers")
+var ErrDataHeadersBad = errors.New("bad data_headers")
 
 type ApiClient struct {
 	// constant after constructor
@@ -129,7 +130,6 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	// Do request
 	//hclient := &http.Client{}
 	resp, err := client.httpclient.Do(req)
-
 	if err != nil {
 		log.Println("http request error", err)
 		return nil
@@ -142,7 +142,6 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 	}
 
 	resp_body, err := ioutil.ReadAll(resp.Body)
-	// FIXME
 	if err != nil {
 		log.Println("Read resp.Body", err)
 		return nil
@@ -161,20 +160,24 @@ func (client *ApiClient) Call(path string, args map[string]interface{}) map[stri
 			client.initialized = true
 		}
 	} else {
-		// FIXME
-		log.Println("no data_headers in response")
+		// FIXME: should not happen?
+		log.Println("[ERROR] no data_headers in response")
 	}
 	return content
 }
 
-// FIXME result_code can be int64 or uint64?
+// NOTICE: result_code can be int64 or uint64
 func (client *ApiClient) GetResultCode(content map[string]interface{}) (interface{}, error) {
 	var result_code interface{}
 	data_headers, ok := content["data_headers"]
 	if ok {
-		result_code = data_headers.(map[interface{}]interface{})["result_code"]
+		data_headers_map, ok := data_headers.(map[interface{}]interface{})
+		if !ok {
+			return int64(-1), ErrDataHeadersBad
+		}
+		result_code = data_headers_map["result_code"]
 	} else {
-		return -1, ErrDataHeaders
+		return int64(-1), ErrDataHeaders
 	}
 	return result_code, nil
 }
@@ -222,12 +225,13 @@ func (client *ApiClient) ParseResultCode(content map[string]interface{}) error {
 }
 
 func (client *ApiClient) LoadCheck() {
-	sum_tmp := md5.Sum([]byte("All your APIs are belong to us"))
+	sum_tmp := md5.Sum([]byte("All your APIs are belong to us")) // some string...
 	args := map[string]interface{}{
 		"campaign_data": "",
-		"campaign_user": 171780, // FIXME
+		"campaign_user": 171780, // FIXME: some arbitrary uid...
 		"campaign_sign": hex.EncodeToString(sum_tmp[:]),
-		"app_type":      0}
+		"app_type":      0,
+	}
 
 	check := client.Call("/load/check", args)
 	if check == nil {
@@ -235,7 +239,7 @@ func (client *ApiClient) LoadCheck() {
 		log.Print(check)
 		return
 	}
-	// FIXME interface conversion
+	// interface conversion / type assertion
 	data_headers, ok := check["data_headers"].(map[interface{}]interface{})
 	if !ok {
 		log.Println("data_header type incorrect")
@@ -246,10 +250,10 @@ func (client *ApiClient) LoadCheck() {
 	if ok {
 		s := new_res_ver.(string)
 		client.Set_res_ver(s)
-		fmt.Println("Update res_ver to ", s)
+		fmt.Println("Update res_ver to", s)
 		time.Sleep(1.3e9) // nanosecond
 		check := client.Call("/load/check", args)
-		log.Print("check again ", check)
+		log.Print("check again", check)
 	}
 }
 

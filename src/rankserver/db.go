@@ -56,7 +56,6 @@ func (r *RankServer) checkDir(timestamp string) bool {
 	var ts_discard string
 	row := r.db.QueryRow("SELECT timestamp FROM rank WHERE timestamp == $1", timestamp)
 	err := row.Scan(&ts_discard)
-	// FIXME err
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return false
@@ -80,7 +79,7 @@ func (r *RankServer) CheckData(timestamp string) {
 	}
 	// check new res_ver
 	// FIXME need some test
-	if (time.Now().Sub(r.lastCheck) >= 5*time.Hour/2) || ((r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 2*time.Hour)) {
+	if (time.Now().Sub(r.lastCheck) >= 1*time.Hour) || ((r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 2*time.Hour)) {
 		r.logger.Println("recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
 		r.client.LoadCheck()
 		rv := r.client.Get_res_ver()
@@ -88,10 +87,6 @@ func (r *RankServer) CheckData(timestamp string) {
 		r.resourceMgr.ParseEvent()
 		r.currentEvent = r.resourceMgr.FindCurrentEvent()
 		r.lastCheck = time.Now()
-	}
-
-	if timestamp == "" {
-		timestamp = latest
 	}
 }
 
