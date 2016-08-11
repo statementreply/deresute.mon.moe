@@ -4,6 +4,7 @@ import (
 	"apiclient"
 	"crypto/tls"
 	"database/sql"
+	"flag"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"gopkg.in/yaml.v2"
@@ -11,15 +12,19 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"path"
 	"resource_mgr"
+	"runtime/pprof"
 	"sort"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 	ts "timestamp"
 )
 
+var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 var wg sync.WaitGroup
 
 var BASE string = path.Dir(os.Args[0])
@@ -217,6 +222,7 @@ func (r *RankServer) getSpeed_i(timestamp string, rankingType int, rank int) int
 	return r.getSpeed(timestamp, rankingType, rank)
 }
 
+// doesn't block
 func (r *RankServer) run() {
 	if r.tlsServer != nil {
 		wg.Add(1)
@@ -236,6 +242,10 @@ func (r *RankServer) run() {
 			r.logger.Fatalln("plainServer", err)
 		}
 	}()
+}
+
+func (r *RankServer) stop() {
+	r.db.Close()
 }
 
 func (r *RankServer) latestData() string {
@@ -373,7 +383,22 @@ func (r *RankServer) speedData_list_e(rankingType int, list_rank []int, event *r
 
 func Main() {
 	log.Print("RankServer running")
+	flag.Parse()
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
 	r := MakeRankServer()
 	r.run()
-	wg.Wait()
+
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	r.logger.Println(<-ch)
+
+	// 
+	//wg.Wait()
 }
