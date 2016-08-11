@@ -319,6 +319,7 @@ func (r *RankServer) get_list_rank(timestamp string, rankingType int) []int {
 // js map syntax
 // {"cols":  [{"id":"timestamp","label":"timestamp","type":"date"}, {"id":"score","label":"score","type":"number"}],
 //  "rows":  [{"c":[{"v":"new Date(1467770520)"}, {"v":14908}]}] }
+/*
 func (r *RankServer) rankData_list_f_e(rankingType int, list_rank []int, dataSource func(string, int, int) interface{}, event *resource_mgr.EventDetail) string {
 	r.UpdateTimestamp()
 	raw := ""
@@ -363,6 +364,7 @@ func (r *RankServer) rankData_list_f_e(rankingType int, list_rank []int, dataSou
 	raw += `]}`
 	return raw
 }
+*/
 
 func (r *RankServer) jsonData(rankingType int, list_rank []int, dataSource func(string, int, int) interface{}, event *resource_mgr.EventDetail) string {
 	r.UpdateTimestamp()
@@ -411,13 +413,14 @@ func (r *RankServer) jsonData(rankingType int, list_rank []int, dataSource func(
 	return raw
 }
 
-func (r *RankServer) rankData_list_e(rankingType int, list_rank []int, event *resource_mgr.EventDetail) string {
-	return r.rankData_list_f_e(rankingType, list_rank, r.fetchData_i, event)
-}
 
-func (r *RankServer) speedData_list_e(rankingType int, list_rank []int, event *resource_mgr.EventDetail) string {
-	return r.rankData_list_f_e(rankingType, list_rank, r.getSpeed_i, event)
-}
+//func (r *RankServer) rankData_list_e(rankingType int, list_rank []int, event *resource_mgr.EventDetail) string {
+//	return r.rankData_list_f_e(rankingType, list_rank, r.fetchData_i, event)
+//}
+
+//func (r *RankServer) speedData_list_e(rankingType int, list_rank []int, event *resource_mgr.EventDetail) string {
+//	return r.rankData_list_f_e(rankingType, list_rank, r.getSpeed_i, event)
+//}
 
 func Main() {
 	log.Print("RankServer running")
