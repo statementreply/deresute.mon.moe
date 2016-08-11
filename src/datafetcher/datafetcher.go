@@ -229,7 +229,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	// query timestamp local_timestamp
 	// query rank local_timestamp, ranking_type, page-to-rank
 	var ts_discard string
-	row := df.db.QueryRow("SELECT timestamp FROM timestamp WHERE timestamp == $1", local_timestamp)
+	row := df.db.QueryRow("SELECT timestamp FROM timestamp WHERE timestamp == $1 LIMIT 1;", local_timestamp)
 	err := row.Scan(&ts_discard)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -244,7 +244,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 		// sql hit
 		log.Println("[INFO] hit table timestamp", local_timestamp)
 	}
-	row = df.db.QueryRow("SELECT timestamp FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3", local_timestamp, ranking_type, (page-1)*10+1)
+	row = df.db.QueryRow("SELECT timestamp FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3 LIMIT 1;", local_timestamp, ranking_type, (page-1)*10+1)
 	err = row.Scan(&ts_discard)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -286,7 +286,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 		rank := vmap["rank"]
 		score := vmap["score"]
 		viewer_id := vmap["user_info"].(map[interface{}]interface{})["viewer_id"]
-		_, err := df.db.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
+		_, err := df.db.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5);",
 			server_timestamp,
 			ranking_type,
 			rank,
@@ -299,13 +299,13 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	// fill zeros
 	for rank := (page-1)*10 + 1 + len(ranking_list); rank <= (page-1)*10+10; rank++ {
 		// rank, 0, 0
-		_, err := df.db.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
+		_, err := df.db.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5);",
 			server_timestamp, ranking_type, rank, 0, 0)
 		if err != nil {
 			log.Println("db insert err", err)
 		}
 	}
-	_, err = df.db.Exec("INSERT OR IGNORE INTO timestamp (timestamp) VALUES ($1)", server_timestamp)
+	_, err = df.db.Exec("INSERT OR IGNORE INTO timestamp (timestamp) VALUES ($1);", server_timestamp)
 	if err != nil && err != sqlite3.ErrConstraintUnique {
 		log.Println("db insert err", err)
 		log.Printf("%#v", err)

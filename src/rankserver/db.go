@@ -23,7 +23,7 @@ func (r *RankServer) setCacheSize() {
 
 // tag: database, sqlite
 func (r *RankServer) UpdateTimestamp() {
-	rows, err := r.db.Query("SELECT timestamp FROM timestamp")
+	rows, err := r.db.Query("SELECT timestamp FROM timestamp;")
 	if err != nil {
 		r.logger.Println("sql error", err)
 		return
@@ -54,7 +54,7 @@ func (r *RankServer) UpdateTimestamp() {
 // tag: database, sqlite
 func (r *RankServer) checkDir(timestamp string) bool {
 	var ts_discard string
-	row := r.db.QueryRow("SELECT timestamp FROM rank WHERE timestamp == $1", timestamp)
+	row := r.db.QueryRow("SELECT timestamp FROM rank WHERE timestamp == $1 LIMIT 1;", timestamp)
 	err := row.Scan(&ts_discard)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -93,7 +93,7 @@ func (r *RankServer) CheckData(timestamp string) {
 // tag: database
 func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int {
 	var score int
-	row := r.db.QueryRow("SELECT score FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3", timestamp, rankingType+1, rank)
+	row := r.db.QueryRow("SELECT score FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3 LIMIT 1;", timestamp, rankingType+1, rank)
 	err := row.Scan(&score)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -112,7 +112,7 @@ func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int 
 // tag: database
 func (r *RankServer) fetchDataListRank(timestamp string, rankingType int) []int {
 	var listRank []int
-	rows, err := r.db.Query("SELECT rank FROM rank WHERE timestamp == $1 AND type == $2", timestamp, rankingType+1)
+	rows, err := r.db.Query("SELECT rank FROM rank WHERE timestamp == $1 AND type == $2;", timestamp, rankingType+1)
 	if err != nil {
 		r.logger.Println("sql error", err)
 		return nil
@@ -143,7 +143,7 @@ func (r *RankServer) fetchDataSlice(timestamp string) []map[int]int {
 	slice[0] = map[int]int{}
 	slice[1] = map[int]int{}
 
-	rows, err := r.db.Query("SELECT type, rank, score FROM rank WHERE timestamp == $1", timestamp)
+	rows, err := r.db.Query("SELECT type, rank, score FROM rank WHERE timestamp == $1;", timestamp)
 	if err != nil {
 		r.logger.Println("sql error", err)
 		return nil
@@ -180,7 +180,7 @@ func (r *RankServer) fetchDataBorder(timestamp_start, timestamp_end string, rank
 	border := map[string]int{}
 	//timestamp_start := ts.TimeToTimestamp(event.EventStart())
 	//timestamp_end := ts.TimeToTimestamp(event.ResultEnd())
-	rows, err := r.db.Query("SELECT timestamp, score FROM rank WHERE type == $1 AND rank == $2 AND timestamp BETWEEN $3 AND $4", rankingType+1, rank, timestamp_start, timestamp_end)
+	rows, err := r.db.Query("SELECT timestamp, score FROM rank WHERE type == $1 AND rank == $2 AND timestamp BETWEEN $3 AND $4;", rankingType+1, rank, timestamp_start, timestamp_end)
 	if err != nil {
 		r.logger.Println("sql error", err)
 		return nil

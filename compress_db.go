@@ -58,7 +58,7 @@ func main() {
 		if tsFilter.MatchString(fi.Name()) && fi.IsDir() {
 			ts := fi.Name()
 			log.Println(ts)
-			_, err = tx.Exec("INSERT OR IGNORE INTO timestamp (timestamp) VALUES ($1)", ts)
+			_, err = tx.Exec("INSERT OR IGNORE INTO timestamp (timestamp) VALUES ($1);", ts)
 			if err != nil {
 				log.Println("db insert err", err)
 				log.Printf("%#v", err)
@@ -132,7 +132,7 @@ func parseDir(tx *sql.Tx, ts string) {
 					log.Fatalln(err)
 				}
 			}
-			_, err := tx.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
+			_, err := tx.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5);",
 				ts, rankingType, rank, score, viewer_id)
 			if err != nil {
 				log.Println("db insert err", err)
@@ -142,7 +142,7 @@ func parseDir(tx *sql.Tx, ts string) {
 		// fill zeros
 		for rank := (page-1)*10 + 1 + len(local_rank_list); rank <= (page-1)*10+10; rank++ {
 			// rank, 0, 0
-			_, err := tx.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5)",
+			_, err := tx.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5);",
 				ts, rankingType, rank, 0, 0)
 			if err != nil {
 				log.Println("db insert err", err)

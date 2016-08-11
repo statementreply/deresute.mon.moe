@@ -137,7 +137,7 @@ func (r *ResourceMgr) LoadMaster() string {
 		return ""
 	}
 	defer db.Close()
-	rows, err := db.Query("select * from manifests;")
+	rows, err := db.Query("SELECT * FROM manifests;")
 	//log.Println(rows)
 	defer rows.Close()
 	if err != nil {
@@ -172,7 +172,7 @@ func (r *ResourceMgr) LoadMusic() {
 		log.Fatal("x1", err)
 	}
 	defer db.Close()
-	rows, err := db.Query("select name, hash from manifests where name GLOB 'musicscores_*.bdb';")
+	rows, err := db.Query("SELECT name, hash FROM manifests WHERE name GLOB 'musicscores_*.bdb';")
 	//log.Println(rows)
 	defer rows.Close()
 	if err != nil {
@@ -196,7 +196,7 @@ func (r *ResourceMgr) ParseMusic(fileName string) {
 		log.Fatal("x1", err)
 	}
 	defer db.Close()
-	rows, err := db.Query("select name, data from blobs;")
+	rows, err := db.Query("SELECT name, data FROM blobs;")
 	defer rows.Close()
 	if err != nil {
 		log.Fatal("x2", err)
@@ -241,7 +241,7 @@ func (r *ResourceMgr) ParseEvent() {
 		return
 	}
 	defer db.Close()
-	rows, err := db.Query("select * from event_data;")
+	rows, err := db.Query("SELECT * FROM event_data;")
 	defer rows.Close()
 	for rows.Next() {
 		var id, typ int
