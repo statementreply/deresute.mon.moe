@@ -110,7 +110,7 @@ func (df *DataFetcher) FinalResultDuplicate(currentEvent *resource_mgr.EventDeta
 		if !ok {
 			return false
 		}
-		log.Println("key_point available", rankingType, rank)
+		log.Println("[INFO] key_point available", rankingType, rank)
 	}
 	return true
 }
@@ -131,7 +131,7 @@ func (df *DataFetcher) Run() error {
 	local_timestamp := ts.GetLocalTimestamp()
 	local_time := ts.TimestampToTime(local_timestamp)
 	if local_time.Before(df.currentResultEnd) {
-		log.Println("duplicate final result prevented")
+		log.Println("[NOTICE] duplicate final result prevented")
 		return nil
 	}
 
@@ -157,7 +157,7 @@ func (df *DataFetcher) Run() error {
 	}
 
 	if df.FinalResultDuplicate(currentEvent) {
-		log.Println("duplicate final result prevented (sql)")
+		log.Println("[NOTICE] duplicate final result prevented (sql)")
 		return nil
 	}
 
@@ -242,7 +242,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 		}
 	} else {
 		// sql hit
-		log.Println("hit table timestamp", local_timestamp)
+		log.Println("[INFO] hit table timestamp", local_timestamp)
 	}
 	row = df.db.QueryRow("SELECT timestamp FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3", local_timestamp, ranking_type, (page-1)*10+1)
 	err = row.Scan(&ts_discard)
@@ -257,11 +257,11 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 		}
 	} else {
 		// sql hit
-		log.Println("hit table rank", local_timestamp)
+		log.Println("[INFO] hit table rank", local_timestamp)
 	}
 
 	if hit {
-		log.Println("hit", local_timestamp, ranking_type, page)
+		log.Println("[INFO] hit", local_timestamp, ranking_type, page)
 		return local_timestamp, "-", nil
 	}
 
@@ -276,7 +276,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	server_timestamp := fmt.Sprintf("%d", server_timestamp_i)
 
 	if server_timestamp != local_timestamp {
-		log.Println("[NOTICE] change to server:", server_timestamp, "local:", local_timestamp)
+		log.Println("[NOTICE] change to server_timestamp:", server_timestamp, "local:", local_timestamp)
 	}
 
 	// write to df.db
