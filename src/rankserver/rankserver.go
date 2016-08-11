@@ -96,7 +96,7 @@ func MakeRankServer() *RankServer {
 			r.logger.Fatalln("load keypair", err)
 		}
 		r.tlsServer = &http.Server{
-			Addr:      ":4002",
+			Addr: ":4002",
 			TLSConfig: &tls.Config{
 				Certificates: []tls.Certificate{cert},
 			},

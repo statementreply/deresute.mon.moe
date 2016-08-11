@@ -45,7 +45,7 @@ type RankServer struct {
 	plainServer  *http.Server
 	tlsServer    *http.Server
 	slHTTP       *stoppableListener.StoppableListener
-	slTLS       *stoppableListener.StoppableListener
+	slTLS        *stoppableListener.StoppableListener
 	hostname     string
 	resourceMgr  *resource_mgr.ResourceMgr
 	currentEvent *resource_mgr.EventDetail
