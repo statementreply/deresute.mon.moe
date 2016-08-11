@@ -53,6 +53,70 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_
 	return df
 }
 
+func (df *DataFetcher) FinalResultDuplicate(currentEvent *resource_mgr.EventDetail) bool {
+	// condition
+	// now is in [result start, result end]
+	// latest ts is in [,]
+	// latest ts has all key point
+
+	if !currentEvent.IsFinal(time.Now()) {
+		return false
+	}
+
+	var latest_timestamp string
+	row := df.db.QueryRow("SELECT timestamp FROM timestamp ORDER BY timestamp DESC LIMIT 1;")
+	err := row.Scan(&latest_timestamp)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false
+		} else {
+			log.Println("sql error", err)
+			return false
+		}
+	}
+
+	latest_time := ts.TimestampToTime(latest_timestamp)
+	if !currentEvent.IsFinal(latest_time) {
+		return false
+	}
+
+	rows, err := df.db.Query("SELECT type, rank FROM rank WHERE timestamp == $1;", latest_timestamp)
+	if err != nil {
+		log.Println("sql error", err)
+		return false
+	}
+	defer rows.Close()
+	local_key_point := make([]map[int]bool, 2)
+	local_key_point[0] = map[int]bool{}
+	local_key_point[1] = map[int]bool{}
+	for rows.Next() {
+		var rankingType, rank int
+		err = rows.Scan(&rankingType, &rank)
+		if err != nil {
+			log.Println("sql error", err)
+			return false
+		}
+		rankingType -= 1
+		local_key_point[rankingType][rank] = true
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Println("sql error", err)
+		return false
+	}
+	for _, k := range df.key_point {
+		rankingType := k[0]
+		rank := k[1]
+		_, ok := local_key_point[rankingType-1][rank]
+		if !ok {
+			return false
+		}
+		log.Println("key_point available", rankingType, rank)
+	}
+	return true
+}
+
 func (df *DataFetcher) Run() error {
 	// handle new res_ver
 	df.Client.LoadCheck()
@@ -92,6 +156,11 @@ func (df *DataFetcher) Run() error {
 		log.Println("create table", err)
 		log.Printf("%#v", err)
 		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
+	}
+
+	if df.FinalResultDuplicate(currentEvent) {
+		log.Println("duplicate final result prevented (sql)")
+		return nil
 	}
 
 	for _, key := range df.key_point {
