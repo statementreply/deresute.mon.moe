@@ -62,7 +62,7 @@ func main() {
 		key_point = append(key_point, [2]int{2, index*10000 + 1})
 	}
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
-	df := datafetcher.NewDataFetcher(client, key_point, RANK_CACHE_DIR, RANK_DB, RESOURCE_CACHE_DIR)
+	df := datafetcher.NewDataFetcher(client, key_point, RANK_DB, RESOURCE_CACHE_DIR)
 
 	ticker := time.NewTicker(time.Second * 1)
 	var q, q0 time.Duration

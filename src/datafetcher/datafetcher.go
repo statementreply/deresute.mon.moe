@@ -31,15 +31,13 @@ type DataFetcher struct {
 	currentResultEnd time.Time
 }
 
-func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_cache_dir, rank_db, resource_cache_dir string) *DataFetcher {
+func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_db, resource_cache_dir string) *DataFetcher {
 	log.Println("NewDataFetcher()")
 	df := new(DataFetcher)
 
 	df.Client = client
 	//client.LoadCheck()
 	df.key_point = key_point
-	// tag: old
-	_ = rank_cache_dir
 	df.rankDB = rank_db
 
 	df.Client.LoadCheck()

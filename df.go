@@ -49,7 +49,7 @@ func main() {
 		key_point = append(key_point, [2]int{1, index*10000 + 1})
 		key_point = append(key_point, [2]int{2, index*10000 + 1})
 	}
-	df := datafetcher.NewDataFetcher(client, key_point, RANK_CACHE_DIR, RANK_DB, RESOURCE_CACHE_DIR)
+	df := datafetcher.NewDataFetcher(client, key_point, RANK_DB, RESOURCE_CACHE_DIR)
 	//client.LoadCheck()
 	err := df.Run()
 	if err != nil {
