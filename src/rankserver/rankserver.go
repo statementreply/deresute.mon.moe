@@ -224,6 +224,37 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
 	}
 }
 
+// new api
+func (r *RankServer) getSpeedBorder(timestamp_start, timestamp_end string, rankingType int, rank int) map[string]float32 {
+	var timestamp_start_prev string
+	{
+		t_i := ts.TimestampToTime(timestamp_start)
+		t_prev := t_i.Add(-INTERVAL)
+		timestamp_start_prev = ts.TimeToTimestamp(t_prev)
+	}
+	border := r.fetchDataBorder(timestamp_start_prev, timestamp_end, rankingType, rank)
+	borderSpeed := map[string]float32{}
+	for timestamp, cur_score := range border {
+		if timestamp < timestamp_start {
+			continue
+		}
+		//cur_score := border[timestamp]
+		var timestamp_prev string
+		{
+			t_i := ts.TimestampToTime(timestamp)
+			t_prev := t_i.Add(-INTERVAL)
+			timestamp_prev = ts.TimeToTimestamp(t_prev)
+		}
+		prev_score, ok := border[timestamp_prev]
+		if ok {
+			borderSpeed[timestamp] = (float32(cur_score - prev_score)) / float32(INTERVAL) * float32(time.Hour)
+		} else {
+			borderSpeed[timestamp] = -1.0
+		}
+	}
+	return borderSpeed
+}
+
 func (r *RankServer) getSpeed_i(timestamp string, rankingType int, rank int) interface{} {
 	return r.getSpeed(timestamp, rankingType, rank)
 }

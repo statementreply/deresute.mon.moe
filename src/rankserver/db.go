@@ -3,7 +3,7 @@ package rankserver
 import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
-	"resource_mgr"
+	//"resource_mgr"
 	"sort"
 	"time"
 	ts "timestamp"
@@ -169,10 +169,10 @@ func (r *RankServer) fetchDataSlice(timestamp string) []map[int]int {
 //rankingType int, list_rank []int, dataSource func(string, int, int) interface{}, event *resource_mgr.EventDetail)
 
 // tag: database
-func (r *RankServer) fetchDataBorder(rankingType int, rank int, event *resource_mgr.EventDetail) map[string]int {
+func (r *RankServer) fetchDataBorder(timestamp_start, timestamp_end string, rankingType int, rank int) map[string]int {
 	border := map[string]int{}
-	timestamp_start := ts.TimeToTimestamp(event.EventStart())
-	timestamp_end := ts.TimeToTimestamp(event.ResultEnd())
+	//timestamp_start := ts.TimeToTimestamp(event.EventStart())
+	//timestamp_end := ts.TimeToTimestamp(event.ResultEnd())
 	rows, err := r.db.Query("SELECT timestamp, score FROM rank WHERE type == $1 AND rank == $2 AND timestamp BETWEEN $3 AND $4", rankingType+1, rank, timestamp_start, timestamp_end)
 	if err != nil {
 		r.logger.Println("sql error", err)
