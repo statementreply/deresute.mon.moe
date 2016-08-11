@@ -25,8 +25,6 @@ type DataFetcher struct {
 	Client         *apiclient.ApiClient
 	resourceMgr    *resource_mgr.ResourceMgr
 	key_point      [][2]int
-	// tag: old
-	//rank_cache_dir string
 	rankDB         string
 	db             *sql.DB
 	// prevent duplicate during [resultstart, resultend]
@@ -212,9 +210,8 @@ func DumpToFile(v interface{}, fileName string) {
 	ioutil.WriteFile(fileName, yy, 0644)
 }
 
-// string for hit/miss
+//return timestamp, statuscode("-", "*", ""), err
 func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_type int, page int) (string, string, error) {
-	//return timestamp, statuscode, err
 
 	event_type := currentEvent.Type()
 	//log.Println("current event type:", event_type)
@@ -228,10 +225,6 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	//localtime := float64(time.Now().UnixNano()) / 1e9 // for debug
 	local_timestamp := ts.GetLocalTimestamp()
 
-	// tag: old
-	//dirname := df.rank_cache_dir + local_timestamp + "/"
-	//path := dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
-
 	hit := true
 
 	// FIXME sqlite3 version
@@ -242,45 +235,35 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	err := row.Scan(&ts_discard)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			//log.Println("not exist", local_timestamp, err)
 			// sql miss
+			//log.Println("not exist", local_timestamp, err)
 			hit = false
 		} else {
 			log.Println("sql error", err)
 			return "", "", err
 		}
 	} else {
-		log.Println("exist", local_timestamp)
 		// sql hit
+		log.Println("hit table timestamp", local_timestamp)
 	}
 	row = df.db.QueryRow("SELECT timestamp FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3", local_timestamp, ranking_type, (page-1)*10+1)
 	err = row.Scan(&ts_discard)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			//log.Println("not exist", local_timestamp, err)
 			// sql miss
+			//log.Println("not exist", local_timestamp, err)
 			hit = false
 		} else {
 			log.Println("sql error", err)
 			return "", "", err
 		}
 	} else {
-		log.Println("exist", local_timestamp)
 		// sql hit
+		log.Println("hit table rank", local_timestamp)
 	}
 
-	//if Exists(path) {
-		// cache hit
-		//log.Println("hit", local_timestamp, ranking_type, page)
-	//} else {
-		//hit = false
-		// cache miss
-		//if !Exists(dirname) {
-		//	os.Mkdir(dirname, 0755)
-		//}
-	//}
-
 	if hit {
+		log.Println("hit", local_timestamp, ranking_type, page)
 		return local_timestamp, "-", nil
 	}
 
@@ -296,17 +279,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 
 	if server_timestamp != local_timestamp {
 		log.Println("[NOTICE] change to server:", server_timestamp, "local:", local_timestamp)
-		//dirname = df.rank_cache_dir + server_timestamp + "/"
-		//path = dirname + fmt.Sprintf("r%02d.%06d", ranking_type, page)
-		//if !Exists(dirname) {
-		//	os.Mkdir(dirname, 0755)
-		//}
 	}
-	//log.Println("write to path", path)
-	//lockfile := dirname + "lock"
-	//ioutil.WriteFile(lockfile, []byte(""), 0644)
-	//DumpToFile(ranking_list, path)
-	//os.Remove(lockfile)
 
 	// write to df.db
 	for _, value := range ranking_list {
