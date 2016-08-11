@@ -198,6 +198,7 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 		//fmt.Println(string(yy))
 		if content != nil {
 			fmt.Println(content)
+			fmt.Printf("%t\n", content)
 			//fmt.Printf("%v\n", content)
 			//fmt.Printf("%#v\n", content)
 			if _, ok := content["data_headers"]; ok {
