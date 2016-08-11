@@ -31,10 +31,10 @@ type twitterParam struct {
 type RankServer struct {
 	//    map[timestamp][rankingType][rank] = score
 	// {"1467555420":   [{10: 2034} ,{30: 203021} ]  }
-	speed          map[string][]map[int]float32 // need mux
+	//speed          map[string][]map[int]float32 // need mux
 	list_timestamp []string                     // need mutex?
 	// for both read and write
-	mux_speed     sync.RWMutex
+	//mux_speed     sync.RWMutex
 	mux_timestamp sync.RWMutex
 	// sql
 	rankDB       string
