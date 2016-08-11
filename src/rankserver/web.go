@@ -20,6 +20,9 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 	if param == nil {
 		return u
 	}
+	if param.event == nil {
+		return u
+	}
 	u += "event=" + fmt.Sprintf("%d", param.event.Id()) + "&"
 	u += "type=" + fmt.Sprintf("%d", param.rankingType) + "&"
 	for _, rank := range param.list_rank {
