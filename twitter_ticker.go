@@ -100,12 +100,6 @@ func (p *Periodic) Run() {
 				}
 
 				//log.Println("body is", string(body))
-				if bytes.Equal(body, content) {
-					goto Retry
-				}
-				if updatingFilter.Match(body) {
-					goto Retry
-				}
 				if waitFilter.Match(body) {
 					log.Println("wait filter matched")
 					goto Finish
@@ -113,6 +107,13 @@ func (p *Periodic) Run() {
 				if resultFilter.Match(content) && resultFilter.Match(body) {
 					log.Println("don't post final twice")
 					goto Finish
+				}
+
+				if bytes.Equal(body, content) {
+					goto Retry
+				}
+				if updatingFilter.Match(body) {
+					goto Retry
 				}
 				if emptyFilter.Match(body) {
 					log.Println("empty response")
