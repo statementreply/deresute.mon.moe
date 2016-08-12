@@ -38,15 +38,23 @@ sub main {
     $rc  = $dbh->begin_work   or die $dbh->errstr;
 
     my $max_id;
+    $max_id = "738619236688396288"; # FIXME
+    my $n_status = 12000;
+    my $i_status = 0;
+    my $n_batch = 200;
 
-    while (1) {
+    while ($i_status < $n_status) {
         my $result;
         eval {
             # user_id => "3697513573"
-            $result = $nt->user_timeline({
-                    screen_name => "deresute_border",
-                    count => 20,
-                });
+            my $arg = {
+                screen_name => "deresute_border",
+                count => $n_batch,
+            };
+            if (defined $max_id) {
+                $$arg{max_id} = $max_id;
+            }
+            $result = $nt->user_timeline($arg);
         };
 
 
@@ -63,10 +71,16 @@ sub main {
                 } else {
                     die "bad id format $id";
                 }
+                if (!defined($max_id)) {
+                    $max_id = $id;
+                } elsif ($id le $max_id) {
+                    $max_id = $id;
+                }
                 my $text = $$status{text};
                 print "$id: len:", length($text), "\n";
                 my $info = parse_status($text, $timestr);
                 update_db($dbh, $info);
+                $i_status++;
 
                 if ($download_image) {
                     my $pic = $$status{entities}{media}[0];
@@ -80,9 +94,12 @@ sub main {
                     }
                 }   
             }
+            if (@$result != $n_batch) {
+                last;
+            }
         }
-        last;
     }
+    print "total $i_status\n";
     $rc  = $dbh->commit   or die $dbh->errstr;
     $dbh->disconnect;
 }
