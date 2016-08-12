@@ -166,7 +166,8 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	timestamp_str := ts.FormatTimestamp_short(timestamp)
 	var isFinal = false
 
-	if r.currentEvent != nil {
+	// exclude caravan/live-party
+	if (r.currentEvent != nil) && (r.currentEvent.HasRanking()) {
 		t := ts.TimestampToTime(timestamp)
 		// FIXME wait only after 2 hour
 		if r.currentEvent.IsCalc(time.Now().Add(-2 * time.Hour)) {
