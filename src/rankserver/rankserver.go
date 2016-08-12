@@ -144,7 +144,7 @@ func MakeRankServer() *RankServer {
 	//r.resourceMgr.LoadManifest()
 	r.resourceMgr.ParseEvent()
 	r.currentEvent = r.resourceMgr.FindCurrentEvent()
-	r.lastCheck = time.Now()
+	//r.lastCheck = time.Now()
 	return r
 }
 
