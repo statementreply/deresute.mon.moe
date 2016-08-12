@@ -139,11 +139,11 @@ func (r *ResourceMgr) LoadMaster() string {
 	defer db.Close()
 	rows, err := db.Query("SELECT * FROM manifests;")
 	//log.Println(rows)
-	defer rows.Close()
 	if err != nil {
 		log.Println("x2", err)
 		return ""
 	}
+	defer rows.Close()
 	var master string
 	for rows.Next() {
 		var name string
