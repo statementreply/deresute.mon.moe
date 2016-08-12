@@ -13,6 +13,7 @@ use LWP::Simple;
 use open qw(:encoding(UTF-8) :std);
 use DateTime::Format::Strptime;
 use DateTime;
+use DBI;
 
 my $config = LoadFile("secret.yaml");
 my $nt = Net::Twitter->new(
@@ -23,6 +24,17 @@ my $nt = Net::Twitter->new(
     "access_token"        => $$config{"twitter_access_token"},
     "access_token_secret" => $$config{"twitter_access_token_secret"},
 );
+
+my $dbh = DBI->connect("dbi:SQLite:uri=file:data/twitter.db?mode=rwc");
+my $rv;
+$rv = $dbh->do("CREATE TABLE IF NOT EXISTS rank (timestamp TEXT, type INTEGER, rank INTEGER, score INTEGER, viewer_id INTEGER, PRIMARY KEY(timestamp, type, rank));");
+print "rv $rv\n";
+$rv = $dbh->do("CREATE TABLE IF NOT EXISTS timestamp (timestamp TEXT, PRIMARY KEY('timestamp'));");
+print "rv $rv\n";
+
+my $rc;
+$rc  = $dbh->begin_work   or die $dbh->errstr;
+
 
 my $result;
 eval {
@@ -50,7 +62,8 @@ if ($@) {
         }
         my $text = $$status{text};
         print "$id:\n";
-        parse_status($text, $timestr);
+        my $info = parse_status($text, $timestr);
+        update_db($dbh, $info);
             
         if ($download_image) {
             my $pic = $$status{entities}{media}[0];
@@ -69,18 +82,26 @@ if ($@) {
     }
 }
 
+$rc  = $dbh->commit   or die $dbh->errstr;
+
 
 sub parse_status {
+    # to return
+    my %info;
+    # param
+    my $text = shift;
+    my $timestr = shift;
+    $info{create_time} = $timestr;
+
     my $strp = DateTime::Format::Strptime->new(
         pattern => '%a %b %d %T %z %Y',
         on_error => 'croak',
     );
-    my $text = shift;
-    my $timestr = shift;
     print "timestr: $timestr\n";
     my $create_time = $strp->parse_datetime($timestr);
     #print Dump($time);
     print "epoch(): ", $create_time->epoch(), "\n";
+    $info{create_time_unix} = $create_time->epoch();
 
     $text =~ s{#デレステ}{}g;
     $text =~ s{https://t\.co/\w+}{}g;
@@ -88,8 +109,6 @@ sub parse_status {
     my @line = split "\n", $text;
     my $timestamp = 0;
     my @border;
-    my %info;
-    $info{create_time} = $timestr;
     for my $line (@line) {
         if ($line =~ m{^(\w+)\s*[：:]\s*   (\d+)   [(（][+\d]*[)）]$}x) {
             my ($rank, $score) = ($1, $2);
@@ -140,4 +159,25 @@ sub parse_status {
     }
     $info{border} = \@border;
     print Dump(\%info);
+    return \%info;
 }
+
+sub update_db {
+    my $dbh = shift;
+    my $info = shift;
+    my $rv;
+    my $ts = "";
+    if (exists $$info{timestamp}) {
+        $ts = $$info{timestamp};
+    } else {
+        $ts = $$info{create_time_unix};
+    }
+    $rv = $dbh->do("INSERT OR IGNORE INTO timestamp (timestamp) VALUES (?);", undef, $ts);
+    print "rv: $rv\n";
+    for my $pair (@{$$info{border}}) {
+        my ($rank, $score) = @$pair;
+        $rv = $dbh->do("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES (?, ?, ?, ?, ?);", undef, $ts, 1, $rank, $score, 0);
+        print "rv: $rv\n";
+    }
+}
+
