@@ -79,7 +79,7 @@ func (r *RankServer) CheckData(timestamp string) {
 	}
 	// check new res_ver
 	// FIXME need some test
-	if (time.Now().Sub(r.lastCheck) >= 1*time.Minute) || ((r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 2*time.Hour)) {
+	if (time.Now().Sub(r.lastCheck) >= 1*time.Hour) || ((r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 2*time.Hour)) {
 		r.logger.Println("recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
 		r.client.LoadCheck()
 		rv := r.client.Get_res_ver()
