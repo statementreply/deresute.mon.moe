@@ -270,10 +270,6 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
-	// debug
-	//r.resourceMgr.Set_res_ver("10017810")
-	//r.resourceMgr.ParseEvent()
-
 	r.preload_html(w, req, &qchartParam{
 		rankingType: 0,
 		list_rank:   []int{120001},
