@@ -123,7 +123,9 @@ func (h *httpStream) run() {
 
 	header, err := buf.Peek(4)
 	if err != nil {
-		log.Printf("cannot peek 4 bytes <%s> %s", string(header), err)
+		if err != io.EOF {
+			log.Printf("cannot peek 4 bytes <%s> %s", string(header), err)
+		}
 	} else if string(header) == "HTTP" { // guess: HTTP response
 		for {
 			req := matchRequest(h.net, h.transport)

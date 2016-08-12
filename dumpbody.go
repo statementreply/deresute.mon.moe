@@ -16,5 +16,6 @@ func main() {
 	} else {
 		body, _ = ioutil.ReadAll(os.Stdin)
 	}
-	apiclient.DecodeBody(body, msg_iv)
+	content := apiclient.DecodeBody(body, msg_iv)
+	fmt.Println(content)
 }

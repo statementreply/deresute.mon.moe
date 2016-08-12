@@ -58,7 +58,7 @@ linksys:
 setcap:
 	sudo setcap cap_net_raw,cap_net_admin=eip ./pcapdump
 capture:
-	./pcapdump -i eth0 -f 'tcp and port 80'
+	./pcapdump -i net0 -f 'tcp and port 80'
 
 prevent_update:
 	curl https://deresuteborder.mon.moe/twitter >cached_status

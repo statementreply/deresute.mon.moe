@@ -48,6 +48,11 @@ func main() {
 
 	// chara_179_00_face_01.unity3d
 	d, err = r.FetchLz4("dl/resources/High/AssetBundles/Android/286775f14f9a9331481535d72c5ede24")
-
+	// v/card_300029.acb v/card_300030.acb v/chara_268.acb
+	d, err = r.Fetch("dl/resources/High/Sound/Common/v/1d0415e9142dfc017c65268be1b851f4")
+	fmt.Println(d, err)
+	d, err = r.Fetch("dl/resources/High/Sound/Common/v/0f157ae68385aea380211cfb9328b971")
+	fmt.Println(d, err)
+	d, err = r.Fetch("dl/resources/High/Sound/Common/v/fd52db77fbb15bd90d0e5573219e12d7")
 	fmt.Println(d, err)
 }
