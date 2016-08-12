@@ -15,75 +15,77 @@ use DateTime::Format::Strptime;
 use DateTime;
 use DBI;
 
-my $config = LoadFile("secret.yaml");
-my $nt = Net::Twitter->new(
-    "ssl"      => 1,
-    "traits"   => ["API::RESTv1_1",],
-    "consumer_key"        => $$config{"twitter_consumer_key"},
-    "consumer_secret"     => $$config{"twitter_consumer_secret"},
-    "access_token"        => $$config{"twitter_access_token"},
-    "access_token_secret" => $$config{"twitter_access_token_secret"},
-);
+sub main {
+    my $config = LoadFile("secret.yaml");
+    my $download_image = 0;
+    my $nt = Net::Twitter->new(
+        "ssl"      => 1,
+        "traits"   => ["API::RESTv1_1",],
+        "consumer_key"        => $$config{"twitter_consumer_key"},
+        "consumer_secret"     => $$config{"twitter_consumer_secret"},
+        "access_token"        => $$config{"twitter_access_token"},
+        "access_token_secret" => $$config{"twitter_access_token_secret"},
+    );
 
-my $dbh = DBI->connect("dbi:SQLite:uri=file:data/twitter.db?mode=rwc");
-my $rv;
-$rv = $dbh->do("CREATE TABLE IF NOT EXISTS rank (timestamp TEXT, type INTEGER, rank INTEGER, score INTEGER, viewer_id INTEGER, PRIMARY KEY(timestamp, type, rank));");
-print "rv $rv\n";
-$rv = $dbh->do("CREATE TABLE IF NOT EXISTS timestamp (timestamp TEXT, PRIMARY KEY('timestamp'));");
-print "rv $rv\n";
+    my $dbh = DBI->connect("dbi:SQLite:uri=file:data/twitter.db?mode=rwc");
+    my $rv;
+    $rv = $dbh->do("CREATE TABLE IF NOT EXISTS rank (timestamp TEXT, type INTEGER, rank INTEGER, score INTEGER, viewer_id INTEGER, PRIMARY KEY(timestamp, type, rank));") or warn $dbh->errstr;
+    #print "rv $rv\n";
+    $rv = $dbh->do("CREATE TABLE IF NOT EXISTS timestamp (timestamp TEXT, PRIMARY KEY('timestamp'));") or warn $dbh->errstr;
+    #print "rv $rv\n";
 
-my $rc;
-$rc  = $dbh->begin_work   or die $dbh->errstr;
+    my $rc;
+    $rc  = $dbh->begin_work   or die $dbh->errstr;
+
+    my $max_id;
+
+    while (1) {
+        my $result;
+        eval {
+            # user_id => "3697513573"
+            $result = $nt->user_timeline({
+                    screen_name => "deresute_border",
+                    count => 20,
+                });
+        };
 
 
-my $result;
-eval {
-    # user_id => "3697513573"
-    $result = $nt->user_timeline({
-        screen_name => "deresute_border",
-        count => 20,
-    });
-};
-
-my $download_image = 0;
-
-if ($@) {
-    print "err: $@\n";
-} else {
-    print "no err: $result\n";
-    print "n_result: ", scalar @$result, "\n";
-    for my $status (@$result) {
-        my $timestr = $$status{created_at};
-        my $id = $$status{id};
-        if ($id =~ m{^\d+$}) {
-            # ok
+        if ($@) {
+            print "err: $@\n";
         } else {
-            die "bad id format $id";
-        }
-        my $text = $$status{text};
-        print "$id:\n";
-        my $info = parse_status($text, $timestr);
-        update_db($dbh, $info);
-            
-        if ($download_image) {
-            my $pic = $$status{entities}{media}[0];
-            #print Dump($pic);
-            #print "\n";
-            my $url = URI->new($$pic{media_url_https});
+            print "no err: $result\n";
+            print "n_result: ", scalar @$result, "\n";
+            for my $status (@$result) {
+                my $timestr = $$status{created_at};
+                my $id = $$status{id};
+                if ($id =~ m{^\d+$}) {
+                    # ok
+                } else {
+                    die "bad id format $id";
+                }
+                my $text = $$status{text};
+                print "$id: len:", length($text), "\n";
+                my $info = parse_status($text, $timestr);
+                update_db($dbh, $info);
 
-            my $file = "data/twitter/$id.jpg";
-            (undef, undef, my $suf) = fileparse($url, qw(.jpg .gif .png));
-            print "$url suf $suf\n";
-            print "$url $file\n";
-            if ( (defined $url) && ($url ne "") && (not (-e $file)) ) {
-                getstore($url, $file);
+                if ($download_image) {
+                    my $pic = $$status{entities}{media}[0];
+                    my $url = URI->new($$pic{media_url_https});
+                    my $file = "data/twitter/$id.jpg";
+                    (undef, undef, my $suf) = fileparse($url, qw(.jpg .gif .png));
+                    print "$url suf $suf\n";
+                    print "$url $file\n";
+                    if ( (defined $url) && ($url ne "") && (not (-e $file)) ) {
+                        getstore($url, $file);
+                    }
+                }   
             }
-        }   
+        }
+        last;
     }
+    $rc  = $dbh->commit   or die $dbh->errstr;
+    $dbh->disconnect;
 }
-
-$rc  = $dbh->commit   or die $dbh->errstr;
-
 
 sub parse_status {
     # to return
@@ -97,10 +99,10 @@ sub parse_status {
         pattern => '%a %b %d %T %z %Y',
         on_error => 'croak',
     );
-    print "timestr: $timestr\n";
+    #print "timestr: $timestr\n";
     my $create_time = $strp->parse_datetime($timestr);
     #print Dump($time);
-    print "epoch(): ", $create_time->epoch(), "\n";
+    #print "epoch(): ", $create_time->epoch(), "\n";
     $info{create_time_unix} = $create_time->epoch();
 
     $text =~ s{#デレステ}{}g;
@@ -112,16 +114,16 @@ sub parse_status {
     for my $line (@line) {
         if ($line =~ m{^(\w+)\s*[：:]\s*   (\d+)   [(（][+\d]*[)）]$}x) {
             my ($rank, $score) = ($1, $2);
-            print "rank $rank score $score <$line>\n";
+            #print "rank $rank score $score <$line>\n";
             $rank =~ s{千位}{001};
             $rank =~ s{万位}{0001};
             push @border, [$rank, $score];
         } elsif ($line =~ m{^\s*$} ) {
-            print "ignore <$line>\n";
+            #print "ignore <$line>\n";
         } elsif ($line =~ m{^(\d{2})/(\d{2})\s+(\d{2}):(\d{2})$}x) {
             my ($mon, $day, $hr, $min) = ($1, $2, $3, $4);
             my $year = $create_time->year();
-            print "m $1 d $2 h $3 m $4 <$line>\n";
+            #print "m $1 d $2 h $3 m $4 <$line>\n";
 
             if ($create_time->month() == $mon) {
                 $year = $create_time->year();
@@ -158,11 +160,20 @@ sub parse_status {
         }
     }
     $info{border} = \@border;
-    print Dump(\%info);
+    #print Dump(\%info);
     return \%info;
 }
 
+sub truncate_timestamp {
+    my $unix = shift;
+    # mod 15*60
+    # rem 2*60
+    return int(($unix-120)/900)*900+120;
+}
+
+
 sub update_db {
+    # param
     my $dbh = shift;
     my $info = shift;
     my $rv;
@@ -170,14 +181,15 @@ sub update_db {
     if (exists $$info{timestamp}) {
         $ts = $$info{timestamp};
     } else {
-        $ts = $$info{create_time_unix};
+        $ts = truncate_timestamp($$info{create_time_unix});
     }
-    $rv = $dbh->do("INSERT OR IGNORE INTO timestamp (timestamp) VALUES (?);", undef, $ts);
-    print "rv: $rv\n";
+    $rv = $dbh->do("INSERT OR IGNORE INTO timestamp (timestamp) VALUES (?);", undef, $ts) or warn $dbh->errstr;
+    #print "rv: $rv\n";
     for my $pair (@{$$info{border}}) {
         my ($rank, $score) = @$pair;
-        $rv = $dbh->do("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES (?, ?, ?, ?, ?);", undef, $ts, 1, $rank, $score, 0);
-        print "rv: $rv\n";
+        $rv = $dbh->do("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES (?, ?, ?, ?, ?);", undef, $ts, 1, $rank, $score, 0) or warn $dbh->errstr;
+        #print "rv: $rv\n";
     }
 }
 
+main();
