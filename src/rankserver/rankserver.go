@@ -137,6 +137,9 @@ func MakeRankServer() *RankServer {
 	r.client.LoadCheck()
 	rv := r.client.Get_res_ver()
 
+	// for debug
+	rv = "10017700"
+
 	r.resourceMgr = resource_mgr.NewResourceMgr(rv, RESOURCE_CACHE_DIR)
 	//r.resourceMgr.LoadManifest()
 	r.resourceMgr.ParseEvent()
