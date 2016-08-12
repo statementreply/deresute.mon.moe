@@ -15,8 +15,6 @@ use DateTime::Format::Strptime;
 use DateTime;
 
 my $config = LoadFile("secret.yaml");
-#print "$config\n";
-#
 my $nt = Net::Twitter->new(
     "ssl"      => 1,
     "traits"   => ["API::RESTv1_1",],
@@ -25,8 +23,6 @@ my $nt = Net::Twitter->new(
     "access_token"        => $$config{"twitter_access_token"},
     "access_token_secret" => $$config{"twitter_access_token_secret"},
 );
-
-
 
 my $result;
 eval {
@@ -43,24 +39,19 @@ if ($@) {
     print "err: $@\n";
 } else {
     print "no err: $result\n";
-    #print "here", Dump($result),"\n";
     print "n_result: ", scalar @$result, "\n";
     for my $status (@$result) {
-        #print Dump($status);
         my $timestr = $$status{created_at};
         my $id = $$status{id};
-        #print "$id\n";
         if ($id =~ m{^\d+$}) {
             # ok
         } else {
             die "bad id format $id";
         }
         my $text = $$status{text};
-        #print "$id: $text\n";
         print "$id:\n";
         parse_status($text, $timestr);
             
-        #print Dump($$status{entities});
         if ($download_image) {
             my $pic = $$status{entities}{media}[0];
             #print Dump($pic);
@@ -98,6 +89,7 @@ sub parse_status {
     my $timestamp = 0;
     my @border;
     my %info;
+    $info{create_time} = $timestr;
     for my $line (@line) {
         if ($line =~ m{^(\w+)\s*[：:]\s*   (\d+)   [(（][+\d]*[)）]$}x) {
             my ($rank, $score) = ($1, $2);
