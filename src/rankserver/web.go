@@ -434,9 +434,11 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	event_id_str_list, ok := req.Form["event"] // checked Atoi
-	event := r.currentEvent
+	// default value is latest
+	event := r.latestEvent
 	if event == nil {
-		event = r.latestEvent
+		//event = r.latestEvent
+		r.logger.Println("latestEvent is nil")
 	}
 	var prefill_event string = ""
 	// this block output: prefill_event, event
@@ -444,14 +446,14 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 		event_id_str := event_id_str_list[0]
 		// skip empty string
 		if event_id_str == "" {
-			event = r.currentEvent
+			event = r.latestEvent
 		} else {
 			event_id, err := strconv.Atoi(event_id_str)
 			if err == nil {
 				prefill_event = event_id_str
 				event = r.resourceMgr.FindEventById(event_id)
 				if event == nil {
-					event = r.currentEvent
+					event = r.latestEvent
 				}
 			} else {
 				r.logger.Println("bad event id", err, event_id_str)
