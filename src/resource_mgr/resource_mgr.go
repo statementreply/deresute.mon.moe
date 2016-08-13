@@ -285,6 +285,10 @@ func (r *ResourceMgr) FindCurrentEvent() *EventDetail {
 	return FindCurrentEvent(r.EventList)
 }
 
+func (r *ResourceMgr) FindLatestEvent() *EventDetail {
+	return FindLatestEvent(r.EventList)
+}
+
 func (r *ResourceMgr) FindEventById(id int) *EventDetail {
 	return r.EventList.FindEventById(id)
 }

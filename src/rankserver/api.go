@@ -40,8 +40,8 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 
 	event_id_str_list, ok := req.Form["event"] // checked Atoi
 	event := r.currentEvent
-	if event == nil {
-		event = r.latestEvent()
+	if (event == nil) || (!event.HasRanking()) {
+		event = r.latestEvent
 	}
 	// this block output: prefill_event, event
 	if ok {

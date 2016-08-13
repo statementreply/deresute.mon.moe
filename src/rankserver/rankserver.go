@@ -141,6 +141,8 @@ func MakeRankServer() *RankServer {
 	//r.resourceMgr.LoadManifest()
 	r.resourceMgr.ParseEvent()
 	r.currentEvent = r.resourceMgr.FindCurrentEvent()
+	r.latestEvent = r.resourceMgr.FindLatestEvent()
+	//log.Println(r.currentEvent.Name(), r.latestEvent.Name())
 	r.lastCheck = time.Now()
 	return r
 }
@@ -203,6 +205,7 @@ func (r *RankServer) inEventActive(timestamp string, event *resource_mgr.EventDe
 }
 
 // return current event or the latest previous event
+/*
 func (r *RankServer) latestEvent() *resource_mgr.EventDetail {
 	// reverse pass
 	for i := len(r.resourceMgr.EventList)-1; i >= 0; i-- {
@@ -213,6 +216,7 @@ func (r *RankServer) latestEvent() *resource_mgr.EventDetail {
 	}
 	return nil
 }
+*/
 
 func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) interface{} {
 	return r.fetchData(timestamp, rankingType, rank)

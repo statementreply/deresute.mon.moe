@@ -87,6 +87,7 @@ func (r *RankServer) CheckData(timestamp string) {
 		r.logger.Println("new res_ver:", rv)
 		r.resourceMgr.ParseEvent()
 		r.currentEvent = r.resourceMgr.FindCurrentEvent()
+		r.latestEvent = r.resourceMgr.FindLatestEvent()
 		r.lastCheck = time.Now()
 	}
 }

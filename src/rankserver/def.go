@@ -47,6 +47,7 @@ type RankServer struct {
 	hostname     string
 	resourceMgr  *resource_mgr.ResourceMgr
 	currentEvent *resource_mgr.EventDetail
+	latestEvent  *resource_mgr.EventDetail
 	client       *apiclient.ApiClient
 	lastCheck    time.Time
 	config       map[string]string

@@ -273,7 +273,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload_html(w, req, &qchartParam{
 		rankingType: 0,
 		list_rank:   []int{120001},
-		event:       r.currentEvent,
+		event:       r.latestEvent,
 		fancyChart:  false,
 	})
 	fmt.Fprint(w, "\n")
@@ -333,7 +333,7 @@ func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload_html(w, req, &qchartParam{
 		rankingType: 0,
 		list_rank:   []int{120001},
-		event:       r.currentEvent,
+		event:       r.latestEvent,
 		fancyChart:  false,
 	})
 	defer r.postload_html(w, req)
@@ -436,7 +436,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	event_id_str_list, ok := req.Form["event"] // checked Atoi
 	event := r.currentEvent
 	if event == nil {
-		event = r.latestEvent()
+		event = r.latestEvent
 	}
 	var prefill_event string = ""
 	// this block output: prefill_event, event
