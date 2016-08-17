@@ -150,7 +150,6 @@ func MakeRankServer() *RankServer {
 func (r *RankServer) setHandleFunc() {
 	// for DefaultServeMux
 	http.HandleFunc("/", r.homeHandler)
-	http.HandleFunc("/h1", r.homeHandler_new)
 	http.HandleFunc("/h2", r.homeHandler_new2)
 	http.HandleFunc("/m/", r.homeMHandler)
 	http.HandleFunc("/event", r.eventHandler)
