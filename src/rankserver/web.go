@@ -278,6 +278,15 @@ func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) 
 	}
 }
 
+func (r *RankServer) qchartHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.CheckData("")
+	tmplVar := r.getTmplVar(w, req)
+	err := rsTmpl.ExecuteTemplate(w, "qchart.html", tmplVar)
+	if err != nil {
+		r.logger.Println("html/template", err)
+	}
+}
+
 func (r *RankServer) chartSnippet() string {
 	// insert graph here
 	return `
