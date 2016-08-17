@@ -1,0 +1,32 @@
+
+<body><div data-role="page" data-dom-cache="false">
+{{template "qchart_info.html" .QChartInfo}}
+<p><a href="..">ホームページ</a></p>
+<div class="form">
+<form action="qchart" method="get">
+  customized border graph：<br>
+
+  <label for="textinput-rank">順位：</label>
+  <input class="t0" id="textinput-rank" type="text" name="rank" size=35 value="60001 120001">
+
+  <input type="hidden" name="event" value="">
+
+  <label for="radio-pt">イベントpt</label>
+  <input class="r0" id="radio-pt" type="radio" name="type" value="0" checked>
+
+  <label for="radio-score">ハイスコア</label>
+  <input class="r0" id="radio-score" type="radio" name="type" value="1">
+
+  <label for="checkbox-achart">AnnotationChart</label>
+  <input class="c0" id="checkbox-achart" type="checkbox" name="achart" value="1">
+
+  <input class="s0" type="submit" value="更新">
+</form>
+</div>
+<div class="ui-grid-a ui-responsive">
+<div class="ui-block-a" id="myLineChart">loading...</div>
+<div class="ui-block-b" id="mySpeedChart">loading...</div>
+</div><div class="note"><p>表示できる順位<br>
+	イベントpt：[1 501 2001 5001 10001 20001 30001 40001 50001 60001 70001 80001 90001 100001 110001 120001 130001 140001 150001 160001 170001 180001 190001 200001 210001 220001 230001 240001 250001 260001 270001 280001 290001 300001 310001 320001 330001 340001 350001 360001 370001 380001 390001 400001 410001 420001 430001 440001 450001 460001 470001 480001 490001 500001 510001 520001 530001 540001 550001 560001 570001 580001 590001 600001 1000001]<br>ハイスコア：[1 5001 10001 20001 30001 40001 50001 60001 70001 80001 90001 100001 110001 120001 130001 140001 150001 160001 170001 180001 190001 200001 210001 220001 230001 240001 250001 260001 270001 280001 290001 300001 310001 320001 330001 340001 350001 360001 370001 380001 390001 400001 410001 420001 430001 440001 450001 460001 470001 480001 490001 500001 510001 520001 530001 540001 550001 560001 570001 580001 590001 600001]
+	</p></div><div class="note"><p>javascript library from <code>https://www.gstatic.com/charts/loader.js</code></p></div></div></body>
+        
