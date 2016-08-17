@@ -174,10 +174,12 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	if err != nil {
 		r.logger.Println("html/template", err)
 	}
-	fmt.Fprint(w, `<body>`)
+	fmt.Fprint(w, `<body>
+`)
 	//fmt.Fprint(w, `<div data-role="page">`)
 	// doesn't work, data-dom-cache=false is the default
-	fmt.Fprint(w, `<div data-role="page" data-dom-cache="false">`)
+	fmt.Fprint(w, `    <div data-role="page" data-dom-cache="false">
+`)
 	// data provided to script
 	// the only dynamic part of this function
 	fmt.Fprintf(w, `<div id="dataurl" style="display:none;">%s</div>`, r.generateDURL(param))
@@ -191,9 +193,11 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 }
 
 func (r *RankServer) postload_html(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprint(w, `</div>`)
-	fmt.Fprint(w, "</body>")
-	fmt.Fprint(w, "</html>\n")
+	fmt.Fprint(w, `
+    </div>
+</body>
+</html>
+`)
 }
 
 var timestampFilter = regexp.MustCompile("^\\d+$")
@@ -228,9 +232,10 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	})
 	fmt.Fprint(w, "\n")
 	defer r.postload_html(w, req)
-	fmt.Fprint(w, `<div id="wrapper">`)
-	defer fmt.Fprint(w, "</div>\n")
-	fmt.Fprintf(w, "<h2>デレステイベントボーダーbotβ+</h2>")
+	fmt.Fprint(w, `        <div id="wrapper">
+`)
+	defer fmt.Fprint(w, "        </div>\n")
+	fmt.Fprintf(w, "            <h2>デレステイベントボーダーbotβ+</h2>")
 	fmt.Fprint(w, "\n")
 	if r.currentEvent != nil {
 		fmt.Fprintf(w, "<p>")
@@ -240,19 +245,20 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 		}
 		fmt.Fprintf(w, "</p>")
 	}
-	fmt.Fprintf(w, `<p>twitter bot：十五分毎にイベントptボーダーを更新し、一時間毎にトロフィーと称号ボーダーを更新します。
-	<a href="https://twitter.com/deresuteborder0">@deresuteborder0</a></p>`)
+	fmt.Fprintf(w, `            <p>twitter bot：十五分毎にイベントptボーダーを更新し、一時間毎にトロフィーと称号ボーダーを更新します。
+            <a href="https://twitter.com/deresuteborder0">@deresuteborder0</a></p>
+`)
 
-	fmt.Fprintf(w, "<a href=\"event\">%s</a><br>\n", "過去のイベント (new)")
-	fmt.Fprintf(w, "<a href=\"log\">%s</a><br>\n", "過去のデータ")
-	fmt.Fprintf(w, "<a href=\"m\">%s</a><br>\n", "m-test")
-	fmt.Fprint(w, "<hr>")
+	fmt.Fprintf(w, "            <a href=\"event\">%s</a><br>\n", "過去のイベント (new)")
+	fmt.Fprintf(w, "            <a href=\"log\">%s</a><br>\n", "過去のデータ")
+	fmt.Fprintf(w, "            <a href=\"m\">%s</a><br>\n", "m-test")
+	fmt.Fprint(w, "            <hr>")
 	fmt.Fprintf(w, "<h3>%s</h3>\n", "12万位ボーダーグラフ")
-	fmt.Fprintf(w, "（<a href=\"qchart?rank=2001&rank=10001&rank=20001&rank=60001&rank=120001\">%s</a>）<br>\n", "他のボーダーはここ")
-	fmt.Fprintf(w, "（<a href=\"qchart?rank=501&rank=5001&rank=50001&rank=500001\">%s</a>）<br>\n", "イベント称号ボーダー")
+	fmt.Fprintf(w, "            （<a href=\"qchart?rank=2001&rank=10001&rank=20001&rank=60001&rank=120001\">%s</a>）<br>\n", "他のボーダーはここ")
+	fmt.Fprintf(w, "            （<a href=\"qchart?rank=501&rank=5001&rank=50001&rank=500001\">%s</a>）<br>\n", "イベント称号ボーダー")
 	fmt.Fprint(w, r.chartSnippet())
 
-	fmt.Fprint(w, "<hr>")
+	fmt.Fprint(w, "            <hr>\n")
 
 	r.CheckData("")
 
@@ -265,8 +271,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 
 	// ajax version
 	fmt.Fprintf(w, "            <h3>%s</h3>\n", "最新ボーダー")
-	fmt.Fprint(w, "            <pre id=\"latestdata\">")
-	fmt.Fprint(w, "</pre>\n")
+	fmt.Fprint(w, "            <pre id=\"latestdata\"></pre>\n")
 }
 
 func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) {
@@ -293,7 +298,8 @@ func (r *RankServer) chartSnippet() string {
 <div class="ui-grid-a ui-responsive">
 <div class="ui-block-a" id="myLineChart">loading...</div>
 <div class="ui-block-b" id="mySpeedChart">loading...</div>
-</div>`
+</div>
+`
 }
 
 // mobile landscape optimized
