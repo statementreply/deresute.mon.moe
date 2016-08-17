@@ -66,7 +66,8 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 			}
 		}
 	} else {
-		list_rank = []int{60001, 120001}
+		// new default value
+		list_rank = []int{120001}
 	}
 
 	event_id_str_list, ok := req.Form["event"] // checked Atoi
@@ -146,6 +147,15 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	result.DURL = r.generateDURL(param)
 	if param.fancyChart {
 		result.AChart = 1
+	}
+
+	if r.currentEvent != nil {
+		result.EventInfo += "<p>"
+		result.EventInfo += "イベント開催中：" + template.HTMLEscapeString(r.currentEvent.Name())
+		if r.currentEvent.LoginBonusType() > 0 {
+			result.EventInfo += "<br>ログインボーナスがあるので、イベントページにアクセスを忘れないように。"
+		}
+		result.EventInfo +="</p>"
 	}
 	return result
 }
@@ -262,6 +272,15 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 func (r *RankServer) homeHandler_new(w http.ResponseWriter, req *http.Request) {
 	r.CheckData("")
 	err := rsTmpl.ExecuteTemplate(w, "homebody.html", &homeData{QChartParam: "/d?type=0&rank=120001&event=3010&", EventTitle: "イベント開催中：LIVE PARTY!!"})
+	if err != nil {
+		r.logger.Println("html/template", err)
+	}
+}
+
+func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.CheckData("")
+	tmplVar := r.getTmplVar(w, req)
+	err := rsTmpl.ExecuteTemplate(w, "home.html", tmplVar)
 	if err != nil {
 		r.logger.Println("html/template", err)
 	}
