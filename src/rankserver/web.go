@@ -480,36 +480,41 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 		fancyChart:  fancyChart,
 	})
 	defer r.postload_html(w, req)
-	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
-	fmt.Fprintf(w, `<div class="form">
-<form action="qchart" method="get">
-  customized border graph：<br>
+	fmt.Fprintf(w, "        <p><a href=\"..\">%s</a></p>\n", "ホームページ")
+	fmt.Fprintf(w, `        <div class="form">
+            <form action="qchart" method="get">
+                customized border graph：<br>
 
-  <label for="textinput-rank">順位：</label>
-  <input class="t0" id="textinput-rank" type="text" name="rank" size=35 value="%s">
+                <label for="textinput-rank">順位：</label>
+                <input class="t0" id="textinput-rank" type="text" name="rank" size=35 value="%s">
 
-  <input type="hidden" name="event" value="%s">
+                <input type="hidden" name="event" value="%s">
 
-  <label for="radio-pt">イベントpt</label>
-  <input class="r0" id="radio-pt" type="radio" name="type" value="0"%s>
+                <label for="radio-pt">イベントpt</label>
+                <input class="r0" id="radio-pt" type="radio" name="type" value="0"%s>
 
-  <label for="radio-score">ハイスコア</label>
-  <input class="r0" id="radio-score" type="radio" name="type" value="1"%s>
+                <label for="radio-score">ハイスコア</label>
+                <input class="r0" id="radio-score" type="radio" name="type" value="1"%s>
 
-  <label for="checkbox-achart">AnnotationChart</label>
-  <input class="c0" id="checkbox-achart" type="checkbox" name="achart" value="1"%s>
+                <label for="checkbox-achart">AnnotationChart</label>
+                <input class="c0" id="checkbox-achart" type="checkbox" name="achart" value="1"%s>
 
-  <input class="s0" type="submit" value="更新">
-</form>
-</div>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
+                <input class="s0" type="submit" value="更新">
+            </form>
+        </div>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
 
 	fmt.Fprint(w, r.chartSnippet())
-	fmt.Fprintf(w, `<div class="note"><p>表示できる順位<br>
-	イベントpt：%d<br>ハイスコア：%d
-	</p></div>`,
+	fmt.Fprintf(w, `        <div class="note">
+            <p>表示できる順位<br>
+            イベントpt：%d<br>ハイスコア：%d
+            </p>
+        </div>
+`,
 		r.get_list_rank(r.latestTimestamp(), 0),
 		r.get_list_rank(r.latestTimestamp(), 1))
-	fmt.Fprint(w, `<div class="note"><p>javascript library from <code>https://www.gstatic.com/charts/loader.js</code></p></div>`)
+	fmt.Fprint(w, `
+        <div class="note"><p>javascript library from <code>https://www.gstatic.com/charts/loader.js</code></p>
+        </div>`)
 }
 
 var staticFilter = regexp.MustCompile("^/static")
