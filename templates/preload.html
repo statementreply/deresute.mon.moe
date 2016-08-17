@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!--
+    // related to font bug?
+    //fmt.Fprint(w, `<html lang="ja">`)
+-->
 <html><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,7 +12,7 @@
 <link rel="stylesheet" type="text/css" href="/static/jquery.mobile-1.4.5.min.css" />
 <script type="text/javascript" src="/static/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="/static/jquery.mobile-1.4.5.min.js"></script>
-
+<!--//fmt.Fprintf(w, `<script language="javascript" type="text/javascript" src="%s"></script>`, r.generateDURL(param))-->
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
 
@@ -40,7 +44,8 @@
 		//google.charts.load('current', {packages: ['corechart', 'annotationchart']});
 	}
 	google.charts.load('current', {packages: ['corechart', 'annotationchart']});
-	google.charts.setOnLoadCallback(drawLineChart);google.charts.setOnLoadCallback(pageChange);
+	google.charts.setOnLoadCallback(drawLineChart);
+        google.charts.setOnLoadCallback(pageChange);
 		function pageChange() {
 			console.log("pagechange");
 			$(window).on("pagechange", function() {
@@ -60,7 +65,11 @@
 				drawLineChart();
 				console.log("orientationchange");
 			});
-		};function updateLatestData() {
+		};
+    // doesn't work
+    //$("#myLineChart").html("");
+    //$("#mySpeedChart").html("");
+        function updateLatestData() {
 		currentPage = $("body").pagecontainer("getActivePage");
 		latestdata = $("#latestdata", currentPage);
 		if (latestdata.length == 0) {
@@ -69,7 +78,8 @@
 		jQuery.get("/latest_data", "", function (data) {
 			latestdata.html(data);
 		}, "text");
-	}function drawLineChart() {
+	}
+        function drawLineChart() {
 	updateLatestData();
 	currentPage = $("body").pagecontainer("getActivePage");
 	dataurl = $("#dataurl", currentPage).text();
@@ -82,27 +92,27 @@
 		width: window.innerWidth || document.body.clientWidth,
 		height: window.innerHeight || document.body.clientHeight,
 	};
-	size_min = Math.min(size.width, size.height)
-	var options = {
-		title: "累計",
-		//width: size.width * 1.0,
-		//height: size.width * 0.5625,
-        hAxis: {
-            format: 'MM/dd HH:mm',
-            gridlines: {count: 12}
-        },
-        vAxis: {
-            minValue: 0,
-			textPosition: 'in',
-        },
-        interpolateNulls: true,
-        explorer: {maxZoomIn: 0.1},
-		//fontSize: 0.035 * size_min,
-		chartArea: {width: '100%', height: '65%'},
-		legend: {position: 'top', alignment: 'center'},
-    };
-	var options_speed = $.extend({}, options);
-	options_speed['interpolateNulls'] = false;
+	size_min = Math.min(size.width, size.height);
+        var options = {
+            title: "累計",
+            //width: size.width * 1.0,
+            //height: size.width * 0.5625,
+            hAxis: {
+                format: 'MM/dd HH:mm',
+                gridlines: {count: 12}
+            },
+            vAxis: {
+                minValue: 0,
+                textPosition: 'in',
+            },
+            interpolateNulls: true,
+            explorer: {maxZoomIn: 0.1},
+            //fontSize: 0.035 * size_min,
+            chartArea: {width: '100%', height: '65%'},
+            legend: {position: 'top', alignment: 'center'},
+        };
+        var options_speed = $.extend({}, options);
+        options_speed['interpolateNulls'] = false;
 	options_speed['title'] = "時速";
 	//console.log(options);
 	//console.log(options_speed);

@@ -72,28 +72,30 @@ func (r *RankServer) preload_html_old(w http.ResponseWriter, req *http.Request, 
 	}
 
 	r.init_req(w, req)
-	fmt.Fprint(w, "<!DOCTYPE html>\n")
+
+	//fmt.Fprint(w, "<!DOCTYPE html>\n")
 	// related to font bug?
 	//fmt.Fprint(w, `<html lang="ja">`)
-	fmt.Fprint(w, `<html>`)
-	fmt.Fprint(w, "<head>\n")
-	fmt.Fprint(w, `<meta charset="UTF-8">
+	//fmt.Fprint(w, `<html>`)
+	//fmt.Fprint(w, "<head>\n")
+	/*fmt.Fprint(w, `<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="keywords" content="デレステ, イベントランキング, ボーダー, アイマス, アイドルマスターシンデレラガールズスターライトステージ">
-<title>デレステボーダーbotβ+</title>`, "\n")
-	fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/style.css" />`, "\n")
-	fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/jquery.mobile-1.4.5.min.css" />`, "\n")
-	fmt.Fprint(w, `<script type="text/javascript" src="/static/jquery-1.12.4.min.js"></script>`, "\n")
-	fmt.Fprint(w, `<script type="text/javascript" src="/static/jquery.mobile-1.4.5.min.js"></script>`, "\n")
+<title>デレステボーダーbotβ+</title>`, "\n")*/
+
+	//fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/style.css" />`, "\n")
+	//fmt.Fprint(w, `<link rel="stylesheet" type="text/css" href="/static/jquery.mobile-1.4.5.min.css" />`, "\n")
+	//fmt.Fprint(w, `<script type="text/javascript" src="/static/jquery-1.12.4.min.js"></script>`, "\n")
+	//fmt.Fprint(w, `<script type="text/javascript" src="/static/jquery.mobile-1.4.5.min.js"></script>`, "\n")
+
 	//fmt.Fprintf(w, `<script language="javascript" type="text/javascript" src="%s"></script>`, r.generateDURL(param))
 
-	//if list_rank != nil {
-	fmt.Fprint(w, `
+	/*fmt.Fprint(w, `
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
-`)
+`)*/
 
-	fmt.Fprint(w, `
+	/*fmt.Fprint(w, `
 	currentPage = $("body").pagecontainer("getActivePage");
 	function setAspectRatio() {
 		aratio = 0.75;
@@ -122,11 +124,11 @@ func (r *RankServer) preload_html_old(w http.ResponseWriter, req *http.Request, 
 		//google.charts.load('current', {packages: ['corechart', 'annotationchart']});
 	}
 	google.charts.load('current', {packages: ['corechart', 'annotationchart']});
-	`)
+	`)*/
 
-	fmt.Fprint(w, `google.charts.setOnLoadCallback(drawLineChart);`)
+	//fmt.Fprint(w, `google.charts.setOnLoadCallback(drawLineChart);`)
 
-	fmt.Fprint(w, `google.charts.setOnLoadCallback(pageChange);
+	/*fmt.Fprint(w, `google.charts.setOnLoadCallback(pageChange);
 		function pageChange() {
 			console.log("pagechange");
 			$(window).on("pagechange", function() {
@@ -146,13 +148,13 @@ func (r *RankServer) preload_html_old(w http.ResponseWriter, req *http.Request, 
 				drawLineChart();
 				console.log("orientationchange");
 			});
-		};`)
+		};`)*/
 
 	// doesn't work
 	//$("#myLineChart").html("");
 	//$("#mySpeedChart").html("");
 
-	fmt.Fprint(w, `function updateLatestData() {
+	/*fmt.Fprint(w, `function updateLatestData() {
 		currentPage = $("body").pagecontainer("getActivePage");
 		latestdata = $("#latestdata", currentPage);
 		if (latestdata.length == 0) {
@@ -161,9 +163,9 @@ func (r *RankServer) preload_html_old(w http.ResponseWriter, req *http.Request, 
 		jQuery.get("/latest_data", "", function (data) {
 			latestdata.html(data);
 		}, "text");
-	}`)
+	}`)*/
 	// need printf for legacy reasons %%
-	fmt.Fprintf(w, `function drawLineChart() {
+	/*fmt.Fprintf(w, `function drawLineChart() {
 	updateLatestData();
 	currentPage = $("body").pagecontainer("getActivePage");
 	dataurl = $("#dataurl", currentPage).text();
@@ -252,10 +254,10 @@ func (r *RankServer) preload_html_old(w http.ResponseWriter, req *http.Request, 
 		chart.draw(data_rank, options);
 	    chart_speed.draw(data_speed, options_speed);
 	})
-    }`)
-	fmt.Fprint(w, `</script>`)
+    }`)*/
+	//fmt.Fprint(w, `</script>`)
 	//}
-	fmt.Fprint(w, "</head>\n")
+	//fmt.Fprint(w, "</head>\n")
 	fmt.Fprint(w, `<body>`)
 
 	//fmt.Fprint(w, `<div data-role="page">`)
