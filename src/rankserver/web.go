@@ -32,6 +32,125 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 	return u
 }
 
+func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplVar {
+	req.ParseForm()
+	result := new(tmplVar)
+
+	timestamp, ok := req.Form["t"] // format checked
+	if !ok {
+		//r.CheckData("")
+		//fmt.Fprint(w, r.latestData())
+	} else {
+		if timestampFilter.MatchString(timestamp[0]) {
+			result.Timestamp = timestamp[0]
+			//r.CheckData(timestamp[0])
+			//fmt.Fprint(w, r.showData(timestamp[0]))
+		} else {
+			r.logger.Println("bad req", req.Form)
+		}
+	}
+	// parse parameters
+	list_rank_str, ok := req.Form["rank"] // format checked split, strconv.Atoi
+	var list_rank []int
+	if ok {
+		list_rank = make([]int, 0, len(list_rank_str))
+		for _, v := range list_rank_str {
+			// now v can contain more than one number
+			//fmt.Println("str<"+v+">")
+			subv := strings.Split(v, " ")
+			for _, vv := range subv {
+				n, err := strconv.Atoi(vv)
+				if (err == nil) && (n >= 1) && (n <= 1000001) {
+					list_rank = append(list_rank, n)
+				}
+			}
+		}
+	} else {
+		list_rank = []int{60001, 120001}
+	}
+
+	event_id_str_list, ok := req.Form["event"] // checked Atoi
+	// default value is latest
+	event := r.latestEvent
+	if event == nil {
+		//event = r.latestEvent
+		r.logger.Println("latestEvent is nil")
+	}
+	var prefill_event string = ""
+	// this block output: prefill_event, event
+	if ok {
+		event_id_str := event_id_str_list[0]
+		// skip empty string
+		if event_id_str == "" {
+			event = r.latestEvent
+		} else {
+			event_id, err := strconv.Atoi(event_id_str)
+			if err == nil {
+				prefill_event = event_id_str
+				event = r.resourceMgr.FindEventById(event_id)
+				if event == nil {
+					event = r.latestEvent
+				}
+			} else {
+				r.logger.Println("bad event id", err, event_id_str)
+			}
+		}
+	}
+	result.PrefillEvent = prefill_event
+	var prefill string = "2001 10001 20001 60001 120001"
+	{
+		n_rank := []string{}
+		for _, n := range list_rank {
+			n_rank = append(n_rank, fmt.Sprintf("%d", n))
+		}
+		prefill = strings.Join(n_rank, " ")
+	}
+	result.PrefillRank = prefill
+
+	var rankingType int
+	rankingType_str_list, ok := req.Form["type"] // checked Atoi
+	if ok {
+		rankingType_str := rankingType_str_list[0]
+		rankingType_i, err := strconv.Atoi(rankingType_str)
+		if err == nil {
+			if rankingType_i > 0 {
+				rankingType = 1
+			}
+		} else {
+			rankingType = 0
+		}
+	} else {
+		rankingType = 0
+	}
+	checked_type := []string{"", ""}
+	checked_type[rankingType] = " checked"
+
+	fancyChart := false
+	fancyChart_checked := ""
+	fancyChart_str_list, ok := req.Form["achart"] // ignored, len
+	if ok {
+		fancyChart_str := fancyChart_str_list[0]
+		if len(fancyChart_str) > 0 {
+			fancyChart = true
+			fancyChart_checked = " checked"
+		}
+	}
+	result.PrefillAChart = fancyChart_checked
+
+	param := &qchartParam{
+		rankingType: rankingType,
+		list_rank: list_rank,
+		event: event,
+		fancyChart: fancyChart,
+	}
+	result.DURL = r.generateDURL(param)
+	if param.fancyChart {
+		result.AChart = 1
+	}
+	return result
+}
+
+
 // rankserver templates
 var rsTmpl = template.Must(template.ParseGlob(BASE + "/templates/*.html"))
 // now the script is totally static

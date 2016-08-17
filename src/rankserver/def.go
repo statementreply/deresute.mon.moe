@@ -28,6 +28,16 @@ type twitterParam struct {
 	interval     time.Duration
 }
 
+type tmplVar struct {
+	EventInfo string
+	Timestamp string
+	DURL string
+	AChart int
+	PrefillEvent string
+	PrefillRank string
+	PrefillAChart string
+}
+
 type RankServer struct {
 	//    map[timestamp][rankingType][rank] = score
 	// {"1467555420":   [{10: 2034} ,{30: 203021} ]  }
