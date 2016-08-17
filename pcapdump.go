@@ -46,6 +46,7 @@ var snaplen = flag.Int("s", 1600, "SnapLen for pcap packet capture")
 var filter = flag.String("f", "tcp", "BPF filter for pcap")
 var logAllPackets = flag.Bool("v", false, "Logs every packet in great detail")
 var showAllHTTP = flag.Bool("a", false, "Show every http request/response")
+var isDebug = flag.Bool("d", false, "(debug) show types")
 var wg sync.WaitGroup
 
 // FIXME use lock to prevent concurrent rw
@@ -200,7 +201,9 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 		//fmt.Println(string(yy))
 		if content != nil {
 			fmt.Println(content)
-			fmt.Printf("%t\n", content)
+			if *isDebug {
+				fmt.Printf("%t\n", content)
+			}
 			//fmt.Printf("%v\n", content)
 			//fmt.Printf("%#v\n", content)
 			if _, ok := content["data_headers"]; ok {
