@@ -140,6 +140,19 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "</pre>")
 }
 
+func (r *RankServer) homeHandler_new(w http.ResponseWriter, req *http.Request) {
+	r.CheckData("")
+	err := rsTmpl.ExecuteTemplate(w, "homebody.html", &homeData{QChartParam: "/d?type=0&rank=120001&event=3010&", EventTitle: "イベント開催中：LIVE PARTY!!"})
+	if err != nil {
+		r.logger.Println("html/template", err)
+	}
+}
+
+type homeData struct {
+	QChartParam string
+	EventTitle string
+}
+
 func (r *RankServer) chartSnippet() string {
 	// insert graph here
 	return `
