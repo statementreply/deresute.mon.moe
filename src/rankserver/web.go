@@ -32,7 +32,8 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 	return u
 }
 
-var preloadTmpl = template.Must(template.ParseGlob(BASE + "/templates/*.html"))
+// rankserver templates
+var rsTmpl = template.Must(template.ParseGlob(BASE + "/templates/*.html"))
 // now the script is totally static
 func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
 	fancyChart := false
@@ -40,7 +41,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 		fancyChart = param.fancyChart
 	}
 	r.init_req(w, req)
-	err := preloadTmpl.ExecuteTemplate(w, "preload.html", nil)
+	err := rsTmpl.ExecuteTemplate(w, "preload.html", nil)
 	if err != nil {
 		r.logger.Println("html/template", err)
 	}
