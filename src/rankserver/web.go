@@ -2,6 +2,7 @@ package rankserver
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -31,8 +32,40 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 	return u
 }
 
+var preloadTmpl = template.Must(template.New("preload.html").ParseFiles(BASE + "/templates/preload.html"))
 // now the script is totally static
 func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
+	fancyChart := false
+	if param != nil {
+		fancyChart = param.fancyChart
+	}
+
+	r.init_req(w, req)
+	err := preloadTmpl.Execute(w, nil)
+	if err != nil {
+		r.logger.Println("html/template", err)
+	}
+	fmt.Fprint(w, `<body>`)
+
+	//fmt.Fprint(w, `<div data-role="page">`)
+	// doesn't work, data-dom-cache=false is the default
+	fmt.Fprint(w, `<div data-role="page" data-dom-cache="false">`)
+	// data provided to script
+	// the only dynamic part of this function
+	fmt.Fprintf(w, `<div id="dataurl" style="display:none;">%s</div>`, r.generateDURL(param))
+	fmt.Fprint(w, "\n")
+	fancyChart_i := 0
+	if fancyChart {
+		fancyChart_i = 1
+	}
+	fmt.Fprintf(w, `<div id="fancychart" style="display:none;">%d</div>`, fancyChart_i)
+	fmt.Fprint(w, "\n")
+}
+
+
+
+// now the script is totally static
+func (r *RankServer) preload_html_old(w http.ResponseWriter, req *http.Request, param *qchartParam) {
 	fancyChart := false
 	if param != nil {
 		fancyChart = param.fancyChart

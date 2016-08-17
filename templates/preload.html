@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="デレステ, イベントランキング, ボーダー, アイマス, アイドルマスターシンデレラガールズスターライトステージ">
+<title>デレステボーダーbotβ+</title>
+<link rel="stylesheet" type="text/css" href="/static/style.css" />
+<link rel="stylesheet" type="text/css" href="/static/jquery.mobile-1.4.5.min.css" />
+<script type="text/javascript" src="/static/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="/static/jquery.mobile-1.4.5.min.js"></script>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+
+	currentPage = $("body").pagecontainer("getActivePage");
+	function setAspectRatio() {
+		aratio = 0.75;
+		if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
+			console.log("shorted setAspectRatio()");
+			return;
+		}
+		myLineChart = $("#myLineChart", currentPage)
+		mySpeedChart = $("#mySpeedChart", currentPage)
+		console.log("setAspectRatio()", myLineChart.width())
+		console.log("setAspectRatio()", myLineChart.height())
+		myLineChart.height(myLineChart.width() * aratio);
+		mySpeedChart.height(mySpeedChart.width() * aratio);
+	}
+	$(window).on("pagecreate pageload pagechange pageshow throttledresize", function(e) {
+		console.log("pagecreate/throttledresize", e);
+		setAspectRatio();
+	});
+	dataurl = $("#dataurl", currentPage).text();
+	console.log("dataurl", dataurl);
+	fancychart = $("#fancychart", currentPage).text();
+	// this doesn't work
+	if (fancychart == 0) {
+		//google.charts.load('current', {packages: ['corechart']});
+	} else {
+		//google.charts.load('current', {packages: ['corechart', 'annotationchart']});
+	}
+	google.charts.load('current', {packages: ['corechart', 'annotationchart']});
+	google.charts.setOnLoadCallback(drawLineChart);google.charts.setOnLoadCallback(pageChange);
+		function pageChange() {
+			console.log("pagechange");
+			$(window).on("pagechange", function() {
+				drawLineChart()
+				console.log("pagechange");
+			});
+			//$("body").pagecontainer()
+			$("body").on("pagecontainerload", function () {
+				//drawLineChart();
+				console.log("pagecontainerload");
+			});
+			$("body").on("pageshow", function () {
+				//drawLineChart();
+				console.log("pageshow");
+			});
+			$(window).on("orientationchange", function() {
+				drawLineChart();
+				console.log("orientationchange");
+			});
+		};function updateLatestData() {
+		currentPage = $("body").pagecontainer("getActivePage");
+		latestdata = $("#latestdata", currentPage);
+		if (latestdata.length == 0) {
+			return;
+		}
+		jQuery.get("/latest_data", "", function (data) {
+			latestdata.html(data);
+		}, "text");
+	}function drawLineChart() {
+	updateLatestData();
+	currentPage = $("body").pagecontainer("getActivePage");
+	dataurl = $("#dataurl", currentPage).text();
+	console.log("dataurl", dataurl);
+	fancychart = $("#fancychart", currentPage).text();
+
+	// first get the size from the window
+	// if that didn't work, get it from the body
+	var size = {
+		width: window.innerWidth || document.body.clientWidth,
+		height: window.innerHeight || document.body.clientHeight,
+	};
+	size_min = Math.min(size.width, size.height)
+	var options = {
+		title: "累計",
+		//width: size.width * 1.0,
+		//height: size.width * 0.5625,
+        hAxis: {
+            format: 'MM/dd HH:mm',
+            gridlines: {count: 12}
+        },
+        vAxis: {
+            minValue: 0,
+			textPosition: 'in',
+        },
+        interpolateNulls: true,
+        explorer: {maxZoomIn: 0.1},
+		//fontSize: 0.035 * size_min,
+		chartArea: {width: '100%', height: '65%'},
+		legend: {position: 'top', alignment: 'center'},
+    };
+	var options_speed = $.extend({}, options);
+	options_speed['interpolateNulls'] = false;
+	options_speed['title'] = "時速";
+	//console.log(options);
+	//console.log(options_speed);
+	if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
+		return;
+	}
+	myLineChart = $("#myLineChart", currentPage)
+	mySpeedChart = $("#mySpeedChart", currentPage)
+	console.log("drawLineChart, call setAspectRatio()")
+	setAspectRatio();
+	console.log("drawLineChart, call setAspectRatio() return")
+	console.log("drawLineChart,", myLineChart, mySpeedChart)
+	var chart
+	var chart_speed
+	if (fancychart == 0) {
+		chart = new google.visualization.LineChart(myLineChart.get(0));
+		chart_speed = new google.visualization.LineChart(mySpeedChart.get(0));
+	} else {
+		chart = eval("new google.visualization.AnnotationChart(myLineChart.get(0))");
+		chart_speed = eval("new google.visualization.AnnotationChart(mySpeedChart.get(0))");
+	}
+
+	$.getJSON(dataurl, "", function (data) {
+		var data_list = [];
+		for (t=0; t<2; t++) {
+			dt = {"cols": [{"id":"timestamp","label":"timestamp","type":"datetime"}],
+			"rows":[]}
+			cur = data[t];
+			//console.log("r", cur[0]);
+			// cols
+			for (i=0; i<cur[0].length; i++) {
+				dt["cols"].push({"id":cur[0][i], "label":cur[0][i], "type":"number"})
+			}
+			// rows
+			for (i=1; i<cur.length; i++) {
+				row = cur[i]
+				row_map = {"c":[{"v":new Date(row[0] * 1000)}]}
+				for (j=1; j<row.length; j++) {
+					row_map["c"].push({"v": row[j]})
+				}
+				dt["rows"].push(row_map)
+			}
+			//console.log(dt)
+			// t=0: dt: ranklist
+			// t=1: dt: speedlist
+			data_list[t] = dt;
+		}
+
+		var data_rank = new google.visualization.DataTable(data_list[0]);
+		var data_speed = new google.visualization.DataTable(data_list[1]);
+		console.log("dtl",data_list);
+		console.log("draw");
+		chart.draw(data_rank, options);
+	    chart_speed.draw(data_speed, options_speed);
+	})
+    }</script></head>
