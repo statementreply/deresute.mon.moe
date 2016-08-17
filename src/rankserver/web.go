@@ -193,7 +193,7 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 func (r *RankServer) postload_html(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, `</div>`)
 	fmt.Fprint(w, "</body>")
-	fmt.Fprint(w, "</html>")
+	fmt.Fprint(w, "</html>\n")
 }
 
 var timestampFilter = regexp.MustCompile("^\\d+$")
@@ -229,7 +229,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "\n")
 	defer r.postload_html(w, req)
 	fmt.Fprint(w, `<div id="wrapper">`)
-	defer fmt.Fprint(w, `</div>`)
+	defer fmt.Fprint(w, "</div>\n")
 	fmt.Fprintf(w, "<h2>デレステイベントボーダーbotβ+</h2>")
 	fmt.Fprint(w, "\n")
 	if r.currentEvent != nil {
@@ -264,9 +264,9 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	*/
 
 	// ajax version
-	fmt.Fprintf(w, "<h3>%s</h3>\n", "最新ボーダー")
-	fmt.Fprint(w, "<pre id=\"latestdata\">")
-	fmt.Fprint(w, "</pre>")
+	fmt.Fprintf(w, "            <h3>%s</h3>\n", "最新ボーダー")
+	fmt.Fprint(w, "            <pre id=\"latestdata\">")
+	fmt.Fprint(w, "</pre>\n")
 }
 
 func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) {
