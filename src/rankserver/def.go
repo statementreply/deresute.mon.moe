@@ -4,12 +4,12 @@ import (
 	"apiclient"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
+	"html/template"
 	"log"
 	"net/http"
 	"resource_mgr"
 	"stoppableListener"
 	"sync"
-	"html/template"
 	"time"
 )
 
@@ -35,10 +35,10 @@ type aTag struct {
 }
 
 type eventInfo struct {
-	EventLink template.HTML
+	EventLink  template.HTML
 	EventStart string
-	EventHalf string
-	EventEnd string
+	EventHalf  string
+	EventEnd   string
 }
 
 type tmplVar struct {
@@ -47,15 +47,15 @@ type tmplVar struct {
 	// for homepage currentEvent
 	EventInfo template.HTML
 	// for others, selected by event=
-	EventTitle string
-	Timestamp string
-	DURL string
-	AChart int
-	PrefillEvent string
-	PrefillRank string
-	PrefillAChart template.HTMLAttr
+	EventTitle         string
+	Timestamp          string
+	DURL               string
+	AChart             int
+	PrefillEvent       string
+	PrefillRank        string
+	PrefillAChart      template.HTMLAttr
 	PrefillCheckedType []template.HTMLAttr
-	AvailableRank [][]int
+	AvailableRank      [][]int
 	// for "/q"
 	Data string
 	// for "/log"
@@ -67,7 +67,7 @@ type tmplVar struct {
 type RankServer struct {
 	//    map[timestamp][rankingType][rank] = score
 	// {"1467555420":   [{10: 2034} ,{30: 203021} ]  }
-	list_timestamp []string                     // need mutex?
+	list_timestamp []string // need mutex?
 	// for both read and write
 	mux_timestamp sync.RWMutex
 	// sql

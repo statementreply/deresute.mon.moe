@@ -5,10 +5,10 @@ import (
 	"encoding/hex"
 	//"gopkg.in/vmihailenco/msgpack.v2"
 	//"gopkg.in/yaml.v2"
+	"bytes"
 	"log"
 	"runtime/debug"
 	"strings"
-	"bytes"
 )
 
 // Processing response (or request)

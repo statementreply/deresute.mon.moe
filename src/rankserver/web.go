@@ -172,7 +172,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 		if r.currentEvent.LoginBonusType() > 0 {
 			result.EventInfo += "<br>ログインボーナスがあるので、イベントページにアクセスを忘れないように。"
 		}
-		result.EventInfo +="</p>"
+		result.EventInfo += "</p>"
 	}
 	result.AvailableRank = [][]int{
 		r.get_list_rank(r.latestTimestamp(), 0),
@@ -353,10 +353,10 @@ func (r *RankServer) eventHandler_new2(w http.ResponseWriter, req *http.Request)
 		tmplVar.EventList = append(
 			tmplVar.EventList,
 			&eventInfo{
-				EventLink: name,
+				EventLink:  name,
 				EventStart: formatter(e.EventStart()),
-				EventHalf: formatter(e.SecondHalfStart()),
-				EventEnd: formatter(e.EventEnd()),
+				EventHalf:  formatter(e.SecondHalfStart()),
+				EventEnd:   formatter(e.EventEnd()),
 			},
 		)
 	}

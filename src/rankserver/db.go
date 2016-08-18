@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	sqlite3 "github.com/mattn/go-sqlite3"
 	//"resource_mgr"
+	"log"
 	"sort"
 	"time"
 	ts "timestamp"
-	"log"
 )
 
 // tag: database, sqlite
@@ -19,7 +19,6 @@ func (r *RankServer) setCacheSize() {
 		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
 	}
 }
-
 
 // tag: database, sqlite
 func (r *RankServer) UpdateTimestamp() {
@@ -174,7 +173,6 @@ func (r *RankServer) fetchDataSlice(timestamp string) []map[int]int {
 	}
 	return slice
 }
-
 
 // SELECT timestamp, score FROM rank WHERE type == 1 AND rank == 120001 AND timestamp BETWEEN 1470622619 AND 1470644220
 //rankingType int, list_rank []int, dataSource func(string, int, int) interface{}, event *resource_mgr.EventDetail)

@@ -22,11 +22,11 @@ var ErrNoResponse = errors.New("no response received")
 var ErrRerun = errors.New("new server timestamp")
 
 type DataFetcher struct {
-	Client         *apiclient.ApiClient
-	resourceMgr    *resource_mgr.ResourceMgr
-	key_point      [][2]int
-	rankDB         string
-	db             *sql.DB
+	Client      *apiclient.ApiClient
+	resourceMgr *resource_mgr.ResourceMgr
+	key_point   [][2]int
+	rankDB      string
+	db          *sql.DB
 	// prevent duplicate during [resultstart, resultend]
 	currentResultEnd time.Time
 }

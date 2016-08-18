@@ -124,7 +124,7 @@ func FindCurrentEvent(eventList []*EventDetail) *EventDetail {
 
 func FindLatestEvent(eventList []*EventDetail) *EventDetail {
 	now := time.Now()
-	for i := len(eventList)-1; i >= 0; i-- {
+	for i := len(eventList) - 1; i >= 0; i-- {
 		e := eventList[i]
 		if !now.Before(e.event_start) && e.HasRanking() {
 			return e
@@ -132,7 +132,6 @@ func FindLatestEvent(eventList []*EventDetail) *EventDetail {
 	}
 	return nil
 }
-
 
 type EventDetailList []*EventDetail
 
