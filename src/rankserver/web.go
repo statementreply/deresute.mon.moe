@@ -187,29 +187,9 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 }
 
 // now the script is totally static
-func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
-	r.init_req(w, req)
-
-	fancyChart := false
-	if param != nil {
-		fancyChart = param.fancyChart
-	}
-
-	fmt.Fprint(w, `<body>
-`)
-	fmt.Fprint(w, `    <div data-role="page" data-dom-cache="false">
-`)
-	// data provided to script
-	// the only dynamic part of this function
-	fmt.Fprintf(w, `<div id="dataurl" style="display:none;">%s</div>`, r.generateDURL(param))
-	fmt.Fprint(w, "\n")
-	fancyChart_i := 0
-	if fancyChart {
-		fancyChart_i = 1
-	}
-	fmt.Fprintf(w, `<div id="fancychart" style="display:none;">%d</div>`, fancyChart_i)
-	fmt.Fprint(w, "\n")
-}
+//func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
+//	r.init_req(w, req)
+//}
 
 func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
