@@ -117,70 +117,47 @@ func (r *RankServer) parseParam_achart(req *http.Request) int {
 // - type:    single 0/1 pt/score
 // - achart:  single 0/1 linechart/annotationchart
 func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplVar {
-	req.ParseForm()
 	result := new(tmplVar)
-
-	// for t
+	req.ParseForm()
 	result.Timestamp = r.parseParam_t(req)
-
 	// FIXME
-	//r.CheckData("")
 	r.CheckData(result.Timestamp)
 
-	// for rank
 	result.list_rank = r.parseParam_rank(req)
 	// new default value
 	if result.list_rank == nil {
 		result.list_rank = []int{120001}
 	}
-
-	// for event
-	{
-		result.event = r.parseParam_event(req)
-		if result.event == nil {
-			// default value is latest
-			result.event = r.latestEvent
-		}
-		if result.event == nil {
-			r.logger.Println("latestEvent is nil")
-		}
-		result.PrefillEvent = ""
-		if result.event != nil {
-			result.PrefillEvent = strconv.Itoa(result.event.Id())
-		}
+	n_rank := []string{}
+	for _, n := range result.list_rank {
+		n_rank = append(n_rank, fmt.Sprintf("%d", n))
 	}
+	result.PrefillRank = strings.Join(n_rank, " ")
 
-	//result.PrefillRank = "2001 10001 20001 60001 120001"
-	{
-		n_rank := []string{}
-		for _, n := range result.list_rank {
-			n_rank = append(n_rank, fmt.Sprintf("%d", n))
-		}
-		result.PrefillRank = strings.Join(n_rank, " ")
+	result.event = r.parseParam_event(req)
+	if result.event == nil {
+		// default value is latest
+		result.event = r.latestEvent
 	}
-
-	// for type
-	{
-		result.rankingType = r.parseParam_type(req)
-		checked_type := []template.HTMLAttr{"", ""}
-		checked_type[result.rankingType] = " checked"
-		result.PrefillCheckedType = checked_type
+	if result.event == nil {
+		r.logger.Println("latestEvent is nil")
 	}
-
-	// for achart
-	{
-		result.AChart = r.parseParam_achart(req)
-		result.fancyChart = false
-		result.PrefillAChart = ""
-		if result.AChart == 1 {
-			result.fancyChart = true
-			result.PrefillAChart = " checked"
-		}
+	result.PrefillEvent = ""
+	if result.event != nil {
+		result.PrefillEvent = strconv.Itoa(result.event.Id())
 	}
+	result.rankingType = r.parseParam_type(req)
+	result.PrefillCheckedType = []template.HTMLAttr{"", ""}
+	result.PrefillCheckedType[result.rankingType] = " checked"
 
-
+	result.AChart = r.parseParam_achart(req)
+	result.fancyChart = false
+	result.PrefillAChart = ""
+	if result.AChart == 1 {
+		result.fancyChart = true
+		result.PrefillAChart = " checked"
+	}
 	result.DURL = r.generateDURL(&result.qchartParam)
-
 	if r.currentEvent != nil {
 		result.EventInfo += "<p>"
 		result.EventInfo += "イベント開催中：" + template.HTMLEscapeString(r.currentEvent.Name())
