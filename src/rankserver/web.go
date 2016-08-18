@@ -149,6 +149,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	result.PrefillEvent = ""
 	if result.event != nil {
 		result.PrefillEvent = strconv.Itoa(result.event.Id())
+		result.EventTitle = result.event.Name()
 	}
 	result.rankingType = r.parseParam_type(req)
 	result.PrefillCheckedType = []template.HTMLAttr{"", ""}
