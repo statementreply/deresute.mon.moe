@@ -4,10 +4,12 @@
 {{template "qchart_info.html" .}}
         <div data-role="main" class="ui-content">
             <p><a href="..">ホームページ</a></p>
-            {{.EventTitle}}
+            <p>{{.EventTitle}}</p>
             <form id="mform" action="#">
-                  <label for="flip-checkbox-1" class="ui-hidden-accessible">Flip toggle switch checkbox:</label>
-                  <input type="checkbox" data-role="flipswitch" data-on-text="score" data-off-text="pt" data-wrapper-class="custom-size-flipswitch" name="flip-checkbox-1" id="flip-checkbox-1">
+                  <label for="flip-checkbox-1" class="ui-hidden-accessible">累計-時速</label>
+                  <input type="checkbox" data-role="flipswitch" data-on-text="時速" data-off-text="累計" data-wrapper-class="custom-size-flipswitch" name="flip-checkbox-1" id="flip-checkbox-1">
+                  <label for="flip-checkbox-2" class="ui-hidden-accessible">pt-score</label>
+                  <input type="checkbox" data-role="flipswitch" data-on-text="score" data-off-text="pt" data-wrapper-class="custom-size-flipswitch" name="flip-checkbox-2" id="flip-checkbox-2">
             </form>
             <div>
                 <div id="myLineChart">aa</div>
@@ -20,6 +22,7 @@ function setMForm () {
     $("#mform").on("change", function() {
         console.log("changemform");
         var cv = $("#flip-checkbox-1").get(0).checked;
+        var score = $("#flip-checkbox-2").get(0).checked;
         console.log(cv);
         currentPage = $("body").pagecontainer("getActivePage");
         if (cv) {
