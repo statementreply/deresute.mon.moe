@@ -16,14 +16,12 @@ func (r *RankServer) latestDataHandler(w http.ResponseWriter, req *http.Request)
 
 func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 	r.CheckData("")
-
 	// parse parameters
 	req.ParseForm()
 	list_rank := r.parseParam_rank(req)
 	if list_rank == nil {
 		list_rank = []int{60001, 120001}
 	}
-
 
 	event := r.parseParam_event(req)
 	if event == nil {
@@ -33,16 +31,15 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 		r.logger.Println("latestEvent is nil")
 		return
 	}
-
 	rankingType := r.parseParam_type(req)
-
 	// generate json
 	fmt.Fprint(w,
 		"[\n",
 		r.jsonData(rankingType, list_rank, r.fetchData_i, event),
 		",\n",
 		r.jsonData(rankingType, list_rank, r.getSpeed_i, event),
-		"]\n")
+		"]\n",
+	)
 }
 
 func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
