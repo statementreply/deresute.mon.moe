@@ -245,17 +245,13 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 	defer fmt.Fprint(w, "</pre>")
 	//fmt.Fprint( w, r.dumpData() )
 	req.ParseForm()
-	timestamp, ok := req.Form["t"] // format checked
-	if !ok {
+	timestamp := r.parseParam_t(req)
+	if timestamp == "" {
 		r.CheckData("")
 		fmt.Fprint(w, r.latestData())
 	} else {
-		if timestampFilter.MatchString(timestamp[0]) {
-			r.CheckData(timestamp[0])
-			fmt.Fprint(w, r.showData(timestamp[0]))
-		} else {
-			r.logger.Println("bad req", req.Form)
-		}
+		r.CheckData(timestamp)
+		fmt.Fprint(w, r.showData(timestamp))
 	}
 }
 
@@ -424,52 +420,25 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 
 	// parse parameters
 	req.ParseForm()
-	list_rank_str, ok := req.Form["rank"] // format checked split, strconv.Atoi
-	var list_rank []int
-	if ok {
-		list_rank = make([]int, 0, len(list_rank_str))
-		for _, v := range list_rank_str {
-			// now v can contain more than one number
-			//fmt.Println("str<"+v+">")
-			subv := strings.Split(v, " ")
-			for _, vv := range subv {
-				n, err := strconv.Atoi(vv)
-				if (err == nil) && (n >= 1) && (n <= 1000001) {
-					list_rank = append(list_rank, n)
-				}
-			}
-		}
-	} else {
+	list_rank := r.parseParam_rank(req)
+	if list_rank == nil {
 		list_rank = []int{60001, 120001}
 	}
 
-	event_id_str_list, ok := req.Form["event"] // checked Atoi
+	event := r.parseParam_event(req)
+
 	// default value is latest
-	event := r.latestEvent
 	if event == nil {
-		//event = r.latestEvent
+		event = r.latestEvent
+	}
+	if event == nil {
 		r.logger.Println("latestEvent is nil")
 	}
 	var prefill_event string = ""
-	// this block output: prefill_event, event
-	if ok {
-		event_id_str := event_id_str_list[0]
-		// skip empty string
-		if event_id_str == "" {
-			event = r.latestEvent
-		} else {
-			event_id, err := strconv.Atoi(event_id_str)
-			if err == nil {
-				prefill_event = event_id_str
-				event = r.resourceMgr.FindEventById(event_id)
-				if event == nil {
-					event = r.latestEvent
-				}
-			} else {
-				r.logger.Println("bad event id", err, event_id_str)
-			}
-		}
+	if event != nil {
+		prefill_event = strconv.Itoa(event.Id())
 	}
+
 	var prefill string = "2001 10001 20001 60001 120001"
 	{
 		n_rank := []string{}
@@ -479,33 +448,17 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 		prefill = strings.Join(n_rank, " ")
 	}
 
-	var rankingType int
-	rankingType_str_list, ok := req.Form["type"] // checked Atoi
-	if ok {
-		rankingType_str := rankingType_str_list[0]
-		rankingType_i, err := strconv.Atoi(rankingType_str)
-		if err == nil {
-			if rankingType_i > 0 {
-				rankingType = 1
-			}
-		} else {
-			rankingType = 0
-		}
-	} else {
-		rankingType = 0
-	}
+	rankingType := r.parseParam_type(req)
 	checked_type := []string{"", ""}
 	checked_type[rankingType] = " checked"
 
+	achart := r.parseParam_achart(req)
+
 	fancyChart := false
 	fancyChart_checked := ""
-	fancyChart_str_list, ok := req.Form["achart"] // ignored, len
-	if ok {
-		fancyChart_str := fancyChart_str_list[0]
-		if len(fancyChart_str) > 0 {
-			fancyChart = true
-			fancyChart_checked = " checked"
-		}
+	if achart == 1 {
+		fancyChart = true
+		fancyChart_checked = " checked"
 	}
 
 	// generate html

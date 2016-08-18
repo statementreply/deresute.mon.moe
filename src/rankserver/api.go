@@ -3,7 +3,7 @@ package rankserver
 import (
 	"fmt"
 	"net/http"
-	"strconv"
+	//"strconv"
 	"strings"
 	"time"
 	ts "timestamp"
@@ -19,74 +19,24 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 
 	// parse parameters
 	req.ParseForm()
-	list_rank_str, ok := req.Form["rank"] // format checked, split, strconv.Atoi
-	var list_rank []int
-	if ok {
-		list_rank = make([]int, 0, len(list_rank_str))
-		for _, v := range list_rank_str {
-			// now v can contain more than one number
-			//fmt.Println("str<"+v+">")
-			subv := strings.Split(v, " ")
-			for _, vv := range subv {
-				n, err := strconv.Atoi(vv)
-				if (err == nil) && (n >= 1) && (n <= 1000001) {
-					list_rank = append(list_rank, n)
-				}
-			}
-		}
-	} else {
+	list_rank := r.parseParam_rank(req)
+	if list_rank == nil {
 		list_rank = []int{60001, 120001}
 	}
 
-	event_id_str_list, ok := req.Form["event"] // checked Atoi
-	event := r.latestEvent
+
+	event := r.parseParam_event(req)
+	if event == nil {
+		event = r.latestEvent
+	}
 	if event == nil {
 		r.logger.Println("latestEvent is nil")
 		return
 	}
-	// this block output: prefill_event, event
-	if ok {
-		event_id_str := event_id_str_list[0]
-		// skip empty string
-		if event_id_str == "" {
-			event = r.latestEvent
-		} else {
-			event_id, err := strconv.Atoi(event_id_str)
-			if err == nil {
-				event = r.resourceMgr.FindEventById(event_id)
-				if event == nil {
-					event = r.latestEvent
-				}
-			} else {
-				r.logger.Println("bad event id", err, event_id_str)
-			}
-		}
-	}
-	{
-		n_rank := []string{}
-		for _, n := range list_rank {
-			n_rank = append(n_rank, fmt.Sprintf("%d", n))
-		}
-	}
 
-	var rankingType int
-	rankingType_str_list, ok := req.Form["type"] // checked Atoi
-	if ok {
-		rankingType_str := rankingType_str_list[0]
-		rankingType_i, err := strconv.Atoi(rankingType_str)
-		if err == nil {
-			if rankingType_i > 0 {
-				rankingType = 1
-			}
-		} else {
-			rankingType = 0
-		}
-	} else {
-		rankingType = 0
-	}
+	rankingType := r.parseParam_type(req)
 
 	// generate json
-
 	fmt.Fprint(w,
 		"[\n",
 		r.jsonData(rankingType, list_rank, r.fetchData_i, event),
