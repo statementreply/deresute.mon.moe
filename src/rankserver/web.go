@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	"regexp"
+	"resource_mgr"
 	"strconv"
 	"strings"
 	"time"
@@ -32,6 +33,82 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 	return u
 }
 
+func (r *RankServer) parseParam_t(req *http.Request) string {
+	timestamp, ok := req.Form["t"] // format checked
+	if ok {
+		if timestampFilter.MatchString(timestamp[0]) {
+			return timestamp[0]
+		} else {
+			r.logger.Println("bad req", req.Form)
+		}
+	}
+	return ""
+}
+
+func (r *RankServer) parseParam_rank(req *http.Request) []int {
+	list_rank_str, ok := req.Form["rank"] // format checked split, strconv.Atoi
+	var list_rank []int
+	if ok {
+		list_rank = make([]int, 0, len(list_rank_str))
+		for _, v := range list_rank_str {
+			// now v can contain more than one number
+			//fmt.Println("str<"+v+">")
+			subv := strings.Split(v, " ")
+			for _, vv := range subv {
+				n, err := strconv.Atoi(vv)
+				if (err == nil) && (n >= 1) && (n <= 1000001) {
+					list_rank = append(list_rank, n)
+				}
+			}
+		}
+	}
+	return list_rank
+}
+
+func (r *RankServer) parseParam_event(req *http.Request) *resource_mgr.EventDetail {
+	var event *resource_mgr.EventDetail
+	event_id_str_list, ok := req.Form["event"] // checked Atoi
+	if ok {
+		event_id_str := event_id_str_list[0]
+		// skip empty string
+		if event_id_str != "" {
+			event_id, err := strconv.Atoi(event_id_str)
+			if err == nil {
+				event = r.resourceMgr.FindEventById(event_id)
+			} else {
+				r.logger.Println("bad event id", err, event_id_str)
+			}
+		}
+	}
+	// could be nil
+	return event
+}
+
+func (r *RankServer) parseParam_type(req *http.Request) int {
+	rankingType_str_list, ok := req.Form["type"] // checked Atoi
+	if ok {
+		rankingType_str := rankingType_str_list[0]
+		rankingType_i, err := strconv.Atoi(rankingType_str)
+		if err == nil {
+			if rankingType_i > 0 {
+				return 1
+			}
+		}
+	}
+	return 0
+}
+
+func (r *RankServer) parseParam_achart(req *http.Request) int {
+	fancyChart_str_list, ok := req.Form["achart"] // ignored, len
+	if ok {
+		fancyChart_str := fancyChart_str_list[0]
+		if len(fancyChart_str) > 0 {
+			return 1
+		}
+	}
+	return 0
+}
+
 // parse parameters
 // available parameters
 // - t:       single timestamp
@@ -44,68 +121,32 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	result := new(tmplVar)
 
 	// for t
-	{
-		timestamp, ok := req.Form["t"] // format checked
-		if ok {
-			if timestampFilter.MatchString(timestamp[0]) {
-				result.Timestamp = timestamp[0]
-			} else {
-				r.logger.Println("bad req", req.Form)
-			}
-		}
-	}
+	result.Timestamp = r.parseParam_t(req)
+
 	// FIXME
 	//r.CheckData("")
 	r.CheckData(result.Timestamp)
 
 	// for rank
-	{
-		list_rank_str, ok := req.Form["rank"] // format checked split, strconv.Atoi
-		// new default value
+	result.list_rank = r.parseParam_rank(req)
+	// new default value
+	if result.list_rank == nil {
 		result.list_rank = []int{120001}
-		if ok {
-			result.list_rank = make([]int, 0, len(list_rank_str))
-			for _, v := range list_rank_str {
-				// now v can contain more than one number
-				//fmt.Println("str<"+v+">")
-				subv := strings.Split(v, " ")
-				for _, vv := range subv {
-					n, err := strconv.Atoi(vv)
-					if (err == nil) && (n >= 1) && (n <= 1000001) {
-						result.list_rank = append(result.list_rank, n)
-					}
-				}
-			}
-		}
 	}
 
 	// for event
 	{
-		// default value is latest
-		result.event = r.latestEvent
+		result.event = r.parseParam_event(req)
+		if result.event == nil {
+			// default value is latest
+			result.event = r.latestEvent
+		}
 		if result.event == nil {
 			r.logger.Println("latestEvent is nil")
 		}
 		result.PrefillEvent = ""
-		// this block output: result.PrefillEvent, result.event
-		event_id_str_list, ok := req.Form["event"] // checked Atoi
-		if ok {
-			event_id_str := event_id_str_list[0]
-			// skip empty string
-			if event_id_str == "" {
-				result.event = r.latestEvent
-			} else {
-				event_id, err := strconv.Atoi(event_id_str)
-				if err == nil {
-					result.PrefillEvent = event_id_str
-					result.event = r.resourceMgr.FindEventById(event_id)
-					if result.event == nil {
-						result.event = r.latestEvent
-					}
-				} else {
-					r.logger.Println("bad event id", err, event_id_str)
-				}
-			}
+		if result.event != nil {
+			result.PrefillEvent = strconv.Itoa(result.event.Id())
 		}
 	}
 
@@ -120,16 +161,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 
 	// for type
 	{
-		rankingType_str_list, ok := req.Form["type"] // checked Atoi
-		if ok {
-			rankingType_str := rankingType_str_list[0]
-			rankingType_i, err := strconv.Atoi(rankingType_str)
-			if err == nil {
-				if rankingType_i > 0 {
-					result.rankingType = 1
-				}
-			}
-		}
+		result.rankingType = r.parseParam_type(req)
 		checked_type := []template.HTMLAttr{"", ""}
 		checked_type[result.rankingType] = " checked"
 		result.PrefillCheckedType = checked_type
@@ -137,17 +169,12 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 
 	// for achart
 	{
+		result.AChart = r.parseParam_achart(req)
 		result.fancyChart = false
-		fancyChart_str_list, ok := req.Form["achart"] // ignored, len
-		if ok {
-			fancyChart_str := fancyChart_str_list[0]
-			if len(fancyChart_str) > 0 {
-				result.fancyChart = true
-				result.PrefillAChart = " checked"
-			}
-		}
-		if result.fancyChart {
-			result.AChart = 1
+		result.PrefillAChart = ""
+		if result.AChart == 1 {
+			result.fancyChart = true
+			result.PrefillAChart = " checked"
 		}
 	}
 
