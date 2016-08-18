@@ -221,7 +221,7 @@ func (r *RankServer) postload_html(w http.ResponseWriter, req *http.Request) {
 
 var timestampFilter = regexp.MustCompile("^\\d+$")
 
-func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
+/*func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload_html(w, req, nil)
 	defer r.postload_html(w, req)
 	fmt.Fprint(w, "        <pre>")
@@ -236,8 +236,9 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprint(w, r.showData(timestamp))
 	}
 }
+*/
 
-func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
+/*func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload_html(w, req, &qchartParam{
 		rankingType: 0,
 		list_rank:   []int{120001},
@@ -280,6 +281,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "            <h3>%s</h3>\n", "最新ボーダー")
 	fmt.Fprint(w, "            <pre id=\"latestdata\"></pre>\n")
 }
+*/
 
 func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) {
 	r.CheckData()
@@ -424,7 +426,7 @@ setMForm();
 `)
 }
 
-func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
+/*func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 	r.preload_html(w, req, nil)
 	defer r.postload_html(w, req)
 	fmt.Fprintf(w, `        <table class="columns">
@@ -441,8 +443,9 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	fmt.Fprintf(w, `        </table>`)
 }
+*/
 
-func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
+/*func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	r.UpdateTimestamp()
 	r.preload_html(w, req, nil)
 	defer r.postload_html(w, req)
@@ -459,8 +462,9 @@ func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "        <a href=\"q?t=%s\">%s</a><br>\n", timestamp, formatter(timestamp))
 	}
 }
+*/
 
-func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
+/*func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	r.CheckData()
 	// parse parameters
 	req.ParseForm()
@@ -544,6 +548,7 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, `        <div class="note"><p>javascript library from <code>https://www.gstatic.com/charts/loader.js</code></p>
         </div>`)
 }
+*/
 
 var staticFilter = regexp.MustCompile("^/static")
 
