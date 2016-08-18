@@ -33,63 +33,78 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 }
 
 // parse parameters
+// available parameters
+// - t:       single timestamp
+// - rank:    multiple rank int
+// - event:   single event_id
+// - type:    single 0/1 pt/score
+// - achart:  single 0/1 linechart/annotationchart
 func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplVar {
 	req.ParseForm()
 	result := new(tmplVar)
 
-	timestamp, ok := req.Form["t"] // format checked
-	if ok {
-		if timestampFilter.MatchString(timestamp[0]) {
-			result.Timestamp = timestamp[0]
-		} else {
-			r.logger.Println("bad req", req.Form)
+	// for t
+	{
+		timestamp, ok := req.Form["t"] // format checked
+		if ok {
+			if timestampFilter.MatchString(timestamp[0]) {
+				result.Timestamp = timestamp[0]
+			} else {
+				r.logger.Println("bad req", req.Form)
+			}
 		}
 	}
 	// FIXME
 	//r.CheckData("")
 	r.CheckData(result.Timestamp)
 
-	list_rank_str, ok := req.Form["rank"] // format checked split, strconv.Atoi
-	// new default value
-	result.list_rank = []int{120001}
-	if ok {
-		result.list_rank = make([]int, 0, len(list_rank_str))
-		for _, v := range list_rank_str {
-			// now v can contain more than one number
-			//fmt.Println("str<"+v+">")
-			subv := strings.Split(v, " ")
-			for _, vv := range subv {
-				n, err := strconv.Atoi(vv)
-				if (err == nil) && (n >= 1) && (n <= 1000001) {
-					result.list_rank = append(result.list_rank, n)
+	// for rank
+	{
+		list_rank_str, ok := req.Form["rank"] // format checked split, strconv.Atoi
+		// new default value
+		result.list_rank = []int{120001}
+		if ok {
+			result.list_rank = make([]int, 0, len(list_rank_str))
+			for _, v := range list_rank_str {
+				// now v can contain more than one number
+				//fmt.Println("str<"+v+">")
+				subv := strings.Split(v, " ")
+				for _, vv := range subv {
+					n, err := strconv.Atoi(vv)
+					if (err == nil) && (n >= 1) && (n <= 1000001) {
+						result.list_rank = append(result.list_rank, n)
+					}
 				}
 			}
 		}
 	}
 
-	// default value is latest
-	result.event = r.latestEvent
-	if result.event == nil {
-		r.logger.Println("latestEvent is nil")
-	}
-	result.PrefillEvent = ""
-	// this block output: result.PrefillEvent, result.event
-	event_id_str_list, ok := req.Form["event"] // checked Atoi
-	if ok {
-		event_id_str := event_id_str_list[0]
-		// skip empty string
-		if event_id_str == "" {
-			result.event = r.latestEvent
-		} else {
-			event_id, err := strconv.Atoi(event_id_str)
-			if err == nil {
-				result.PrefillEvent = event_id_str
-				result.event = r.resourceMgr.FindEventById(event_id)
-				if result.event == nil {
-					result.event = r.latestEvent
-				}
+	// for event
+	{
+		// default value is latest
+		result.event = r.latestEvent
+		if result.event == nil {
+			r.logger.Println("latestEvent is nil")
+		}
+		result.PrefillEvent = ""
+		// this block output: result.PrefillEvent, result.event
+		event_id_str_list, ok := req.Form["event"] // checked Atoi
+		if ok {
+			event_id_str := event_id_str_list[0]
+			// skip empty string
+			if event_id_str == "" {
+				result.event = r.latestEvent
 			} else {
-				r.logger.Println("bad event id", err, event_id_str)
+				event_id, err := strconv.Atoi(event_id_str)
+				if err == nil {
+					result.PrefillEvent = event_id_str
+					result.event = r.resourceMgr.FindEventById(event_id)
+					if result.event == nil {
+						result.event = r.latestEvent
+					}
+				} else {
+					r.logger.Println("bad event id", err, event_id_str)
+				}
 			}
 		}
 	}
@@ -103,35 +118,41 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 		result.PrefillRank = strings.Join(n_rank, " ")
 	}
 
-	rankingType_str_list, ok := req.Form["type"] // checked Atoi
-	if ok {
-		rankingType_str := rankingType_str_list[0]
-		rankingType_i, err := strconv.Atoi(rankingType_str)
-		if err == nil {
-			if rankingType_i > 0 {
-				result.rankingType = 1
+	// for type
+	{
+		rankingType_str_list, ok := req.Form["type"] // checked Atoi
+		if ok {
+			rankingType_str := rankingType_str_list[0]
+			rankingType_i, err := strconv.Atoi(rankingType_str)
+			if err == nil {
+				if rankingType_i > 0 {
+					result.rankingType = 1
+				}
 			}
 		}
+		checked_type := []template.HTMLAttr{"", ""}
+		checked_type[result.rankingType] = " checked"
+		result.PrefillCheckedType = checked_type
 	}
-	checked_type := []template.HTMLAttr{"", ""}
-	checked_type[result.rankingType] = " checked"
 
-	result.fancyChart = false
-	fancyChart_str_list, ok := req.Form["achart"] // ignored, len
-	if ok {
-		fancyChart_str := fancyChart_str_list[0]
-		if len(fancyChart_str) > 0 {
-			result.fancyChart = true
-			result.PrefillAChart = " checked"
+	// for achart
+	{
+		result.fancyChart = false
+		fancyChart_str_list, ok := req.Form["achart"] // ignored, len
+		if ok {
+			fancyChart_str := fancyChart_str_list[0]
+			if len(fancyChart_str) > 0 {
+				result.fancyChart = true
+				result.PrefillAChart = " checked"
+			}
+		}
+		if result.fancyChart {
+			result.AChart = 1
 		}
 	}
 
-	result.PrefillCheckedType = checked_type
 
 	result.DURL = r.generateDURL(&result.qchartParam)
-	if result.fancyChart {
-		result.AChart = 1
-	}
 
 	if r.currentEvent != nil {
 		result.EventInfo += "<p>"
