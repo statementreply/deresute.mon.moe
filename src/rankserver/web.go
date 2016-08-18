@@ -12,6 +12,11 @@ import (
 	ts "timestamp"
 )
 
+// rankserver templates
+var rsTmpl = template.Must(template.ParseGlob(BASE + "/templates/*.html"))
+var timestampFilter = regexp.MustCompile("^\\d+$")
+var staticFilter = regexp.MustCompile("^/static")
+
 func (r *RankServer) init_req(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	r.logger.Printf("[INFO] %T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
@@ -181,9 +186,6 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	return result
 }
 
-// rankserver templates
-var rsTmpl = template.Must(template.ParseGlob(BASE + "/templates/*.html"))
-
 // now the script is totally static
 func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
 	fancyChart := false
@@ -218,8 +220,6 @@ func (r *RankServer) postload_html(w http.ResponseWriter, req *http.Request) {
 </html>
 `)
 }
-
-var timestampFilter = regexp.MustCompile("^\\d+$")
 
 func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) {
 	r.CheckData()
@@ -306,14 +306,14 @@ func (r *RankServer) eventHandler_new2(w http.ResponseWriter, req *http.Request)
 	}
 }
 
-func (r *RankServer) chartSnippet() string {
+/*func (r *RankServer) chartSnippet() string {
 	return `
 <div class="ui-grid-a ui-responsive">
 <div class="ui-block-a" id="myLineChart">loading...</div>
 <div class="ui-block-b" id="mySpeedChart">loading...</div>
 </div>
 `
-}
+}*/
 
 // mobile landscape optimized
 func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
@@ -363,8 +363,6 @@ setMForm();
 </script>
 `)
 }
-
-var staticFilter = regexp.MustCompile("^/static")
 
 func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
