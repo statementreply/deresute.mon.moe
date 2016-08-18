@@ -34,6 +34,13 @@ type aTag struct {
 	Text string
 }
 
+type eventInfo struct {
+	EventLink template.HTML
+	EventStart string
+	EventHalf string
+	EventEnd string
+}
+
 type tmplVar struct {
 	// embed a qchartParam
 	qchartParam
@@ -53,6 +60,8 @@ type tmplVar struct {
 	Data string
 	// for "/log"
 	TimestampList []*aTag
+	// for "/event"
+	EventList []*eventInfo
 }
 
 type RankServer struct {

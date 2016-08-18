@@ -337,6 +337,35 @@ func (r *RankServer) logHandler_new2(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func (r *RankServer) eventHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.UpdateTimestamp()
+	r.CheckData()
+	req.ParseForm()
+	tmplVar := r.getTmplVar(w, req)
+	formatter := ts.FormatTime
+	for _, e := range r.resourceMgr.EventList {
+		name := template.HTML(template.HTMLEscapeString(e.Name()))
+		if (e.Type() == 1 || e.Type() == 3) && e.EventEnd().After(time.Unix(1467552720, 0)) {
+			// ranking information available
+			name_tmp := `<a href="qchart?event=` + strconv.Itoa(e.Id()) + `">` + string(name) + `</a>`
+			name = template.HTML(name_tmp)
+		}
+		tmplVar.EventList = append(
+			tmplVar.EventList,
+			&eventInfo{
+				EventLink: name,
+				EventStart: formatter(e.EventStart()),
+				EventHalf: formatter(e.SecondHalfStart()),
+				EventEnd: formatter(e.EventEnd()),
+			},
+		)
+	}
+	err := rsTmpl.ExecuteTemplate(w, "event.html", tmplVar)
+	if err != nil {
+		r.logger.Println("html/template", err)
+	}
+}
+
 func (r *RankServer) chartSnippet() string {
 	return `
 <div class="ui-grid-a ui-responsive">
