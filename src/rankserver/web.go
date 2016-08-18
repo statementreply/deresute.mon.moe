@@ -314,6 +314,29 @@ func (r *RankServer) qHandler_new2(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func (r *RankServer) logHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.UpdateTimestamp()
+	r.CheckData()
+	req.ParseForm()
+	tmplVar := r.getTmplVar(w, req)
+
+	local_timestamp := r.GetListTimestamp()
+	for _, timestamp := range local_timestamp {
+		tmplVar.TimestampList = append(
+			tmplVar.TimestampList,
+			&aTag{
+				Link: fmt.Sprintf("q2?t=%s", timestamp),
+				Text: ts.FormatTimestamp(timestamp),
+			},
+		)
+	}
+
+	err := rsTmpl.ExecuteTemplate(w, "log.html", tmplVar)
+	if err != nil {
+		r.logger.Println("html/template", err)
+	}
+}
+
 func (r *RankServer) chartSnippet() string {
 	return `
 <div class="ui-grid-a ui-responsive">

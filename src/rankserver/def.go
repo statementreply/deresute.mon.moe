@@ -29,6 +29,11 @@ type twitterParam struct {
 	interval     time.Duration
 }
 
+type aTag struct {
+	Link string
+	Text string
+}
+
 type tmplVar struct {
 	// embed a qchartParam
 	qchartParam
@@ -46,6 +51,8 @@ type tmplVar struct {
 	AvailableRank [][]int
 	// for "/q"
 	Data string
+	// for "/log"
+	TimestampList []*aTag
 }
 
 type RankServer struct {

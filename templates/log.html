@@ -1,0 +1,12 @@
+{{template "preload.html"}}
+<body>
+    <div data-role="page" data-dom-cache="false">
+{{template "qchart_info.html" .}}
+        <br>デレステイベントボーダー<br><br>
+        <a href="..">最新ボーダー</a><br>
+{{range .TimestampList}}
+        <a href="{{.Link}}">{{.Text}}</a><br>
+{{end}}
+    </div>
+</body>
+{{template "postload.html"}}
