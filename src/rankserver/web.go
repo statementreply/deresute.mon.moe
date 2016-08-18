@@ -188,15 +188,13 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 
 // now the script is totally static
 func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
+	r.init_req(w, req)
+
 	fancyChart := false
 	if param != nil {
 		fancyChart = param.fancyChart
 	}
-	r.init_req(w, req)
-	err := rsTmpl.ExecuteTemplate(w, "preload.html", nil)
-	if err != nil {
-		r.logger.Println("html/template", err)
-	}
+
 	fmt.Fprint(w, `<body>
 `)
 	fmt.Fprint(w, `    <div data-role="page" data-dom-cache="false">
@@ -213,15 +211,8 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	fmt.Fprint(w, "\n")
 }
 
-func (r *RankServer) postload_html(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprint(w, `
-    </div>
-</body>
-</html>
-`)
-}
-
 func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
 	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
 	err := rsTmpl.ExecuteTemplate(w, "home.html", tmplVar)
@@ -232,6 +223,7 @@ func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) 
 
 // mobile landscape optimized
 func (r *RankServer) homeMHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
 	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
 	err := rsTmpl.ExecuteTemplate(w, "m.html", tmplVar)
@@ -241,6 +233,7 @@ func (r *RankServer) homeMHandler_new2(w http.ResponseWriter, req *http.Request)
 }
 
 func (r *RankServer) qchartHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
 	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
 	err := rsTmpl.ExecuteTemplate(w, "qchart.html", tmplVar)
@@ -250,6 +243,7 @@ func (r *RankServer) qchartHandler_new2(w http.ResponseWriter, req *http.Request
 }
 
 func (r *RankServer) qHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
 	r.CheckData()
 	req.ParseForm()
 	tmplVar := r.getTmplVar(w, req)
@@ -265,6 +259,7 @@ func (r *RankServer) qHandler_new2(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) logHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
 	r.UpdateTimestamp()
 	r.CheckData()
 	req.ParseForm()
@@ -288,6 +283,7 @@ func (r *RankServer) logHandler_new2(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) eventHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
 	r.UpdateTimestamp()
 	r.CheckData()
 	req.ParseForm()
