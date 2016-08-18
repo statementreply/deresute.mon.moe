@@ -5,12 +5,13 @@
         <p><a href="..">ホームページ</a></p>
         <p>イベント：{{.EventTitle}}</p>
         <div class="form">
+            <p>customized border graph：</p>
             <form action="qchart" method="get">
-                customized border graph：<br>
 
-                <label for="textinput-rank">順位：
+                <div class="ui-field-contain">
+                <label for="textinput-rank"><strong>順位：</strong></label>
                 <input class="t0" id="textinput-rank" type="text" name="rank" size=35 value="{{.PrefillRank}}">
-                </label>
+                </div>
 
                 <input type="hidden" name="event" value="{{.PrefillEvent}}">
 
