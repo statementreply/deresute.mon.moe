@@ -47,7 +47,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	}
 	// FIXME
 	//r.CheckData("")
-	//r.CheckData(result.Timestamp)
+	r.CheckData(result.Timestamp)
 
 	list_rank_str, ok := req.Form["rank"] // format checked split, strconv.Atoi
 	// new default value
@@ -140,6 +140,10 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 			result.EventInfo += "<br>ログインボーナスがあるので、イベントページにアクセスを忘れないように。"
 		}
 		result.EventInfo +="</p>"
+	}
+	result.AvailableRank = [][]int{
+		r.get_list_rank(r.latestTimestamp(), 0),
+		r.get_list_rank(r.latestTimestamp(), 1),
 	}
 	return result
 }
@@ -490,14 +494,14 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, r.chartSnippet())
 	fmt.Fprintf(w, `        <div class="note">
             <p>表示できる順位<br>
-            イベントpt：%d<br>ハイスコア：%d
+            イベントpt：%d<br>
+            ハイスコア：%d
             </p>
         </div>
 `,
 		r.get_list_rank(r.latestTimestamp(), 0),
 		r.get_list_rank(r.latestTimestamp(), 1))
-	fmt.Fprint(w, `
-        <div class="note"><p>javascript library from <code>https://www.gstatic.com/charts/loader.js</code></p>
+	fmt.Fprint(w, `        <div class="note"><p>javascript library from <code>https://www.gstatic.com/charts/loader.js</code></p>
         </div>`)
 }
 
