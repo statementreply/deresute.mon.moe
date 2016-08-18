@@ -162,9 +162,12 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 		result.PrefillAChart = " checked"
 	}
 	result.DURL = r.generateDURL(&result.qchartParam)
+	// for debug
+	//r.currentEvent = result.event
 	if r.currentEvent != nil {
 		result.EventInfo += "<p>"
-		result.EventInfo += "イベント開催中：" + template.HTMLEscapeString(r.currentEvent.Name())
+		result.EventInfo += "イベント開催中："
+		result.EventInfo += template.HTML(template.HTMLEscapeString(r.currentEvent.Name()))
 		if r.currentEvent.LoginBonusType() > 0 {
 			result.EventInfo += "<br>ログインボーナスがあるので、イベントページにアクセスを忘れないように。"
 		}
@@ -247,13 +250,15 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	defer fmt.Fprint(w, "        </div>\n")
 	fmt.Fprintf(w, "            <h2>デレステイベントボーダーbotβ+</h2>")
 	fmt.Fprint(w, "\n")
+	// for debug
+	//r.currentEvent = r.latestEvent
 	if r.currentEvent != nil {
-		fmt.Fprintf(w, "<p>")
+		fmt.Fprintf(w, "            <p>")
 		fmt.Fprintf(w, "イベント開催中：%s", r.currentEvent.Name())
 		if r.currentEvent.LoginBonusType() > 0 {
 			fmt.Fprintf(w, "<br>ログインボーナスがあるので、イベントページにアクセスを忘れないように。")
 		}
-		fmt.Fprintf(w, "</p>")
+		fmt.Fprintf(w, "</p>\n")
 	}
 	fmt.Fprintf(w, `            <p>twitter bot：十五分毎にイベントptボーダーを更新し、一時間毎にトロフィーと称号ボーダーを更新します。
             <a href="https://twitter.com/deresuteborder0">@deresuteborder0</a></p>

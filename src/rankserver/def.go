@@ -32,7 +32,7 @@ type twitterParam struct {
 type tmplVar struct {
 	// embed a qchartParam
 	qchartParam
-	EventInfo string
+	EventInfo template.HTML
 	Timestamp string
 	DURL string
 	AChart int
