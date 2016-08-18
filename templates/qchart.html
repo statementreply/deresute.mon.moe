@@ -15,15 +15,15 @@
                 <input type="hidden" name="event" value="{{.PrefillEvent}}">
 
                 <label for="radio-pt">イベントpt
-                <input class="r0" id="radio-pt" type="radio" name="type" value="0"{{ index .PrefillCheckedType 0 }}>
+                <input class="r0" id="radio-pt" type="radio" name="type" value="0" {{ index .PrefillCheckedType 0 }}>
                 </label>
 
                 <label for="radio-score">ハイスコア
-                <input class="r0" id="radio-score" type="radio" name="type" value="1"{{ index .PrefillCheckedType 1 }}>
+                <input class="r0" id="radio-score" type="radio" name="type" value="1" {{ index .PrefillCheckedType 1 }}>
                 </label>
 
                 <label for="checkbox-achart">AnnotationChart
-                <input class="c0" id="checkbox-achart" type="checkbox" name="achart" value="1"{{ .PrefillAChart }}>
+                <input class="c0" id="checkbox-achart" type="checkbox" name="achart" value="1" {{ .PrefillAChart }}>
                 </label>
 
                 <input class="s0" type="submit" value="更新">
