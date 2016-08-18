@@ -160,8 +160,8 @@ function drawLineChart() {
 
         var data_rank = new google.visualization.DataTable(data_list[0]);
         var data_speed = new google.visualization.DataTable(data_list[1]);
-        //console.log("dtl",data_list);
-        //console.log("draw");
+        console.log("dtl", data_list[1]);
+        console.log("draw");
         chart.draw(data_rank, options);
         chart_speed.draw(data_speed, options_speed);
     })

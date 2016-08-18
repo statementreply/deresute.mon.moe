@@ -1,40 +1,47 @@
+{{template "preload.html"}}
 <body>
-    <div data-role="page" data-dom-cache="false">
-<div id="dataurl" style="display:none;">/d?type=0&rank=120001&event=3010&</div>
-<div id="fancychart" style="display:none;">0</div>
-<div data-role="page"><div data-role="main" class="ui-content"><p><a href="..">ホームページ</a></p>
-
-<form id="mform" action="#">
-  <label for="flip-checkbox-1" class="ui-hidden-accessible">Flip toggle switch checkbox:</label>
-  <input type="checkbox" data-role="flipswitch" data-on-text="score" data-off-text="pt" data-wrapper-class="custom-size-flipswitch" name="flip-checkbox-1" id="flip-checkbox-1">
-</form>
-<div>
-	<div id="myLineChart">aa</div>
-	<div id="mySpeedChart" style="display:none">bb</div></div>
-<script type="text/javascript">
-
+    <div data-role="page" data-dom-cache="false" id="mhome">
+{{template "qchart_info.html" .}}
+        <div data-role="main" class="ui-content">
+            <p><a href="..">ホームページ</a></p>
+            {{.EventTitle}}
+            <form id="mform" action="#">
+                  <label for="flip-checkbox-1" class="ui-hidden-accessible">Flip toggle switch checkbox:</label>
+                  <input type="checkbox" data-role="flipswitch" data-on-text="score" data-off-text="pt" data-wrapper-class="custom-size-flipswitch" name="flip-checkbox-1" id="flip-checkbox-1">
+            </form>
+            <div>
+                <div id="myLineChart">aa</div>
+                <!--<div id="mySpeedChart" style="display:none">bb</div>-->
+                <div id="mySpeedChart" style="visibility:hidden">bb</div>
+                <!--<div id="mySpeedChart">bb</div>-->
+            </div>
+            <script type="text/javascript">
 function setMForm () {
-  $("#mform").on("change", function() {
-  console.log("changemform");
-  var cv = $("#flip-checkbox-1").get(0).checked;
-  console.log(cv);
-  currentPage = $("body").pagecontainer("getActivePage");
-  if (cv) {
-	  $("#myLineChart", currentPage).css("display","none");
-	  $("#mySpeedChart", currentPage).css("display","block");
-  } else {
-	  $("#mySpeedChart", currentPage).css("display","none");
-	  $("#myLineChart", currentPage).css("display","block");
-  }
-  });
+    $("#mform").on("change", function() {
+        console.log("changemform");
+        var cv = $("#flip-checkbox-1").get(0).checked;
+        console.log(cv);
+        currentPage = $("body").pagecontainer("getActivePage");
+        if (cv) {
+            $("#myLineChart", currentPage).css("visibility","hidden");
+            $("#myLineChart", currentPage).css("display","none");
+            $("#mySpeedChart", currentPage).css("visibility","visible");
+            $("#mySpeedChart", currentPage).css("display","block");
+        } else {
+            $("#myLineChart", currentPage).css("visibility","visible");
+            $("#myLineChart", currentPage).css("display","block");
+            $("#mySpeedChart", currentPage).css("visibility","hidden");
+            $("#mySpeedChart", currentPage).css("display","none");
+        }
+    });
 }
 
-//$("body").on("beforeshow", setMForm);
+//$("#mhome").on("pagecontainerload", setMForm);
+//$("body").on("pageshow", setMForm);
 $("body").on("pagechange", setMForm);
 setMForm();
-
-</script>
-</div></div>
+            </script>
+        </div>
     </div>
 </body>
-</html>
+{{template "postload.html"}}
