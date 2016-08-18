@@ -50,9 +50,8 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	//r.CheckData(result.Timestamp)
 
 	list_rank_str, ok := req.Form["rank"] // format checked split, strconv.Atoi
-	var list_rank []int
 	if ok {
-		list_rank = make([]int, 0, len(list_rank_str))
+		result.list_rank = make([]int, 0, len(list_rank_str))
 		for _, v := range list_rank_str {
 			// now v can contain more than one number
 			//fmt.Println("str<"+v+">")
@@ -60,13 +59,13 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 			for _, vv := range subv {
 				n, err := strconv.Atoi(vv)
 				if (err == nil) && (n >= 1) && (n <= 1000001) {
-					list_rank = append(list_rank, n)
+					result.list_rank = append(result.list_rank, n)
 				}
 			}
 		}
 	} else {
 		// new default value
-		list_rank = []int{120001}
+		result.list_rank = []int{120001}
 	}
 
 	// default value is latest
@@ -99,46 +98,42 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	result.PrefillRank = "2001 10001 20001 60001 120001"
 	{
 		n_rank := []string{}
-		for _, n := range list_rank {
+		for _, n := range result.list_rank {
 			n_rank = append(n_rank, fmt.Sprintf("%d", n))
 		}
 		result.PrefillRank = strings.Join(n_rank, " ")
 	}
 
-	var rankingType int = 0
 	rankingType_str_list, ok := req.Form["type"] // checked Atoi
 	if ok {
 		rankingType_str := rankingType_str_list[0]
 		rankingType_i, err := strconv.Atoi(rankingType_str)
 		if err == nil {
 			if rankingType_i > 0 {
-				rankingType = 1
+				result.rankingType = 1
 			}
 		}
 	}
 	checked_type := []string{"", ""}
-	checked_type[rankingType] = " checked"
+	checked_type[result.rankingType] = " checked"
 
-	fancyChart := false
+	result.fancyChart = false
 	fancyChart_checked := ""
 	fancyChart_str_list, ok := req.Form["achart"] // ignored, len
 	if ok {
 		fancyChart_str := fancyChart_str_list[0]
 		if len(fancyChart_str) > 0 {
-			fancyChart = true
+			result.fancyChart = true
 			fancyChart_checked = " checked"
 		}
 	}
 	result.PrefillAChart = fancyChart_checked
 
-	param := &qchartParam{
-		rankingType: rankingType,
-		list_rank: list_rank,
-		event: event,
-		fancyChart: fancyChart,
-	}
-	result.DURL = r.generateDURL(param)
-	if param.fancyChart {
+	//result.rankingType = rankingType
+	result.event = event
+
+	result.DURL = r.generateDURL(&result.qchartParam)
+	if result.fancyChart {
 		result.AChart = 1
 	}
 
