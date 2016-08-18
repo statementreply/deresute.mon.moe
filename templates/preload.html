@@ -17,22 +17,22 @@ currentPage = $("body").pagecontainer("getActivePage");
 function setAspectRatio() {
     aratio = 0.75;
     if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
-        console.log("shorted setAspectRatio()");
+        //console.log("shorted setAspectRatio()");
         return;
     }
     myLineChart = $("#myLineChart", currentPage);
     mySpeedChart = $("#mySpeedChart", currentPage);
-    console.log("setAspectRatio()", myLineChart.width());
-    console.log("setAspectRatio()", myLineChart.height());
+    //console.log("setAspectRatio()", myLineChart.width());
+    //console.log("setAspectRatio()", myLineChart.height());
     myLineChart.height(myLineChart.width() * aratio);
     mySpeedChart.height(mySpeedChart.width() * aratio);
 }
 $(window).on("pagecreate pageload pagechange pageshow throttledresize", function(e) {
-    console.log("pagecreate/throttledresize", e);
+    //console.log("pagecreate/throttledresize", e);
     setAspectRatio();
 });
 dataurl = $("#dataurl", currentPage).text();
-console.log("dataurl", dataurl);
+//console.log("dataurl", dataurl);
 fancychart = $("#fancychart", currentPage).text();
 // this doesn't work
 if (fancychart == 0) {
@@ -44,23 +44,23 @@ google.charts.load('current', {packages: ['corechart', 'annotationchart']});
 google.charts.setOnLoadCallback(drawLineChart);
 google.charts.setOnLoadCallback(pageChange);
 function pageChange() {
-    console.log("pagechange");
+    //console.log("pagechange");
     $(window).on("pagechange", function() {
         drawLineChart();
-        console.log("pagechange");
+        //console.log("pagechange");
     });
     //$("body").pagecontainer()
     $("body").on("pagecontainerload", function () {
         //drawLineChart();
-        console.log("pagecontainerload");
+        //console.log("pagecontainerload");
     });
     $("body").on("pageshow", function () {
         //drawLineChart();
-        console.log("pageshow");
+        //console.log("pageshow");
     });
     $(window).on("orientationchange", function() {
         drawLineChart();
-        console.log("orientationchange");
+        //console.log("orientationchange");
     });
 };
 // doesn't work
@@ -80,7 +80,7 @@ function drawLineChart() {
     updateLatestData();
     currentPage = $("body").pagecontainer("getActivePage");
     dataurl = $("#dataurl", currentPage).text();
-    console.log("dataurl", dataurl);
+    //console.log("dataurl", dataurl);
     fancychart = $("#fancychart", currentPage).text();
 
     // first get the size from the window
@@ -118,10 +118,10 @@ function drawLineChart() {
     }
     myLineChart = $("#myLineChart", currentPage);
     mySpeedChart = $("#mySpeedChart", currentPage);
-    console.log("drawLineChart, call setAspectRatio()");
+    //console.log("drawLineChart, call setAspectRatio()");
     setAspectRatio();
-    console.log("drawLineChart, call setAspectRatio() return");
-    console.log("drawLineChart,", myLineChart, mySpeedChart);
+    //console.log("drawLineChart, call setAspectRatio() return");
+    //console.log("drawLineChart,", myLineChart, mySpeedChart);
     var chart;
     var chart_speed;
     if (fancychart == 0) {
@@ -160,8 +160,8 @@ function drawLineChart() {
 
         var data_rank = new google.visualization.DataTable(data_list[0]);
         var data_speed = new google.visualization.DataTable(data_list[1]);
-        console.log("dtl",data_list);
-        console.log("draw");
+        //console.log("dtl",data_list);
+        //console.log("draw");
         chart.draw(data_rank, options);
         chart_speed.draw(data_speed, options_speed);
     })
