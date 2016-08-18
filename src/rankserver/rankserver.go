@@ -149,18 +149,18 @@ func MakeRankServer() *RankServer {
 
 func (r *RankServer) setHandleFunc() {
 	// for DefaultServeMux
-	http.HandleFunc("/event", r.eventHandler)
-	http.HandleFunc("/q", r.qHandler)
-	http.HandleFunc("/log", r.logHandler)
 	// html/template
 	http.HandleFunc("/", r.homeHandler_new2)
 	http.HandleFunc("/qchart", r.qchartHandler_new2)
-	http.HandleFunc("/q2", r.qHandler_new2)
-	http.HandleFunc("/log2", r.logHandler_new2)
-	http.HandleFunc("/event2", r.eventHandler_new2)
+	http.HandleFunc("/q", r.qHandler_new2)
+	http.HandleFunc("/log", r.logHandler_new2)
+	http.HandleFunc("/event", r.eventHandler_new2)
 	// old
 	http.HandleFunc("/h0", r.homeHandler)        // old homepage
 	http.HandleFunc("/qchart0", r.qchartHandler) // old qchart
+	http.HandleFunc("/q0", r.qHandler)
+	http.HandleFunc("/log0", r.logHandler)
+	http.HandleFunc("/event0", r.eventHandler)
 	// auxiliary
 	http.HandleFunc("/static/", r.staticHandler)
 	// early testing
