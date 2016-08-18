@@ -155,6 +155,7 @@ func (r *RankServer) setHandleFunc() {
 	// html/template
 	http.HandleFunc("/", r.homeHandler_new2)
 	http.HandleFunc("/qchart", r.qchartHandler_new2)
+	http.HandleFunc("/q2", r.qHandler_new2)
 	// old
 	http.HandleFunc("/h0", r.homeHandler)  // old homepage
 	http.HandleFunc("/qchart0", r.qchartHandler) // old qchart

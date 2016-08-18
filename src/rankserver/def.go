@@ -44,6 +44,8 @@ type tmplVar struct {
 	PrefillAChart template.HTMLAttr
 	PrefillCheckedType []template.HTMLAttr
 	AvailableRank [][]int
+	// for "/q"
+	Data string
 }
 
 type RankServer struct {

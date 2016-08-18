@@ -299,6 +299,21 @@ func (r *RankServer) qchartHandler_new2(w http.ResponseWriter, req *http.Request
 	}
 }
 
+func (r *RankServer) qHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.CheckData()
+	req.ParseForm()
+	tmplVar := r.getTmplVar(w, req)
+	if tmplVar.Timestamp == "" {
+		tmplVar.Data = r.latestData()
+	} else {
+		tmplVar.Data = r.showData(tmplVar.Timestamp)
+	}
+	err := rsTmpl.ExecuteTemplate(w, "q.html", tmplVar)
+	if err != nil {
+		r.logger.Println("html/template", err)
+	}
+}
+
 func (r *RankServer) chartSnippet() string {
 	return `
 <div class="ui-grid-a ui-responsive">
