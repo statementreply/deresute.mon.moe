@@ -19,7 +19,7 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 	// parse parameters
 	req.ParseForm()
 	list_rank := r.parseParam_rank(req)
-	if list_rank == nil {
+	if (list_rank == nil) || (len(list_rank) == 0) {
 		list_rank = []int{60001, 120001}
 	}
 

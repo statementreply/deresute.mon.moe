@@ -33,6 +33,7 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 	return u
 }
 
+// returns valid timestamp or ""
 func (r *RankServer) parseParam_t(req *http.Request) string {
 	timestamp, ok := req.Form["t"] // format checked
 	if ok {
@@ -45,6 +46,7 @@ func (r *RankServer) parseParam_t(req *http.Request) string {
 	return ""
 }
 
+// returns list_rank or nil (list could be empty but not nil?)
 func (r *RankServer) parseParam_rank(req *http.Request) []int {
 	list_rank_str, ok := req.Form["rank"] // format checked split, strconv.Atoi
 	var list_rank []int
@@ -65,6 +67,7 @@ func (r *RankServer) parseParam_rank(req *http.Request) []int {
 	return list_rank
 }
 
+// returns valid event or nil
 func (r *RankServer) parseParam_event(req *http.Request) *resource_mgr.EventDetail {
 	var event *resource_mgr.EventDetail
 	event_id_str_list, ok := req.Form["event"] // checked Atoi
@@ -84,6 +87,7 @@ func (r *RankServer) parseParam_event(req *http.Request) *resource_mgr.EventDeta
 	return event
 }
 
+// returns 0 or 1
 func (r *RankServer) parseParam_type(req *http.Request) int {
 	rankingType_str_list, ok := req.Form["type"] // checked Atoi
 	if ok {
@@ -98,6 +102,7 @@ func (r *RankServer) parseParam_type(req *http.Request) int {
 	return 0
 }
 
+// returns 0 or 1
 func (r *RankServer) parseParam_achart(req *http.Request) int {
 	fancyChart_str_list, ok := req.Form["achart"] // ignored, len
 	if ok {
@@ -124,7 +129,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 
 	result.list_rank = r.parseParam_rank(req)
 	// new default value
-	if result.list_rank == nil {
+	if (result.list_rank == nil) || (len(result.list_rank) == 0) {
 		result.list_rank = []int{120001}
 	}
 	n_rank := []string{}
@@ -172,9 +177,9 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	return result
 }
 
-
 // rankserver templates
 var rsTmpl = template.Must(template.ParseGlob(BASE + "/templates/*.html"))
+
 // now the script is totally static
 func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
 	fancyChart := false
@@ -188,8 +193,6 @@ func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, para
 	}
 	fmt.Fprint(w, `<body>
 `)
-	//fmt.Fprint(w, `<div data-role="page">`)
-	// doesn't work, data-dom-cache=false is the default
 	fmt.Fprint(w, `    <div data-role="page" data-dom-cache="false">
 `)
 	// data provided to script
@@ -264,19 +267,10 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "            （<a href=\"qchart?rank=2001&rank=10001&rank=20001&rank=60001&rank=120001\">%s</a>）<br>\n", "他のボーダーはここ")
 	fmt.Fprintf(w, "            （<a href=\"qchart?rank=501&rank=5001&rank=50001&rank=500001\">%s</a>）<br>\n", "イベント称号ボーダー")
 	fmt.Fprint(w, r.chartSnippet())
-
 	fmt.Fprint(w, "            <hr>\n")
 
 	r.CheckData()
-
-	/*
-		fmt.Fprintf(w, "<h3>%s</h3>\n", "最新ボーダー")
-		fmt.Fprint(w, "<pre>")
-		fmt.Fprint(w, r.latestData())
-		fmt.Fprint(w, "</pre>")
-	*/
-
-	// ajax version
+	// uses ajax
 	fmt.Fprintf(w, "            <h3>%s</h3>\n", "最新ボーダー")
 	fmt.Fprint(w, "            <pre id=\"latestdata\"></pre>\n")
 }
@@ -300,7 +294,6 @@ func (r *RankServer) qchartHandler_new2(w http.ResponseWriter, req *http.Request
 }
 
 func (r *RankServer) chartSnippet() string {
-	// insert graph here
 	return `
 <div class="ui-grid-a ui-responsive">
 <div class="ui-block-a" id="myLineChart">loading...</div>
@@ -322,7 +315,6 @@ func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
 	defer fmt.Fprintf(w, `</div></div>`)
 
 	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
-
 	fmt.Fprintf(w, `
 <form id="mform" action="#">
   <label for="flip-checkbox-1" class="ui-hidden-accessible">Flip toggle switch checkbox:</label>
@@ -332,7 +324,6 @@ func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, `<div>
 	<div id="myLineChart">aa</div>
 	<div id="mySpeedChart" style="display:none">bb</div></div>`)
-
 	fmt.Fprintf(w, `
 <script type="text/javascript">
 
@@ -392,16 +383,14 @@ func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 
 func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	r.CheckData()
-
 	// parse parameters
 	req.ParseForm()
 	list_rank := r.parseParam_rank(req)
-	if list_rank == nil {
+	if (list_rank == nil) || (len(list_rank) == 0) {
 		list_rank = []int{60001, 120001}
 	}
 
 	event := r.parseParam_event(req)
-
 	// default value is latest
 	if event == nil {
 		event = r.latestEvent
@@ -409,12 +398,11 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	if event == nil {
 		r.logger.Println("latestEvent is nil")
 	}
-	var prefill_event string = ""
+	prefill_event := ""
 	if event != nil {
 		prefill_event = strconv.Itoa(event.Id())
 	}
-
-	var prefill string = "2001 10001 20001 60001 120001"
+	prefill := ""
 	{
 		n_rank := []string{}
 		for _, n := range list_rank {
@@ -422,13 +410,11 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 		}
 		prefill = strings.Join(n_rank, " ")
 	}
-
 	rankingType := r.parseParam_type(req)
 	checked_type := []string{"", ""}
 	checked_type[rankingType] = " checked"
 
 	achart := r.parseParam_achart(req)
-
 	fancyChart := false
 	fancyChart_checked := ""
 	if achart == 1 {
@@ -466,7 +452,6 @@ func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
                 <input class="s0" type="submit" value="更新">
             </form>
         </div>`, prefill, prefill_event, checked_type[0], checked_type[1], fancyChart_checked)
-
 	fmt.Fprint(w, r.chartSnippet())
 	fmt.Fprintf(w, `        <div class="note">
             <p>表示できる順位<br>
