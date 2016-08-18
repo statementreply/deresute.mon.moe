@@ -9,6 +9,7 @@ import (
 	"resource_mgr"
 	"stoppableListener"
 	"sync"
+	"html/template"
 	"time"
 )
 
@@ -37,7 +38,8 @@ type tmplVar struct {
 	AChart int
 	PrefillEvent string
 	PrefillRank string
-	PrefillAChart string
+	PrefillAChart template.HTMLAttr
+	PrefillCheckedType []template.HTMLAttr
 }
 
 type RankServer struct {

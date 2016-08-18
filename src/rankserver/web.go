@@ -50,6 +50,8 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	//r.CheckData(result.Timestamp)
 
 	list_rank_str, ok := req.Form["rank"] // format checked split, strconv.Atoi
+	// new default value
+	result.list_rank = []int{120001}
 	if ok {
 		result.list_rank = make([]int, 0, len(list_rank_str))
 		for _, v := range list_rank_str {
@@ -63,31 +65,28 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 				}
 			}
 		}
-	} else {
-		// new default value
-		result.list_rank = []int{120001}
 	}
 
 	// default value is latest
-	event := r.latestEvent
-	if event == nil {
+	result.event = r.latestEvent
+	if result.event == nil {
 		r.logger.Println("latestEvent is nil")
 	}
 	result.PrefillEvent = ""
-	// this block output: result.PrefillEvent, event
+	// this block output: result.PrefillEvent, result.event
 	event_id_str_list, ok := req.Form["event"] // checked Atoi
 	if ok {
 		event_id_str := event_id_str_list[0]
 		// skip empty string
 		if event_id_str == "" {
-			event = r.latestEvent
+			result.event = r.latestEvent
 		} else {
 			event_id, err := strconv.Atoi(event_id_str)
 			if err == nil {
 				result.PrefillEvent = event_id_str
-				event = r.resourceMgr.FindEventById(event_id)
-				if event == nil {
-					event = r.latestEvent
+				result.event = r.resourceMgr.FindEventById(event_id)
+				if result.event == nil {
+					result.event = r.latestEvent
 				}
 			} else {
 				r.logger.Println("bad event id", err, event_id_str)
@@ -95,7 +94,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 		}
 	}
 
-	result.PrefillRank = "2001 10001 20001 60001 120001"
+	//result.PrefillRank = "2001 10001 20001 60001 120001"
 	{
 		n_rank := []string{}
 		for _, n := range result.list_rank {
@@ -114,23 +113,20 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 			}
 		}
 	}
-	checked_type := []string{"", ""}
+	checked_type := []template.HTMLAttr{"", ""}
 	checked_type[result.rankingType] = " checked"
 
 	result.fancyChart = false
-	fancyChart_checked := ""
 	fancyChart_str_list, ok := req.Form["achart"] // ignored, len
 	if ok {
 		fancyChart_str := fancyChart_str_list[0]
 		if len(fancyChart_str) > 0 {
 			result.fancyChart = true
-			fancyChart_checked = " checked"
+			result.PrefillAChart = " checked"
 		}
 	}
-	result.PrefillAChart = fancyChart_checked
 
-	//result.rankingType = rankingType
-	result.event = event
+	result.PrefillCheckedType = checked_type
 
 	result.DURL = r.generateDURL(&result.qchartParam)
 	if result.fancyChart {
