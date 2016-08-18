@@ -325,7 +325,7 @@ func (r *RankServer) logHandler_new2(w http.ResponseWriter, req *http.Request) {
 		tmplVar.TimestampList = append(
 			tmplVar.TimestampList,
 			&aTag{
-				Link: fmt.Sprintf("q2?t=%s", timestamp),
+				Link: fmt.Sprintf("q?t=%s", timestamp),
 				Text: ts.FormatTimestamp(timestamp),
 			},
 		)
@@ -445,12 +445,17 @@ func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	r.UpdateTimestamp()
 	r.preload_html(w, req, nil)
 	defer r.postload_html(w, req)
-	fmt.Fprintf(w, "<br>デレステイベントボーダー<br><br>")
-	fmt.Fprintf(w, "<a href=\"..\">%s</a><br>\n", "最新ボーダー")
+	fmt.Fprintf(w, "        <br>デレステイベントボーダー<br><br>\n")
+	fmt.Fprintf(w, "        <a href=\"..\">%s</a><br>\n", "最新ボーダー")
 
 	local_timestamp := r.GetListTimestamp()
+	formatter := func(ts0 string) string {
+		ts1 := ts.FormatTimestamp(ts0)
+		ts1 = strings.Replace(ts1, "+", "&#43;", -1)
+		return ts1
+	}
 	for _, timestamp := range local_timestamp {
-		fmt.Fprintf(w, "<a href=\"q?t=%s\">%s</a><br>\n", timestamp, ts.FormatTimestamp(timestamp))
+		fmt.Fprintf(w, "        <a href=\"q?t=%s\">%s</a><br>\n", timestamp, formatter(timestamp))
 	}
 }
 
