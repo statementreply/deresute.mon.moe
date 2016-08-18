@@ -8,19 +8,23 @@
             <form action="qchart" method="get">
                 customized border graph：<br>
 
-                <label for="textinput-rank">順位：</label>
+                <label for="textinput-rank">順位：
                 <input class="t0" id="textinput-rank" type="text" name="rank" size=35 value="{{.PrefillRank}}">
+                </label>
 
                 <input type="hidden" name="event" value="{{.PrefillEvent}}">
 
-                <label for="radio-pt">イベントpt</label>
+                <label for="radio-pt">イベントpt
                 <input class="r0" id="radio-pt" type="radio" name="type" value="0"{{ index .PrefillCheckedType 0 }}>
+                </label>
 
-                <label for="radio-score">ハイスコア</label>
+                <label for="radio-score">ハイスコア
                 <input class="r0" id="radio-score" type="radio" name="type" value="1"{{ index .PrefillCheckedType 1 }}>
+                </label>
 
-                <label for="checkbox-achart">AnnotationChart</label>
+                <label for="checkbox-achart">AnnotationChart
                 <input class="c0" id="checkbox-achart" type="checkbox" name="achart" value="1"{{ .PrefillAChart }}>
+                </label>
 
                 <input class="s0" type="submit" value="更新">
             </form>
