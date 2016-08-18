@@ -15,7 +15,7 @@ func (r *RankServer) latestDataHandler(w http.ResponseWriter, req *http.Request)
 }
 
 func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
-	r.CheckData("")
+	r.CheckData()
 	// parse parameters
 	req.ParseForm()
 	list_rank := r.parseParam_rank(req)
@@ -104,7 +104,7 @@ func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Reque
 
 func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Request, param twitterParam) {
 	var status string
-	r.CheckData("")
+	r.CheckData()
 	timestamp := r.latestTimestamp()
 	r.init_req(w, req)
 	var title string

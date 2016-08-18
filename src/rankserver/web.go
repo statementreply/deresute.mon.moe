@@ -120,8 +120,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	result := new(tmplVar)
 	req.ParseForm()
 	result.Timestamp = r.parseParam_t(req)
-	// FIXME
-	r.CheckData(result.Timestamp)
+	r.CheckData()
 
 	result.list_rank = r.parseParam_rank(req)
 	// new default value
@@ -223,11 +222,10 @@ func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 	//fmt.Fprint( w, r.dumpData() )
 	req.ParseForm()
 	timestamp := r.parseParam_t(req)
+	r.CheckData()
 	if timestamp == "" {
-		r.CheckData("")
 		fmt.Fprint(w, r.latestData())
 	} else {
-		r.CheckData(timestamp)
 		fmt.Fprint(w, r.showData(timestamp))
 	}
 }
@@ -269,7 +267,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 
 	fmt.Fprint(w, "            <hr>\n")
 
-	r.CheckData("")
+	r.CheckData()
 
 	/*
 		fmt.Fprintf(w, "<h3>%s</h3>\n", "最新ボーダー")
@@ -284,7 +282,7 @@ func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) {
-	r.CheckData("")
+	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
 	err := rsTmpl.ExecuteTemplate(w, "home.html", tmplVar)
 	if err != nil {
@@ -293,7 +291,7 @@ func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) 
 }
 
 func (r *RankServer) qchartHandler_new2(w http.ResponseWriter, req *http.Request) {
-	r.CheckData("")
+	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
 	err := rsTmpl.ExecuteTemplate(w, "qchart.html", tmplVar)
 	if err != nil {
@@ -393,7 +391,7 @@ func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
-	r.CheckData("")
+	r.CheckData()
 
 	// parse parameters
 	req.ParseForm()

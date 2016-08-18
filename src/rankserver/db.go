@@ -70,7 +70,7 @@ func (r *RankServer) checkDir(timestamp string) bool {
 }
 
 // tag: database, sqlite
-func (r *RankServer) CheckData(timestamp string) {
+func (r *RankServer) CheckData() {
 	r.UpdateTimestamp()
 	latest := r.latestTimestamp()
 	latest_time := time.Unix(0, 0)
