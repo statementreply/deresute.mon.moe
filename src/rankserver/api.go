@@ -84,8 +84,6 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 	} else {
 		rankingType = 0
 	}
-	checked_type := []string{"", ""}
-	checked_type[rankingType] = " checked"
 
 	// generate json
 
