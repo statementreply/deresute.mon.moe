@@ -158,7 +158,7 @@ func (r *RankServer) setHandleFunc() {
 	// auxiliary
 	http.HandleFunc("/static/", r.staticHandler)
 	// early testing
-	http.HandleFunc("/m/", r.homeMHandler) // only for test
+	http.HandleFunc("/m/", r.homeMHandler_new2) // only for test
 	// API/plaintext
 	http.HandleFunc("/twitter", r.twitterHandler)
 	http.HandleFunc("/twitter_emblem", r.twitterEmblemHandler)

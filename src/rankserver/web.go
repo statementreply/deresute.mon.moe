@@ -230,6 +230,16 @@ func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) 
 	}
 }
 
+// mobile landscape optimized
+func (r *RankServer) homeMHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.CheckData()
+	tmplVar := r.getTmplVar(w, req)
+	err := rsTmpl.ExecuteTemplate(w, "m.html", tmplVar)
+	if err != nil {
+		r.logger.Println("html/template", err)
+	}
+}
+
 func (r *RankServer) qchartHandler_new2(w http.ResponseWriter, req *http.Request) {
 	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
@@ -315,54 +325,6 @@ func (r *RankServer) eventHandler_new2(w http.ResponseWriter, req *http.Request)
 `
 }*/
 
-// mobile landscape optimized
-func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
-	r.preload_html(w, req, &qchartParam{
-		rankingType: 0,
-		list_rank:   []int{120001},
-		event:       r.latestEvent,
-		fancyChart:  false,
-	})
-	defer r.postload_html(w, req)
-	fmt.Fprintf(w, `<div data-role="page"><div data-role="main" class="ui-content">`)
-	defer fmt.Fprintf(w, `</div></div>`)
-
-	fmt.Fprintf(w, "<p><a href=\"..\">%s</a></p>\n", "ホームページ")
-	fmt.Fprintf(w, `
-<form id="mform" action="#">
-  <label for="flip-checkbox-1" class="ui-hidden-accessible">Flip toggle switch checkbox:</label>
-  <input type="checkbox" data-role="flipswitch" data-on-text="score" data-off-text="pt" data-wrapper-class="custom-size-flipswitch" name="flip-checkbox-1" id="flip-checkbox-1">
-</form>
-`)
-	fmt.Fprintf(w, `<div>
-	<div id="myLineChart">aa</div>
-	<div id="mySpeedChart" style="display:none">bb</div></div>`)
-	fmt.Fprintf(w, `
-<script type="text/javascript">
-
-function setMForm () {
-  $("#mform").on("change", function() {
-  console.log("changemform");
-  var cv = $("#flip-checkbox-1").get(0).checked;
-  console.log(cv);
-  currentPage = $("body").pagecontainer("getActivePage");
-  if (cv) {
-	  $("#myLineChart", currentPage).css("display","none");
-	  $("#mySpeedChart", currentPage).css("display","block");
-  } else {
-	  $("#mySpeedChart", currentPage).css("display","none");
-	  $("#myLineChart", currentPage).css("display","block");
-  }
-  });
-}
-
-//$("body").on("beforeshow", setMForm);
-$("body").on("pagechange", setMForm);
-setMForm();
-
-</script>
-`)
-}
 
 func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
