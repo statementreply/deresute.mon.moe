@@ -186,11 +186,6 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	return result
 }
 
-// now the script is totally static
-//func (r *RankServer) preload_html(w http.ResponseWriter, req *http.Request, param *qchartParam) {
-//	r.init_req(w, req)
-//}
-
 func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.CheckData()
@@ -292,16 +287,6 @@ func (r *RankServer) eventHandler_new2(w http.ResponseWriter, req *http.Request)
 	}
 }
 
-/*func (r *RankServer) chartSnippet() string {
-	return `
-<div class="ui-grid-a ui-responsive">
-<div class="ui-block-a" id="myLineChart">loading...</div>
-<div class="ui-block-b" id="mySpeedChart">loading...</div>
-</div>
-`
-}*/
-
-
 func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	if !staticFilter.MatchString(req.URL.Path) {
@@ -318,6 +303,7 @@ func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) redirectHandler(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
 	req.URL.Host = r.hostname + ":4002"
 	req.URL.Scheme = "https"
 	http.Redirect(w, req, req.URL.String(), http.StatusMovedPermanently)
