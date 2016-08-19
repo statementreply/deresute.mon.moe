@@ -36,7 +36,7 @@ import (
 	"github.com/google/gopacket/pcap"
 	"github.com/google/gopacket/tcpassembly"
 	"github.com/google/gopacket/tcpassembly/tcpreader"
-	//"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 	"util"
 )
 
@@ -47,6 +47,7 @@ var filter = flag.String("f", "tcp", "BPF filter for pcap")
 var logAllPackets = flag.Bool("v", false, "Logs every packet in great detail")
 var showAllHTTP = flag.Bool("a", false, "Show every http request/response")
 var isDebug = flag.Bool("d", false, "(debug) show types")
+var showYAML = flag.Bool("y", false, "(debug) show yaml")
 var wg sync.WaitGroup
 
 // FIXME use lock to prevent concurrent rw
@@ -209,6 +210,10 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 			if _, ok := content["data_headers"]; ok {
 				result_code := content["data_headers"].(map[interface{}]interface{})["result_code"]
 				fmt.Printf("%T %#v\n", result_code, result_code)
+			}
+			if *showYAML {
+				yy, _ := yaml.Marshal(content)
+				fmt.Print(string(yy))
 			}
 		}
 		outputLock.Unlock()
