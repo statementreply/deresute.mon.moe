@@ -34,6 +34,7 @@ type aTag struct {
 	Text string
 }
 
+// extension of EventDetail type
 type eventInfo struct {
 	*resource_mgr.EventDetail
 	EventLink  template.HTML

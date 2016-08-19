@@ -271,7 +271,8 @@ func (r *RankServer) logHandler_new2(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r *RankServer) isEventAvailable(e *resource_mgr.EventDetail) bool {
-	if (e.Type() == 1 || e.Type() == 3) && e.EventEnd().After(time.Unix(1467552720, 0)) {
+	// ranking information available after 2016-07
+	if e.HasRanking() && e.EventEnd().After(time.Unix(1467552720, 0)) {
 		return true
 	} else {
 		return false
@@ -287,8 +288,7 @@ func (r *RankServer) eventHandler_new2(w http.ResponseWriter, req *http.Request)
 	formatter := ts.FormatTime
 	for _, e := range r.resourceMgr.EventList {
 		name := template.HTML(template.HTMLEscapeString(e.Name()))
-		if (e.Type() == 1 || e.Type() == 3) && e.EventEnd().After(time.Unix(1467552720, 0)) {
-			// ranking information available
+		if r.isEventAvailable(e) {
 			name_tmp := `<a href="qchart?event=` + strconv.Itoa(e.Id()) + `">` + string(name) + `</a>`
 			name = template.HTML(name_tmp)
 		}
