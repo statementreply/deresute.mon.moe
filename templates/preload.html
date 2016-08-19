@@ -42,6 +42,7 @@ if (fancychart == 0) {
 }
 google.charts.load('current', {packages: ['corechart', 'annotationchart']});
 google.charts.setOnLoadCallback(drawLineChart);
+google.charts.setOnLoadCallback(drawDistChart);
 google.charts.setOnLoadCallback(pageChange);
 function pageChange() {
     //console.log("pagechange");
@@ -164,6 +165,77 @@ function drawLineChart() {
         //console.log("draw");
         chart.draw(data_rank, options);
         chart_speed.draw(data_speed, options_speed);
+    })
+}
+
+function drawDistChart() {
+    currentPage = $("body").pagecontainer("getActivePage");
+    timestamp = $("#timestamp", currentPage).text();
+    rankingType = $("#rankingtype", currentPage).text();
+    var options = {
+        title: "累計",
+        width: 900,
+        height: 500,
+        hAxis: {
+            minValue: 0,
+            gridlines: {count: 10},
+            format: 'short',
+        },
+        vAxis: {
+            minValue: 0,
+            textPosition: 'in',
+            logScale: true,
+            format: 'short',
+            gridlines: {count: 10},
+        },
+        interpolateNulls: true,
+        explorer: {maxZoomIn: 0.1},
+        //fontSize: 0.035 * size_min,
+        chartArea: {width: '100%', height: '65%'},
+        legend: {position: 'top', alignment: 'center'},
+    };
+    myDistChart = $("#myDistChart", currentPage);
+    console.log("drawDistChart");
+    if (myDistChart.length == 0) {
+        return;
+    }
+    console.log("drawDistChart");
+    ddataurl = "/d_dist?t=" + timestamp;
+    console.log(ddataurl);
+    $.getJSON(ddataurl, "", function (data) {
+        console.log(data);
+        var data_list = [];
+        for (t=0; t<2; t++) {
+            dt = {"cols": [{"id":"timestamp","label":"rank","type":"number"}],
+                "rows":[]}
+            //console.log("r", cur[0]);
+            // cols
+            dt["cols"].push({"id":"pt/score", "label":"pt/score", "type":"number"});
+            cur = data[t];
+            // rows
+            for (i=0; i<cur.length; i++) {
+                row = cur[i];
+                row_map = {"c": [{"v": row[0]}, {"v": row[1]}]};
+                dt["rows"].push(row_map);
+            }
+            //console.log(dt)
+            // t=0: dt: ranklist
+            // t=1: dt: speedlist
+            data_list[t] = dt;
+        }
+
+        var data_pt = new google.visualization.DataTable(data_list[0]);
+        var data_score = new google.visualization.DataTable(data_list[1]);
+        //console.log("dtl", data_list[1]);
+        console.log("draw");
+        chart = new google.visualization.LineChart(myDistChart.get(0));
+        if (rankingType == 0) {
+            options.title = "pt";
+            chart.draw(data_pt, options);
+        } else {
+            options.title = "score";
+            chart.draw(data_score, options);
+        }
     })
 }
     </script>

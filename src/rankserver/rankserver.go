@@ -155,6 +155,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/q", r.qHandler_new2)
 	http.HandleFunc("/log", r.logHandler_new2)
 	http.HandleFunc("/event", r.eventHandler_new2)
+	http.HandleFunc("/dist", r.distHandler_new2)
 	// auxiliary
 	http.HandleFunc("/static/", r.staticHandler)
 	// early testing
@@ -166,6 +167,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/res_ver", r.res_verHandler)
 	http.HandleFunc("/latest_data", r.latestDataHandler)
 	http.HandleFunc("/d", r.dataHandler)
+	http.HandleFunc("/d_dist", r.distDataHandler)
 }
 
 func (r *RankServer) latestTimestamp() string {

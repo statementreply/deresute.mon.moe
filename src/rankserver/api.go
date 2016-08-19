@@ -42,6 +42,36 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 	)
 }
 
+func (r *RankServer) distDataHandler(w http.ResponseWriter, req *http.Request) {
+	r.CheckData()
+	req.ParseForm()
+	timestamp := r.parseParam_t(req)
+	if timestamp == "" {
+		timestamp = r.latestTimestamp()
+	}
+	item := r.fetchDataSlice(timestamp)
+	fmt.Fprint(w, "[\n")
+	for i := 0; i<len(item); i++ {
+		fmt.Fprint(w, "[\n")
+		needComma := false
+		sorted_k := r.get_list_rank(timestamp, i)
+
+		for _, k := range sorted_k {
+			v := item[i][k]
+			if needComma {
+				fmt.Fprint(w, ",")
+			}
+			fmt.Fprintf(w, `[%d, %d]`, k, v)
+			needComma = true
+		}
+		fmt.Fprint(w, "]\n")
+		if i < len(item) - 1 {
+			fmt.Fprint(w, ",")
+		}
+	}
+	fmt.Fprint(w, "]\n")
+}
+
 func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 	param := twitterParam{
 		title_suffix: "",

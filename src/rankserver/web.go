@@ -246,6 +246,22 @@ func (r *RankServer) qHandler_new2(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// distribution
+func (r *RankServer) distHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
+	r.CheckData()
+	req.ParseForm()
+	tmplVar := r.getTmplVar(w, req)
+	if tmplVar.Timestamp == "" {
+		tmplVar.Timestamp = r.latestTimestamp()
+	}
+	tmplVar.RankingType = tmplVar.rankingType
+	err := rsTmpl.ExecuteTemplate(w, "dist.html", tmplVar)
+	if err != nil {
+		r.logger.Println("html/template", err)
+	}
+}
+
 func (r *RankServer) logHandler_new2(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.UpdateTimestamp()

@@ -67,6 +67,8 @@ type tmplVar struct {
 	TimestampList []*aTag
 	// for "/event"
 	EventList []*eventInfo
+	// for "/dist"
+	RankingType int
 }
 
 type RankServer struct {
