@@ -13,7 +13,13 @@
                 <input class="t0" id="textinput-rank" type="text" name="rank" size=35 value="{{.PrefillRank}}">
                 </div>
 
-                <input type="hidden" name="event" value="{{.PrefillEvent}}">
+                <!--<input type="hidden" name="event" value="{{.PrefillEvent}}">-->
+
+                <select name="event">
+                    {{range .EventAvailable}}
+                    <option value="{{.Id}}" {{if .EventSelected}}selected="selected"{{end}}>{{.Name}}</option>
+                    {{end}}
+                </select>
 
                 <label for="radio-pt">イベントpt
                 <input class="r0" id="radio-pt" type="radio" name="type" value="0" {{ index .PrefillCheckedType 0 }}>

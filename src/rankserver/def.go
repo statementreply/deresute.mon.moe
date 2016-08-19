@@ -35,10 +35,12 @@ type aTag struct {
 }
 
 type eventInfo struct {
+	*resource_mgr.EventDetail
 	EventLink  template.HTML
 	EventStart string
 	EventHalf  string
 	EventEnd   string
+	EventSelected bool
 }
 
 type tmplVar struct {
@@ -56,6 +58,8 @@ type tmplVar struct {
 	PrefillAChart      template.HTMLAttr
 	PrefillCheckedType []template.HTMLAttr
 	AvailableRank      [][]int
+	// for "/qchart"
+	EventAvailable     []*eventInfo
 	// for "/q"
 	Data string
 	// for "/log"

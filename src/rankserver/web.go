@@ -211,6 +211,19 @@ func (r *RankServer) qchartHandler_new2(w http.ResponseWriter, req *http.Request
 	r.init_req(w, req)
 	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
+	for _, e := range r.resourceMgr.EventList {
+		if r.isEventAvailable(e) {
+			selected := false
+			if tmplVar.event != nil {
+				selected = tmplVar.event.Id() == e.Id()
+			}
+			tmplVar.EventAvailable = append(tmplVar.EventAvailable,
+				&eventInfo{
+					EventDetail: e,
+					EventSelected: selected,
+				})
+		}
+	}
 	err := rsTmpl.ExecuteTemplate(w, "qchart.html", tmplVar)
 	if err != nil {
 		r.logger.Println("html/template", err)
@@ -254,6 +267,14 @@ func (r *RankServer) logHandler_new2(w http.ResponseWriter, req *http.Request) {
 	err := rsTmpl.ExecuteTemplate(w, "log.html", tmplVar)
 	if err != nil {
 		r.logger.Println("html/template", err)
+	}
+}
+
+func (r *RankServer) isEventAvailable(e *resource_mgr.EventDetail) bool {
+	if (e.Type() == 1 || e.Type() == 3) && e.EventEnd().After(time.Unix(1467552720, 0)) {
+		return true
+	} else {
+		return false
 	}
 }
 
