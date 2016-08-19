@@ -184,9 +184,10 @@ function drawDistChart() {
         vAxis: {
             minValue: 0,
             textPosition: 'in',
-            logScale: true,
+            logScale: false,
             format: 'short',
             gridlines: {count: 10},
+            minorGridlines: {count: 10},
         },
         interpolateNulls: true,
         explorer: {maxZoomIn: 0.1},
@@ -230,6 +231,7 @@ function drawDistChart() {
         console.log("draw");
         chart = new google.visualization.LineChart(myDistChart.get(0));
         if (rankingType == 0) {
+            options.vAxis.logScale = true;
             options.title = "pt";
             chart.draw(data_pt, options);
         } else {
