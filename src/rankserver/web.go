@@ -291,11 +291,17 @@ func (r *RankServer) distHandler_new2(w http.ResponseWriter, req *http.Request) 
 		tmplVar.Timestamp = r.latestTimestamp()
 	}
 	tmplVar.RankingType = tmplVar.rankingType
+	t_date := r.parseParam_date(req)
+	t_time := r.parseParam_time(req)
+	if (t_date > 0) && (t_time > 0) {
+		tmplVar.Timestamp = strconv.FormatInt(t_date+t_time, 10)
+	}
 	for i:=0; i<24*4; i++ {
 		tmplVar.ListTimeOfDay = append(tmplVar.ListTimeOfDay,
 		&TimeOfSelector{
 			Second: int64(i*900+120),
 			Text: fmt.Sprintf("%02d:%02d", i/4, (i%4)*15+2),
+			Selected: t_time == int64(i*900+120),
 		})
 	}
 	if tmplVar.event != nil {
@@ -305,14 +311,10 @@ func (r *RankServer) distHandler_new2(w http.ResponseWriter, req *http.Request) 
 			&TimeOfSelector{
 				Second: baseTime.Unix(),
 				Text: baseTime.Format("2006 01-02"),
+				Selected: t_date == baseTime.Unix(),
 			})
 			baseTime = baseTime.Add(time.Hour * 24)
 		}
-	}
-	t_date := r.parseParam_date(req)
-	t_time := r.parseParam_time(req)
-	if (t_date > 0) && (t_time > 0) {
-		tmplVar.Timestamp = strconv.FormatInt(t_date+t_time, 10)
 	}
 	err := rsTmpl.ExecuteTemplate(w, "dist.html", tmplVar)
 	if err != nil {

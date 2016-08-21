@@ -19,7 +19,7 @@
                 <label for="form-date">date</label>
                 <select id="form-date" name="date" id="date">
                     {{range .ListDate}}
-                            <option value="{{.Second}}">{{.Text}}</option>{{end}}
+                            <option value="{{.Second}}" {{if .Selected}}selected="selected"{{end}}>{{.Text}}</option>{{end}}
                 </select>
                 </div>
 
@@ -27,7 +27,7 @@
                 <label for="form-time">time</label>
                 <select id="form-time" name="time" id="time">
                     {{range .ListTimeOfDay}}
-                            <option value="{{.Second}}">{{.Text}}</option>{{end}}
+                            <option value="{{.Second}}" {{if .Selected}}selected="selected"{{end}}>{{.Text}}</option>{{end}}
                 </select>
                 </div>
                 <input class="s0" type="submit" value="更新">

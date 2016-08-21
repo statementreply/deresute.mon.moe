@@ -47,6 +47,7 @@ type eventInfo struct {
 type TimeOfSelector struct {
 	Second int64
 	Text string
+	Selected bool
 }
 
 type tmplVar struct {
