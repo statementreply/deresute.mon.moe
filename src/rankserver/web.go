@@ -51,6 +51,40 @@ func (r *RankServer) parseParam_t(req *http.Request) string {
 	return ""
 }
 
+// returns valid timestamp or ""
+func (r *RankServer) parseParam_date(req *http.Request) int64 {
+	timestamp, ok := req.Form["date"] // format checked
+	if ok {
+		if timestampFilter.MatchString(timestamp[0]) {
+			n, err := strconv.ParseInt(timestamp[0], 10, 64)
+			if err != nil {
+				return 0
+			}
+			return n
+		} else {
+			r.logger.Println("bad req", req.Form)
+		}
+	}
+	return 0
+}
+
+// returns valid timestamp or ""
+func (r *RankServer) parseParam_time(req *http.Request) int64 {
+	timestamp, ok := req.Form["time"] // format checked
+	if ok {
+		if timestampFilter.MatchString(timestamp[0]) {
+			n, err := strconv.ParseInt(timestamp[0], 10, 64)
+			if err != nil {
+				return 0
+			}
+			return n
+		} else {
+			r.logger.Println("bad req", req.Form)
+		}
+	}
+	return 0
+}
+
 // returns list_rank or nil (list could be empty but not nil?)
 func (r *RankServer) parseParam_rank(req *http.Request) []int {
 	list_rank_str, ok := req.Form["rank"] // format checked split, strconv.Atoi
@@ -274,6 +308,11 @@ func (r *RankServer) distHandler_new2(w http.ResponseWriter, req *http.Request) 
 			})
 			baseTime = baseTime.Add(time.Hour * 24)
 		}
+	}
+	t_date := r.parseParam_date(req)
+	t_time := r.parseParam_time(req)
+	if (t_date > 0) && (t_time > 0) {
+		tmplVar.Timestamp = strconv.FormatInt(t_date+t_time, 10)
 	}
 	err := rsTmpl.ExecuteTemplate(w, "dist.html", tmplVar)
 	if err != nil {

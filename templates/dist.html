@@ -6,21 +6,30 @@
         <div class="form">
             <p>イベント：{{.EventTitle}}</p>
             <form action="/dist" method="get">
-                <select name="event">
+                <div class="ui-field-contain">
+                <label for="form-event">イベント</label>
+                <select id="form-event" name="event">
                     {{range .EventAvailable}}
                     <option value="{{.Id}}" {{if .EventSelected}}selected="selected"{{end}}>{{.Name}}</option>
                     {{end}}
                 </select>
+                </div>
 
-
-                <select name="date" id="date">
+                <div class="ui-field-contain">
+                <label for="form-date">date</label>
+                <select id="form-date" name="date" id="date">
                     {{range .ListDate}}
                             <option value="{{.Second}}">{{.Text}}</option>{{end}}
                 </select>
-                <select name="time" id="time">
+                </div>
+
+                <div class="ui-field-contain">
+                <label for="form-time">time</label>
+                <select id="form-time" name="time" id="time">
                     {{range .ListTimeOfDay}}
                             <option value="{{.Second}}">{{.Text}}</option>{{end}}
                 </select>
+                </div>
                 <input class="s0" type="submit" value="更新">
             </form>
         </div>
