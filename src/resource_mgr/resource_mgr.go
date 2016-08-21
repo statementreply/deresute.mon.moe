@@ -226,7 +226,7 @@ func (r *ResourceMgr) ParseMusic(fileName string) {
 				//fmt.Println(name, "UTF-8 valid")
 				//fmt.Println(data)
 			} else {
-				fmt.Println(name, "UTF-8 invalid")
+				log.Println(name, "UTF-8 invalid")
 			}
 		}
 	}
