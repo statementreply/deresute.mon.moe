@@ -22,13 +22,13 @@ sub at {
 
 
 my ($magic, $version, $fileCount, $byteAlign) = unpack "a4NVV", at(0);
-print "$magic $version, $fileCount $byteAlign\n";
-printf "%x\n", $version;
+#print "$magic $version, $fileCount $byteAlign\n";
+#printf "%x\n", $version;
 my $offsetFieldSize = 4;
 
 my $FileOffsetLast = unpack "V", at(16 + $fileCount * 2 + $offsetFieldSize * $fileCount);
 
-printf "last %x\n", $FileOffsetLast;
+#printf "last %x\n", $FileOffsetLast;
 
 my $PrevFileOffset = 0;
 my $PrevCueID;
@@ -44,18 +44,18 @@ for (my $i = 0; $i < $fileCount; $i++) {
 
 
 
-    print "cueid $CueID\n";
-    printf "%x %x %x\n", $FileOffset, $FileOffsetRaw, $FileOffsetRound;
-    print "\n";
+    #print "cueid $CueID\n";
+    #printf "%x %x %x\n", $FileOffset, $FileOffsetRaw, $FileOffsetRound;
+    #print "\n";
 
     if ($PrevFileOffset > 0) {
-        print Dump([$PrevCueID, $PrevFileOffset, $FileOffsetRound]);
+        #print Dump([$PrevCueID, $PrevFileOffset, $FileOffsetRound]);
         dump_file($PrevCueID, $PrevFileOffset, $FileOffsetRound);
     }
     $PrevFileOffset = $FileOffsetRound;
     $PrevCueID = $CueID;
 }
-print Dump([$PrevCueID, $PrevFileOffset, $FileOffsetLast]);
+#print Dump([$PrevCueID, $PrevFileOffset, $FileOffsetLast]);
 dump_file($PrevCueID, $PrevFileOffset, $FileOffsetLast);
 
 sub dump_file {
