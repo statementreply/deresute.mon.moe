@@ -59,7 +59,8 @@ func main() {
 	//fmt.Println(d, err)
 
 	for i := 1; i < len(os.Args); i++ {
-		d, err := r.Fetch("dl/resources/High/Sound/Common/l/" + os.Args[i])
+		//d, err := r.Fetch("dl/resources/High/Sound/Common/l/" + os.Args[i])
+		d, err := r.FetchLz4("dl/resources/High/AssetBundles/Android/" + os.Args[i])
 		if err != nil {
 			log.Fatalln(err)
 		}
