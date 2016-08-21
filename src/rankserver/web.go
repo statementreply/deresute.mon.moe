@@ -295,6 +295,12 @@ func (r *RankServer) distHandler_new2(w http.ResponseWriter, req *http.Request) 
 	t_time := r.parseParam_time(req)
 	if (t_date > 0) && (t_time > 0) {
 		tmplVar.Timestamp = strconv.FormatInt(t_date+t_time, 10)
+	} else {
+		t, err := strconv.ParseInt(r.latestTimestamp(), 10, 64)
+		if err == nil {
+			t_time = t % (3600 * 24)
+			t_date = t - t_time
+		}
 	}
 	for i:=0; i<24*4; i++ {
 		tmplVar.ListTimeOfDay = append(tmplVar.ListTimeOfDay,
