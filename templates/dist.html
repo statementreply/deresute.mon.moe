@@ -3,7 +3,31 @@
     <div data-role="page" data-dom-cache="false">
 {{template "qchart_info.html" .}}
 {{template "navbar.html"}}
-<div id="myDistChart">loading...</div>
+        <div class="form">
+            <p>イベント：{{.EventTitle}}</p>
+            <form action="/dist" method="get">
+                <select name="event">
+                    {{range .EventAvailable}}
+                    <option value="{{.Id}}" {{if .EventSelected}}selected="selected"{{end}}>{{.Name}}</option>
+                    {{end}}
+                </select>
+
+
+                <select name="date" id="date">
+                    {{range .ListDate}}
+                            <option value="{{.Second}}">{{.Text}}</option>{{end}}
+                </select>
+                <select name="time" id="time">
+                    {{range .ListTimeOfDay}}
+                            <option value="{{.Second}}">{{.Text}}</option>{{end}}
+                </select>
+                <input class="s0" type="submit" value="更新">
+            </form>
+        </div>
+<div class="ui-grid-a ui-responsive">
+<div class="ui-block-a" id="myDistChart">loading...</div>
+<div class="ui-block-b" id="myScoreDistChart">loading...</div>
+</div>
     </div>
 </body>
 {{template "postload.html"}}

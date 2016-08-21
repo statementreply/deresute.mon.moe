@@ -16,16 +16,21 @@
 currentPage = $("body").pagecontainer("getActivePage");
 function setAspectRatio() {
     aratio = 0.75;
-    if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
-        //console.log("shorted setAspectRatio()");
-        return;
-    }
     myLineChart = $("#myLineChart", currentPage);
     mySpeedChart = $("#mySpeedChart", currentPage);
-    //console.log("setAspectRatio()", myLineChart.width());
-    //console.log("setAspectRatio()", myLineChart.height());
-    myLineChart.height(myLineChart.width() * aratio);
-    mySpeedChart.height(mySpeedChart.width() * aratio);
+    if ((myLineChart.length > 0) && (mySpeedChart.length > 0)) {
+        //console.log("shorted setAspectRatio()");
+        //console.log("setAspectRatio()", myLineChart.width());
+        //console.log("setAspectRatio()", myLineChart.height());
+        myLineChart.height(myLineChart.width() * aratio);
+        mySpeedChart.height(mySpeedChart.width() * aratio);
+    }
+    myDistChart = $("#myDistChart", currentPage);
+    myScoreDistChart = $("#myScoreDistChart", currentPage);
+    if ((myDistChart.length > 0) && (myScoreDistChart.length > 0)) {
+        myDistChart.height(myDistChart.width() * aratio)
+        myScoreDistChart.height(myScoreDistChart.width() * aratio)
+    }
 }
 $(window).on("pagecreate pageload pagechange pageshow throttledresize", function(e) {
     //console.log("pagecreate/throttledresize", e);
@@ -34,12 +39,6 @@ $(window).on("pagecreate pageload pagechange pageshow throttledresize", function
 dataurl = $("#dataurl", currentPage).text();
 //console.log("dataurl", dataurl);
 fancychart = $("#fancychart", currentPage).text();
-// this doesn't work
-if (fancychart == 0) {
-    //google.charts.load('current', {packages: ['corechart']});
-} else {
-    //google.charts.load('current', {packages: ['corechart', 'annotationchart']});
-}
 google.charts.load('current', {packages: ['corechart', 'annotationchart']});
 google.charts.setOnLoadCallback(drawLineChart);
 google.charts.setOnLoadCallback(drawDistChart);
@@ -48,6 +47,7 @@ function pageChange() {
     //console.log("pagechange");
     $(window).on("pagechange", function() {
         drawLineChart();
+        drawDistChart();
         //console.log("pagechange");
     });
     //$("body").pagecontainer()
@@ -61,6 +61,7 @@ function pageChange() {
     });
     $(window).on("orientationchange", function() {
         drawLineChart();
+        drawDistChart();
         //console.log("orientationchange");
     });
 };
@@ -84,17 +85,8 @@ function drawLineChart() {
     //console.log("dataurl", dataurl);
     fancychart = $("#fancychart", currentPage).text();
 
-    // first get the size from the window
-    // if that didn't work, get it from the body
-    var size = {
-        width: window.innerWidth || document.body.clientWidth,
-        height: window.innerHeight || document.body.clientHeight,
-    };
-    size_min = Math.min(size.width, size.height);
     var options = {
         title: "累計",
-        //width: size.width * 1.0,
-        //height: size.width * 0.5625,
         hAxis: {
             format: 'MM/dd HH:mm',
             gridlines: {count: 12}
@@ -105,7 +97,6 @@ function drawLineChart() {
         },
         interpolateNulls: true,
         explorer: {maxZoomIn: 0.1},
-        //fontSize: 0.035 * size_min,
         chartArea: {width: '100%', height: '65%'},
         legend: {position: 'top', alignment: 'center'},
     };
@@ -169,13 +160,11 @@ function drawLineChart() {
 }
 
 function drawDistChart() {
+    setAspectRatio();
     currentPage = $("body").pagecontainer("getActivePage");
     timestamp = $("#timestamp", currentPage).text();
     rankingType = $("#rankingtype", currentPage).text();
     var options = {
-        title: "累計",
-        width: 900,
-        height: 500,
         hAxis: {
             minValue: 0,
             gridlines: {count: 10},
@@ -186,16 +175,23 @@ function drawDistChart() {
             textPosition: 'in',
             logScale: false,
             format: 'short',
-            gridlines: {count: 10},
-            minorGridlines: {count: 10},
+            gridlines: {count: 5},
+            minorGridlines: {count: 5},
         },
         interpolateNulls: true,
         explorer: {maxZoomIn: 0.1},
-        //fontSize: 0.035 * size_min,
         chartArea: {width: '100%', height: '65%'},
         legend: {position: 'top', alignment: 'center'},
     };
+    var options_score = $.extend({}, options);
+    options_score.vAxis = $.extend({}, options.vAxis);
+
+    options.vAxis.logScale = true;
+    options.title = "pt";
+    options_score.vAxis.logScale = false;
+    options_score.title = "score";
     myDistChart = $("#myDistChart", currentPage);
+    myScoreDistChart = $("#myScoreDistChart", currentPage);
     console.log("drawDistChart");
     if (myDistChart.length == 0) {
         return;
@@ -230,14 +226,9 @@ function drawDistChart() {
         //console.log("dtl", data_list[1]);
         console.log("draw");
         chart = new google.visualization.LineChart(myDistChart.get(0));
-        if (rankingType == 0) {
-            options.vAxis.logScale = true;
-            options.title = "pt";
-            chart.draw(data_pt, options);
-        } else {
-            options.title = "score";
-            chart.draw(data_score, options);
-        }
+        chart_score = new google.visualization.LineChart(myScoreDistChart.get(0));
+        chart.draw(data_pt, options);
+        chart_score.draw(data_score, options_score);
     })
 }
     </script>

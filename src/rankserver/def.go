@@ -44,6 +44,11 @@ type eventInfo struct {
 	EventSelected bool
 }
 
+type TimeOfSelector struct {
+	Second int64
+	Text string
+}
+
 type tmplVar struct {
 	// embed a qchartParam
 	qchartParam
@@ -69,6 +74,8 @@ type tmplVar struct {
 	EventList []*eventInfo
 	// for "/dist"
 	RankingType int
+	ListTimeOfDay []*TimeOfSelector
+	ListDate []*TimeOfSelector
 }
 
 type RankServer struct {
