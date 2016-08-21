@@ -16,7 +16,7 @@
                 </div>
 
                 <div class="ui-field-contain">
-                <label for="form-date">date</label>
+                <label for="form-date">日付</label>
                 <select id="form-date" name="date" id="date">
                     {{range .ListDate}}
                             <option value="{{.Second}}" {{if .Selected}}selected="selected"{{end}}>{{.Text}}</option>{{end}}
@@ -24,7 +24,7 @@
                 </div>
 
                 <div class="ui-field-contain">
-                <label for="form-time">time</label>
+                <label for="form-time">時刻</label>
                 <select id="form-time" name="time" id="time">
                     {{range .ListTimeOfDay}}
                             <option value="{{.Second}}" {{if .Selected}}selected="selected"{{end}}>{{.Text}}</option>{{end}}
