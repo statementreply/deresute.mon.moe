@@ -20,3 +20,5 @@ src/gopkg.in
 cached_status*
 /compress_db
 /static/*.html
+/*.acb/
+/*.awb/
