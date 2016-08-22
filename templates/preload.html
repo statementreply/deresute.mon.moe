@@ -14,6 +14,13 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
 currentPage = $("body").pagecontainer("getActivePage");
+function setAspectRatio_i(elem) {
+    aratio = 0.75;
+    if (elem.length > 0) {
+        elem.height(elem.width() * aratio);
+    }
+}
+
 function setAspectRatio() {
     aratio = 0.75;
     myLineChart = $("#myLineChart", currentPage);
@@ -31,6 +38,8 @@ function setAspectRatio() {
         myDistChart.height(myDistChart.width() * aratio)
         myScoreDistChart.height(myScoreDistChart.width() * aratio)
     }
+    setAspectRatio_i($("#myDensityChart"));
+    setAspectRatio_i($("#myScoreDensityChart"));
 }
 $(window).on("pagecreate pageload pagechange pageshow throttledresize", function(e) {
     //console.log("pagecreate/throttledresize", e);
@@ -192,6 +201,8 @@ function drawDistChart() {
     options_score.title = "score";
     myDistChart = $("#myDistChart", currentPage);
     myScoreDistChart = $("#myScoreDistChart", currentPage);
+    myDensityChart = $("#myDensityChart", currentPage);
+    myScoreDensityChart = $("#myScoreDensityChart", currentPage);
     console.log("drawDistChart");
     if (myDistChart.length == 0) {
         return;
@@ -202,12 +213,13 @@ function drawDistChart() {
     $.getJSON(ddataurl, "", function (data) {
         console.log(data);
         var data_list = [];
-        for (t=0; t<2; t++) {
+        plot_label = ["pt", "score", "rank/pt", "rank/score"];
+        for (t=0; t<4; t++) {
             dt = {"cols": [{"id":"timestamp","label":"rank","type":"number"}],
                 "rows":[]}
             //console.log("r", cur[0]);
             // cols
-            dt["cols"].push({"id":"pt/score", "label":"pt/score", "type":"number"});
+            dt["cols"].push({"id":plot_label[t], "label":plot_label[t], "type":"number"});
             cur = data[t];
             // rows
             for (i=0; i<cur.length; i++) {
@@ -223,12 +235,20 @@ function drawDistChart() {
 
         var data_pt = new google.visualization.DataTable(data_list[0]);
         var data_score = new google.visualization.DataTable(data_list[1]);
+        var data_density_pt = new google.visualization.DataTable(data_list[2]);
+        var data_density_score = new google.visualization.DataTable(data_list[3]);
         //console.log("dtl", data_list[1]);
         console.log("draw");
         chart = new google.visualization.LineChart(myDistChart.get(0));
         chart_score = new google.visualization.LineChart(myScoreDistChart.get(0));
+        chart_density = new google.visualization.LineChart(myDensityChart.get(0));
+        chart_density_score = new google.visualization.LineChart(myScoreDensityChart.get(0));
         chart.draw(data_pt, options);
         chart_score.draw(data_score, options_score);
+        options.title = "pt密度";
+        options_score.title = "スコア密度";
+        chart_density.draw(data_density_pt, options);
+        chart_density_score.draw(data_density_score, options_score);
     })
 }
     </script>
