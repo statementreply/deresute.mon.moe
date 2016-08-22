@@ -42,6 +42,27 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 	)
 }
 
+func (r *RankServer) getDensity(timestamp string) []map[int]int {
+	item := r.fetchDataSlice(timestamp)
+	result := make([]map[int]int, len(item))
+	for i := 0; i<len(item); i++ {
+		sorted_k := r.get_list_rank(timestamp, i)
+		result[i] = make(map[int]int)
+		for j, k := range sorted_k {
+			//cur_k = k
+			var diff int
+			if j < len(sorted_k) - 1 {
+				next_k := sorted_k[j+1]
+				diff = item[i][k] - item[i][next_k]
+			} else {
+				diff = item[i][k]
+			}
+			result[i][k] = diff
+		}
+	}
+	return result
+}
+
 func (r *RankServer) distDataHandler(w http.ResponseWriter, req *http.Request) {
 	r.CheckData()
 	req.ParseForm()
@@ -49,8 +70,10 @@ func (r *RankServer) distDataHandler(w http.ResponseWriter, req *http.Request) {
 	if timestamp == "" {
 		timestamp = r.latestTimestamp()
 	}
-	item := r.fetchDataSlice(timestamp)
+	//item := r.fetchDataSlice(timestamp)
+	item := r.getDensity(timestamp)
 	fmt.Fprint(w, "[\n")
+	// len(item) == 2
 	for i := 0; i<len(item); i++ {
 		fmt.Fprint(w, "[\n")
 		needComma := false
