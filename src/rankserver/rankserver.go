@@ -100,6 +100,8 @@ func MakeRankServer() *RankServer {
 			Addr: ":4002",
 			TLSConfig: &tls.Config{
 				Certificates: []tls.Certificate{cert},
+				// can be omitted
+				NextProtos: []string{"h2", "http/1.1"},
 			},
 		}
 		r.plainServer = &http.Server{Addr: ":4001", Handler: http.NewServeMux()}
