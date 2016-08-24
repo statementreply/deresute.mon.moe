@@ -48,6 +48,8 @@ $(window).on("pagecreate pageload pagechange pageshow throttledresize", function
 dataurl = $("#dataurl", currentPage).text();
 //console.log("dataurl", dataurl);
 fancychart = $("#fancychart", currentPage).text();
+// packages 'corechart' 'annotationchart'
+// 'line' for material design
 google.charts.load('current', {packages: ['corechart', 'annotationchart']});
 google.charts.setOnLoadCallback(drawLineChart);
 google.charts.setOnLoadCallback(drawDistChart);
@@ -128,6 +130,8 @@ function drawLineChart() {
     if (fancychart == 0) {
         chart = new google.visualization.LineChart(myLineChart.get(0));
         chart_speed = new google.visualization.LineChart(mySpeedChart.get(0));
+        // try material design
+        //chart_speed = new google.charts.Line(mySpeedChart.get(0));
     } else {
         chart = eval("new google.visualization.AnnotationChart(myLineChart.get(0))");
         chart_speed = eval("new google.visualization.AnnotationChart(mySpeedChart.get(0))");
