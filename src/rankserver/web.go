@@ -227,7 +227,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 			}
 			result.EventAvailable = append(result.EventAvailable,
 				&eventInfo{
-					EventDetail: e,
+					EventDetail:   e,
 					EventSelected: selected,
 				})
 		}
@@ -296,7 +296,7 @@ func (r *RankServer) distHandler_new2(w http.ResponseWriter, req *http.Request) 
 	t_time := r.parseParam_time(req)
 	t_offset := int64(9 * 3600)
 	if (t_date > 0) && (t_time > 0) {
-		tmplVar.Timestamp = strconv.FormatInt(t_date + t_time - t_offset, 10)
+		tmplVar.Timestamp = strconv.FormatInt(t_date+t_time-t_offset, 10)
 	} else {
 		t, err := strconv.ParseInt(r.latestTimestamp(), 10, 64)
 		t += t_offset
@@ -305,23 +305,23 @@ func (r *RankServer) distHandler_new2(w http.ResponseWriter, req *http.Request) 
 			t_date = t - t_time
 		}
 	}
-	for i:=0; i<24*4; i++ {
+	for i := 0; i < 24*4; i++ {
 		tmplVar.ListTimeOfDay = append(tmplVar.ListTimeOfDay,
-		&TimeOfSelector{
-			Second: int64(i*900+120),
-			Text: fmt.Sprintf("%02d:%02d", i/4, (i%4)*15+2),
-			Selected: t_time == int64(i*900+120),
-		})
+			&TimeOfSelector{
+				Second:   int64(i*900 + 120),
+				Text:     fmt.Sprintf("%02d:%02d", i/4, (i%4)*15+2),
+				Selected: t_time == int64(i*900+120),
+			})
 	}
 	if tmplVar.event != nil {
 		baseTime := tmplVar.event.EventStart().Truncate(time.Hour * 24)
 		for !baseTime.After(tmplVar.event.ResultEnd()) {
 			tmplVar.ListDate = append(tmplVar.ListDate,
-			&TimeOfSelector{
-				Second: baseTime.Unix(),
-				Text: baseTime.Format("2006 01-02"),
-				Selected: t_date == baseTime.Unix(),
-			})
+				&TimeOfSelector{
+					Second:   baseTime.Unix(),
+					Text:     baseTime.Format("2006 01-02"),
+					Selected: t_date == baseTime.Unix(),
+				})
 			baseTime = baseTime.Add(time.Hour * 24)
 		}
 	}

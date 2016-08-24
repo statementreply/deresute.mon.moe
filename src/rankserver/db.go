@@ -78,9 +78,11 @@ func (r *RankServer) CheckData() {
 	}
 	// check new res_ver
 	// FIXME need some test
+	// FIXME race condition
 	if (time.Now().Sub(r.lastCheck) >= 1*time.Hour) || ((r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 2*time.Hour)) {
 		r.logger.Println("recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
-		// try to restart
+		r.lastCheck = time.Now()
+		// try to restart session (session expires after certain time)
 		r.client.Reset_sid()
 		r.client.LoadCheck()
 		rv := r.client.Get_res_ver()
@@ -89,7 +91,6 @@ func (r *RankServer) CheckData() {
 		r.resourceMgr.ParseEvent()
 		r.currentEvent = r.resourceMgr.FindCurrentEvent()
 		r.latestEvent = r.resourceMgr.FindLatestEvent()
-		r.lastCheck = time.Now()
 	}
 }
 

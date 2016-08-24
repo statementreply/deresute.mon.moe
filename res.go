@@ -26,7 +26,7 @@ func main() {
 	log.Println("master is", r.LoadMaster())
 	r.ParseEvent()
 	for _, e := range r.EventList {
-		_= e
+		_ = e
 		//fmt.Println(e.NoticeStart(), e.EventStart(), e.Name())
 		//fmt.Println(utf8.RuneCountInString(e.Name()), e.Name())
 	}

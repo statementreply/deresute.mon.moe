@@ -48,15 +48,15 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 func (r *RankServer) getDensity(timestamp string) []map[int]float32 {
 	item := r.fetchDataSlice(timestamp)
 	result := make([]map[int]float32, len(item))
-	for i := 0; i<len(item); i++ {
+	for i := 0; i < len(item); i++ {
 		sorted_k := r.get_list_rank(timestamp, i)
 		result[i] = make(map[int]float32)
 		for j, k := range sorted_k {
 			//cur_k = k
 			var diff float32
-			if j < len(sorted_k) - 1 {
+			if j < len(sorted_k)-1 {
 				next_k := sorted_k[j+1]
-				diff = float32(next_k - k) / float32(item[i][k] - item[i][next_k])
+				diff = float32(next_k-k) / float32(item[i][k]-item[i][next_k])
 			} else {
 				diff = float32(10000.0) / float32(item[i][k])
 			}
@@ -88,7 +88,7 @@ func mapToJson(v interface{}, list_key_v interface{}) string {
 		if needComma {
 			result += ","
 		}
-		result += fmt.Sprint(`[`, k, `,`,  v, `]`)
+		result += fmt.Sprint(`[`, k, `,`, v, `]`)
 		needComma = true
 	}
 	result += "]\n"
@@ -106,16 +106,16 @@ func (r *RankServer) distDataHandler(w http.ResponseWriter, req *http.Request) {
 	item := r.fetchDataSlice(timestamp)
 	fmt.Fprint(w, "[\n")
 	// len(item) == 2
-	for i := 0; i<len(item); i++ {
+	for i := 0; i < len(item); i++ {
 		sorted_k := r.get_list_rank(timestamp, i)
 		fmt.Fprint(w, mapToJson(item[i], sorted_k))
 		fmt.Fprint(w, ",")
 	}
 	item2 := r.getDensity(timestamp)
-	for i := 0; i<len(item2); i++ {
+	for i := 0; i < len(item2); i++ {
 		sorted_k := r.get_list_rank(timestamp, i)
 		fmt.Fprint(w, mapToJson(item2[i], sorted_k))
-		if i < len(item2) - 1 {
+		if i < len(item2)-1 {
 			fmt.Fprint(w, ",")
 		}
 	}

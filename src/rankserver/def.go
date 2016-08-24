@@ -37,16 +37,16 @@ type aTag struct {
 // extension of EventDetail type
 type eventInfo struct {
 	*resource_mgr.EventDetail
-	EventLink  template.HTML
-	EventStart string
-	EventHalf  string
-	EventEnd   string
+	EventLink     template.HTML
+	EventStart    string
+	EventHalf     string
+	EventEnd      string
 	EventSelected bool
 }
 
 type TimeOfSelector struct {
-	Second int64
-	Text string
+	Second   int64
+	Text     string
 	Selected bool
 }
 
@@ -66,7 +66,7 @@ type tmplVar struct {
 	PrefillCheckedType []template.HTMLAttr
 	AvailableRank      [][]int
 	// for "/qchart"
-	EventAvailable     []*eventInfo
+	EventAvailable []*eventInfo
 	// for "/q"
 	Data string
 	// for "/log"
@@ -74,9 +74,9 @@ type tmplVar struct {
 	// for "/event"
 	EventList []*eventInfo
 	// for "/dist"
-	RankingType int
+	RankingType   int
 	ListTimeOfDay []*TimeOfSelector
-	ListDate []*TimeOfSelector
+	ListDate      []*TimeOfSelector
 }
 
 type RankServer struct {
