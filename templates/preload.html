@@ -22,22 +22,13 @@ function setAspectRatio_i(elem) {
 }
 
 function setAspectRatio() {
-    aratio = 0.75;
-    myLineChart = $("#myLineChart", currentPage);
-    mySpeedChart = $("#mySpeedChart", currentPage);
-    if ((myLineChart.length > 0) && (mySpeedChart.length > 0)) {
-        //console.log("shorted setAspectRatio()");
-        //console.log("setAspectRatio()", myLineChart.width());
-        //console.log("setAspectRatio()", myLineChart.height());
-        myLineChart.height(myLineChart.width() * aratio);
-        mySpeedChart.height(mySpeedChart.width() * aratio);
-    }
+    setAspectRatio_i($("#myLineChart", currentPage));
+    setAspectRatio_i($("#mySpeedChart", currentPage));
+
     myDistChart = $("#myDistChart", currentPage);
     myScoreDistChart = $("#myScoreDistChart", currentPage);
-    if ((myDistChart.length > 0) && (myScoreDistChart.length > 0)) {
-        myDistChart.height(myDistChart.width() * aratio)
-        myScoreDistChart.height(myScoreDistChart.width() * aratio)
-    }
+    setAspectRatio_i(myDistChart);
+    setAspectRatio_i(myScoreDistChart);
 }
 $(window).on("pagecreate pageload pagechange pageshow throttledresize", function(e) {
     //console.log("pagecreate/throttledresize", e);
