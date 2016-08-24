@@ -183,10 +183,10 @@ func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Reque
 }
 
 func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Request, param twitterParam) {
+	r.init_req(w, req)
 	var status string
 	r.CheckData()
 	timestamp := r.latestTimestamp()
-	r.init_req(w, req)
 	var title string
 
 	timestamp_str := ts.FormatTimestamp_short(timestamp)
