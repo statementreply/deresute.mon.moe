@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"regexp"
 	"resource_mgr"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -17,10 +18,29 @@ var rsTmpl = template.Must(template.ParseGlob(BASE + "/templates/*.html"))
 var timestampFilter = regexp.MustCompile("^\\d+$")
 var staticFilter = regexp.MustCompile("^/static")
 
+func dumpHeader(header *http.Header) string {
+	var result string
+	var keys []string
+	for k := range *header {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	var kv []string
+	for _, k := range keys {
+		kv = append(kv, fmt.Sprintf("%v:%v", k, (*header)[k]))
+	}
+	result = strings.Join(kv, " ")
+	result = "map[" + result + "]"
+	return result
+}
+
 // log and parseform
 func (r *RankServer) init_req(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
-	r.logger.Printf("[INFO] %T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)
+	// req.Header is a map, with unordered keys
+	r.logger.Printf("[INFO] %T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, dumpHeader(&req.Header), req.Form, req.RequestURI, req.TLS)
+	//fmt.Println(dumpHeader(&req.Header))
 }
 
 func (r *RankServer) generateDURL(param *qchartParam) string {
