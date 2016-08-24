@@ -13,5 +13,5 @@ func main() {
 	}
 	res_ver := os.Args[1]
 	r := resource_mgr.NewResourceMgr(res_ver, "data/resourcesbeta")
-	fmt.Println("master is", r.LoadMaster())
+	fmt.Println(r.LoadMaster())
 }
