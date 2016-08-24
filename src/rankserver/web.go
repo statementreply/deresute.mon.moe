@@ -17,6 +17,7 @@ var rsTmpl = template.Must(template.ParseGlob(BASE + "/templates/*.html"))
 var timestampFilter = regexp.MustCompile("^\\d+$")
 var staticFilter = regexp.MustCompile("^/static")
 
+// log and parseform
 func (r *RankServer) init_req(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	r.logger.Printf("[INFO] %T <%s> \"%v\" %s <%s> %v %v %s %v\n", req, req.RemoteAddr, req.URL, req.Proto, req.Host, req.Header, req.Form, req.RequestURI, req.TLS)

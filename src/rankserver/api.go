@@ -12,10 +12,12 @@ import (
 )
 
 func (r *RankServer) latestDataHandler(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
 	fmt.Fprint(w, r.latestData())
 }
 
 func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
 	r.CheckData()
 	// parse parameters
 	req.ParseForm()
@@ -94,6 +96,7 @@ func mapToJson(v interface{}, list_key_v interface{}) string {
 }
 
 func (r *RankServer) distDataHandler(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
 	r.CheckData()
 	req.ParseForm()
 	timestamp := r.parseParam_t(req)
