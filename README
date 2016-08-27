@@ -5,6 +5,8 @@ TODO
 - dfticker save less?
 - concurrent map rw?
 
+manual restart rankserver needed for app_ver update
+
 
 [outdated] Data flow           when to run
 - python main2.py   periodic
