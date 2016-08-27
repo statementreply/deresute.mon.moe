@@ -308,15 +308,15 @@ func (r *RankServer) distHandler_new2(w http.ResponseWriter, req *http.Request) 
 	r.CheckData()
 	req.ParseForm()
 	tmplVar := r.getTmplVar(w, req)
-	if tmplVar.Timestamp == "" {
-		tmplVar.Timestamp = r.latestTimestamp()
-	}
+	//if tmplVar.Timestamp == "" {
+	//	tmplVar.Timestamp = r.latestTimestamp()
+	//}
 	tmplVar.RankingType = tmplVar.rankingType
 	t_date := r.parseParam_date(req)
 	t_time := r.parseParam_time(req)
 	t_offset := int64(9 * 3600)
 	if (t_date > 0) && (t_time > 0) {
-		tmplVar.Timestamp = strconv.FormatInt(t_date+t_time-t_offset, 10)
+		//tmplVar.Timestamp = strconv.FormatInt(t_date+t_time-t_offset, 10)
 	} else {
 		//lt := r.latestTimestamp()
 		// allow 2min to update
@@ -327,6 +327,9 @@ func (r *RankServer) distHandler_new2(w http.ResponseWriter, req *http.Request) 
 			t_time = t % (3600 * 24)
 			t_date = t - t_time
 		}
+	}
+	if tmplVar.Timestamp == "" {
+		tmplVar.Timestamp = strconv.FormatInt(t_date+t_time-t_offset, 10)
 	}
 	for i := 0; i < 24*4; i++ {
 		tmplVar.ListTimeOfDay = append(tmplVar.ListTimeOfDay,
