@@ -318,7 +318,10 @@ func (r *RankServer) distHandler_new2(w http.ResponseWriter, req *http.Request) 
 	if (t_date > 0) && (t_time > 0) {
 		tmplVar.Timestamp = strconv.FormatInt(t_date+t_time-t_offset, 10)
 	} else {
-		t, err := strconv.ParseInt(r.latestTimestamp(), 10, 64)
+		//lt := r.latestTimestamp()
+		// allow 2min to update
+		lt := r.truncateTimestamp(time.Now().Add(-2 * time.Minute))
+		t, err := strconv.ParseInt(lt, 10, 64)
 		t += t_offset
 		if err == nil {
 			t_time = t % (3600 * 24)

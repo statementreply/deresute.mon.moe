@@ -187,6 +187,23 @@ func (r *RankServer) latestTimestamp() string {
 	return latest
 }
 
+// latestTimestamp() == truncateTimestamp(time.Now())
+func (r *RankServer) truncateTimestamp(t time.Time) string {
+	r.UpdateTimestamp()
+	var latest string
+	latest = ""
+	// skip empty timestamps
+	local_timestamp := r.GetListTimestamp()
+	for ind := len(local_timestamp) - 1; ind >= 0; ind-- {
+		latest = local_timestamp[ind]
+		latest_t := ts.TimestampToTime(latest)
+		if (!latest_t.After(t)) && r.checkDir(latest) {
+			break
+		}
+	}
+	return latest
+}
+
 func (r *RankServer) inEvent(timestamp string, event *resource_mgr.EventDetail) bool {
 	if event == nil {
 		return true
