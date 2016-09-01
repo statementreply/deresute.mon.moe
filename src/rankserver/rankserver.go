@@ -158,6 +158,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/log", r.logHandler_new2)
 	http.HandleFunc("/event", r.eventHandler_new2)
 	http.HandleFunc("/dist", r.distHandler_new2)
+	http.HandleFunc("/_twc", r.twcHandler_new2)
 	// auxiliary
 	http.HandleFunc("/static/", r.staticHandler)
 	// early testing
