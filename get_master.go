@@ -11,7 +11,11 @@ func main() {
 		fmt.Println("res_ver needed")
 		return
 	}
-	res_ver := os.Args[1]
-	r := resource_mgr.NewResourceMgr(res_ver, "data/resourcesbeta")
-	fmt.Println(r.LoadMaster())
+	for i, res_ver := range os.Args {
+		if i == 0 {
+			continue
+		}
+		r := resource_mgr.NewResourceMgr(res_ver, "data/resourcesbeta")
+		fmt.Println(r.LoadMaster())
+	}
 }
