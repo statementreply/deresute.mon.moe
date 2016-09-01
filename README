@@ -4,6 +4,7 @@ TODO
 - dfticker mem leak?
 - dfticker save less?
 - concurrent map rw?
+- error message tags: sql/database locked, ...
 
 manual restart rankserver needed for app_ver update
 
