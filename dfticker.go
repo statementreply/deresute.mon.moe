@@ -26,7 +26,7 @@ var _isRunning bool
 var lastRun = time.Unix(0, 0)
 
 // global const
-var sleepDuration = time.Second * 220
+var sleepDuration = time.Second * 120
 
 func main() {
 	fh, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
@@ -91,11 +91,12 @@ func runCommand(df *datafetcher.DataFetcher) {
 		err := df.Run()
 		SetFinished()
 		if err != nil {
-			log.Println(err)
+			log.Println("dfticker runCommand error: ", err)
 			// reset unconditionally
 			if err != nil {
 				df.Client.Reset_sid()
 			}
+			// err timeout?
 			if err == apiclient.ErrSession || err == datafetcher.ErrRerun {
 				// run again immediately
 				lock.Lock()
