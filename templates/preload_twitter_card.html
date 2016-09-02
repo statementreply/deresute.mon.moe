@@ -86,10 +86,11 @@ function updateLatestData() {
 function drawChart() {
     currentPage = $("body").pagecontainer("getActivePage");
     dataurl = $("#dataurl", currentPage).text();
+    eventTitle = $("#eventtitle", currentPage).text();
     //console.log("dataurl", dataurl);
     fancychart = $("#fancychart", currentPage).text();
     var options = {
-        title: "12万位ボーダーグラフ",
+        title: eventTitle + " 12万位ボーダー",
         hAxis: {
             format: 'MM/dd HH:mm',
             gridlines: {count: 12}
