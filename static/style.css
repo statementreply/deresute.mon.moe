@@ -1,7 +1,7 @@
 html, body {
     font-size: 5vw;
-    height: 100%;
-    width: 100%;
+    /*height: 100%;*/
+    /*width: 100%;*/
 }
 
 /* override font here */
@@ -53,14 +53,12 @@ div.param {
     height: 0px;
 }
 
-#myLineChart, #mySpeedChart {
-    border: 1px solid #ccc;
+html.twc, body.twc, div.twc {
+    height: 99%;
 }
 
-/* FIXME: override jquery-mobile? */
-
-div.ui-page {
-    height: 100%;
+#myLineChart, #mySpeedChart {
+    border: 1px solid #ccc;
 }
 
 #myTWCChart {

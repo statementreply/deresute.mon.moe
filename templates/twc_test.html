@@ -1,11 +1,9 @@
 {{template "preload_twitter_card.html"}}
 
-<body>
-    <div data-role="page" data-dom-cache="false">
+<body class="twc">
+    <div data-role="page" data-dom-cache="false" class="twc">
 {{template "qchart_info.html" .}}
-        <div id="wrapper">
-            テスト：12万位ボーダーグラフ
-        </div>
+            <div id="myTWCChart">loading...</div>
     </div>
 </body>
 {{template "postload.html"}}

@@ -269,7 +269,7 @@ func (r *RankServer) twcHandler_new2(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
-	err := rsTmpl.ExecuteTemplate(w, "home_twitter_card.html", tmplVar)
+	err := rsTmpl.ExecuteTemplate(w, "twitter_card.html", tmplVar)
 	if err != nil {
 		r.logger.Println("html/template", err)
 	}
