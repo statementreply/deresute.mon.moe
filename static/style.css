@@ -63,7 +63,7 @@ html.twc, body.twc, div.twc {
 
 #myTWCChart {
     /* to avoid scroll bar? */
-    height: 99%;
+    height: 96%;
     /*min-height: fill-content;*/
     /*min-height: 732px;*/
     width: 100%;
