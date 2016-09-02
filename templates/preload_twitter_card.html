@@ -122,7 +122,7 @@ function drawChart() {
     $.getJSON(dataurl, "", function (data) {
         console.log(data);
         var data_list = [];
-        plot_label = ["pt", "speed"];
+        plot_label = ["pt", "時速"];
         for (t=0; t<1; t++) {
             dt = {"cols": [{"id":"timestamp","label":"time","type":"datetime"}],
                 "rows":[]}
