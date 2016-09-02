@@ -275,6 +275,16 @@ func (r *RankServer) twcHandler_new2(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func (r *RankServer) twcTestHandler_new2(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
+	r.CheckData()
+	tmplVar := r.getTmplVar(w, req)
+	err := rsTmpl.ExecuteTemplate(w, "twc_test.html", tmplVar)
+	if err != nil {
+		r.logger.Println("html/template", err)
+	}
+}
+
 // mobile landscape optimized
 func (r *RankServer) homeMHandler_new2(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
