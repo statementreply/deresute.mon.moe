@@ -1,10 +1,10 @@
 {{template "preload_twitter_card.html" "https://deresute.mon.moe/twc"}}
 
-<body>
-    <!--<div data-role="page" data-dom-cache="false">-->
+<body class="twc">
+    <div data-role="page" data-dom-cache="false" class="twc">
 {{template "qchart_info.html" .}}
             <!--<h3>{{.EventTitle}} 12万位ボーダーグラフ</h3>-->
             <div id="myTWCChart">loading...</div>
-    <!--</div>-->
+    </div>
 </body>
 {{template "postload.html"}}
