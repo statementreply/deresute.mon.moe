@@ -92,12 +92,14 @@ func runCommand(df *datafetcher.DataFetcher) {
 		SetFinished()
 		if err != nil {
 			log.Println("dfticker runCommand error: ", err)
+			log.Printf("dfticker runCommand error: %#v\n", err)
 			// reset unconditionally
 			if err != nil {
 				df.Client.Reset_sid()
 			}
 			// err timeout?
-			if err == apiclient.ErrSession || err == datafetcher.ErrRerun {
+			if err == apiclient.ErrSession || err == datafetcher.ErrRerun ||
+			   err == datafetcher.ErrNoResponse {
 				// run again immediately
 				lock.Lock()
 				lastRun = time.Unix(0, 0)
