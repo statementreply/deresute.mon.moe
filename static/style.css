@@ -64,7 +64,8 @@ div.ui-page {
 }
 
 #myTWCChart {
-    height: 100%;
+    /* to avoid scroll bar? */
+    height: 99%;
     /*min-height: fill-content;*/
     /*min-height: 732px;*/
     width: 100%;
