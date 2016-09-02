@@ -140,7 +140,7 @@ function drawChart() {
             for (i=0; i<cur.length; i++) {
                 row = cur[i];
                 row2 = cur2[i];
-                row_map = {"c": [{"v": row[0]}, {"v": row[1]}, {"v": row2[1]}]};
+                row_map = {"c": [{"v": new Date(row[0]*1000)}, {"v": row[1]}, {"v": row2[1]}]};
                 dt["rows"].push(row_map);
             }
             //console.log(dt)
