@@ -122,7 +122,7 @@ function drawChart() {
     if (myTWCChart.length == 0) {
         return;
     }
-    setAspectRatio_i(myTWCChart);
+    //setAspectRatio_i(myTWCChart);
     chart = new google.visualization.LineChart(myTWCChart.get(0));
     $.getJSON(dataurl, "", function (data) {
         console.log(data);

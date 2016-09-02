@@ -1,12 +1,10 @@
 {{template "preload_twitter_card.html"}}
 
 <body>
-    <div data-role="page" data-dom-cache="false">
+    <!--<div data-role="page" data-dom-cache="false">-->
 {{template "qchart_info.html" .}}
-        <div id="wrapper">
             <!--<h3>{{.EventTitle}} 12万位ボーダーグラフ</h3>-->
             <div id="myTWCChart">loading...</div>
-        </div>
-    </div>
+    <!--</div>-->
 </body>
 {{template "postload.html"}}
