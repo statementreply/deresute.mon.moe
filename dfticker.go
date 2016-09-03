@@ -99,7 +99,7 @@ func runCommand(df *datafetcher.DataFetcher) {
 			}
 			// err timeout?
 			if err == apiclient.ErrSession || err == datafetcher.ErrRerun ||
-			   err == datafetcher.ErrNoResponse {
+				err == datafetcher.ErrNoResponse {
 				// run again immediately
 				lock.Lock()
 				lastRun = time.Unix(0, 0)

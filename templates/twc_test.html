@@ -1,9 +1,8 @@
 {{template "preload_twitter_card.html" "https://deresute.mon.moe/twc_test"}}
-
 <body class="twc">
     <div data-role="page" data-dom-cache="false" class="twc">
-{{template "qchart_info.html" .}}
-            <div id="myTWCChart" class="twc-test">loading...</div>
+        {{template "qchart_info.html" .}}
+        <div id="myTWCChart" class="twc-test">loading...</div>
     </div>
 </body>
 {{template "postload.html"}}
