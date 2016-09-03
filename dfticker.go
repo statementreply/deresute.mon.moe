@@ -26,7 +26,7 @@ var _isRunning bool
 var lastRun = time.Unix(0, 0)
 
 // global const
-var sleepDuration = time.Second * 120
+var sleepDuration = time.Second * 150
 
 func main() {
 	fh, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
