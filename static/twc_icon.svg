@@ -46,13 +46,13 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:zoom="0.45888285"
-     inkscape:cx="-341.80045"
-     inkscape:cy="247.17613"
+     inkscape:zoom="0.64895835"
+     inkscape:cx="353.11075"
+     inkscape:cy="204.41987"
      inkscape:window-x="0"
      inkscape:window-y="37"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="layer2" />
   <g
      inkscape:groupmode="layer"
      id="layer1"
@@ -78,7 +78,7 @@
      style="display:inline">
     <path
        style="fill:#000000"
-       d="m 200,60.000003 22.9,22.9 L 174.1,131.7 134.1,91.700003 60,165.9 74.1,180 l 60,-60 40,40 63,-62.899997 L 260,120 260,60.000003 Z"
+       d="m 192,72.000003 18.32,18.32 L 171.28,129.36 139.28,97.360003 80,156.72 91.28,168 l 48,-48 32,32 50.4,-50.32 L 240,120 240,72.000003 Z"
        id="path4"
        inkscape:connector-curvature="0" />
   </g>
