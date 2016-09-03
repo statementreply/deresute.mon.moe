@@ -242,7 +242,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 		}
 	} else {
 		// sql hit
-		log.Println("[INFO] hit table timestamp", local_timestamp)
+		//log.Println("[INFO] hit table timestamp", local_timestamp)
 	}
 	row = df.db.QueryRow("SELECT timestamp FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3 LIMIT 1;", local_timestamp, ranking_type, (page-1)*10+1)
 	err = row.Scan(&ts_discard)
@@ -257,7 +257,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 		}
 	} else {
 		// sql hit
-		log.Println("[INFO] hit table rank", local_timestamp)
+		//log.Println("[INFO] hit table rank", local_timestamp)
 	}
 
 	if hit {
