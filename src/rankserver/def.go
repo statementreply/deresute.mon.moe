@@ -18,6 +18,7 @@ type qchartParam struct {
 	list_rank   []int
 	event       *resource_mgr.EventDetail
 	fancyChart  bool
+	Delta       time.Duration
 }
 
 type twitterParam struct {

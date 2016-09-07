@@ -244,14 +244,14 @@ func (r *RankServer) latestEvent() *resource_mgr.EventDetail {
 }
 */
 
-func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int) interface{} {
+func (r *RankServer) fetchData_i(timestamp string, rankingType int, rank int, delta time.Duration) interface{} {
 	return r.fetchData(timestamp, rankingType, rank)
 }
 
 // speed per hour
-func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float32 {
+func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int, delta time.Duration) float32 {
 	t_i := ts.TimestampToTime(timestamp)
-	t_prev := t_i.Add(-INTERVAL)
+	t_prev := t_i.Add(-delta)
 	prev_timestamp := ts.TimeToTimestamp(t_prev)
 
 	cur_score := r.fetchData(timestamp, rankingType, rank)
@@ -259,7 +259,7 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
 	if (cur_score >= 0) && (prev_score >= 0) {
 		// both score are valid
 		// nanoseconds
-		speed := (float32(cur_score - prev_score)) / float32(INTERVAL) * float32(time.Hour)
+		speed := (float32(cur_score - prev_score)) / float32(delta) * float32(time.Hour)
 		return speed
 	} else {
 		// one of them is missing data
@@ -268,11 +268,11 @@ func (r *RankServer) getSpeed(timestamp string, rankingType int, rank int) float
 }
 
 // new api
-func (r *RankServer) getSpeedBorder(timestamp_start, timestamp_end string, rankingType int, rank int) map[string]float32 {
+func (r *RankServer) getSpeedBorder(timestamp_start, timestamp_end string, rankingType int, rank int, delta time.Duration) map[string]float32 {
 	var timestamp_start_prev string
 	{
 		t_i := ts.TimestampToTime(timestamp_start)
-		t_prev := t_i.Add(-INTERVAL)
+		t_prev := t_i.Add(-delta)
 		timestamp_start_prev = ts.TimeToTimestamp(t_prev)
 	}
 	border := r.fetchDataBorder(timestamp_start_prev, timestamp_end, rankingType, rank)
@@ -285,12 +285,12 @@ func (r *RankServer) getSpeedBorder(timestamp_start, timestamp_end string, ranki
 		var timestamp_prev string
 		{
 			t_i := ts.TimestampToTime(timestamp)
-			t_prev := t_i.Add(-INTERVAL)
+			t_prev := t_i.Add(-delta)
 			timestamp_prev = ts.TimeToTimestamp(t_prev)
 		}
 		prev_score, ok := border[timestamp_prev]
 		if ok {
-			borderSpeed[timestamp] = (float32(cur_score - prev_score)) / float32(INTERVAL) * float32(time.Hour)
+			borderSpeed[timestamp] = (float32(cur_score - prev_score)) / float32(delta) * float32(time.Hour)
 		} else {
 			borderSpeed[timestamp] = -1.0
 		}
@@ -298,8 +298,8 @@ func (r *RankServer) getSpeedBorder(timestamp_start, timestamp_end string, ranki
 	return borderSpeed
 }
 
-func (r *RankServer) getSpeed_i(timestamp string, rankingType int, rank int) interface{} {
-	return r.getSpeed(timestamp, rankingType, rank)
+func (r *RankServer) getSpeed_i(timestamp string, rankingType int, rank int, delta time.Duration) interface{} {
+	return r.getSpeed(timestamp, rankingType, rank, delta)
 }
 
 // doesn't block
@@ -374,7 +374,7 @@ func (r *RankServer) get_list_rank(timestamp string, rankingType int) []int {
 //  "rows":  [{"c":[{"v":"new Date(1467770520)"}, {"v":14908}]}] }
 
 // json
-func (r *RankServer) jsonData(rankingType int, list_rank []int, dataSource func(string, int, int) interface{}, event *resource_mgr.EventDetail) string {
+func (r *RankServer) jsonData(rankingType int, list_rank []int, dataSource func(string, int, int, time.Duration) interface{}, event *resource_mgr.EventDetail, delta time.Duration) string {
 	r.UpdateTimestamp()
 	// begin list
 	raw := "[["
@@ -392,7 +392,7 @@ func (r *RankServer) jsonData(rankingType int, list_rank []int, dataSource func(
 		// time in milliseconds
 		raw += fmt.Sprintf(`["%s",`, timestamp)
 		for _, rank := range list_rank {
-			score := dataSource(timestamp, rankingType, rank)
+			score := dataSource(timestamp, rankingType, rank, delta)
 			switch score.(type) {
 			case int:
 				score_i := score.(int)

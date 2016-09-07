@@ -35,12 +35,16 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	rankingType := r.parseParam_type(req)
+	delta := time.Duration(r.parseParam_delta(req)) * time.Second
+	if delta == 0 {
+		delta = INTERVAL
+	}
 	// generate json
 	fmt.Fprint(w,
 		"[\n",
-		r.jsonData(rankingType, list_rank, r.fetchData_i, event),
+		r.jsonData(rankingType, list_rank, r.fetchData_i, event, delta),
 		",\n",
-		r.jsonData(rankingType, list_rank, r.getSpeed_i, event),
+		r.jsonData(rankingType, list_rank, r.getSpeed_i, event, delta),
 		"]\n",
 	)
 }

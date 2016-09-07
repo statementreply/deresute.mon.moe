@@ -55,6 +55,11 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 	if param.event == nil {
 		return u
 	}
+	if param.Delta != 0 {
+		u += "delta=" + fmt.Sprintf("%d", int64(param.Delta / time.Second))
+		u += "&"
+		//r.logger.Println("delta:", u)
+	}
 	u += "event=" + fmt.Sprintf("%d", param.event.Id()) + "&"
 	return u
 }
@@ -98,6 +103,23 @@ func (r *RankServer) parseParam_time(req *http.Request) int64 {
 			if err != nil {
 				return 0
 			}
+			return n
+		} else {
+			r.logger.Println("bad req", req.Form)
+		}
+	}
+	return 0
+}
+
+func (r *RankServer) parseParam_delta(req *http.Request) int64 {
+	delta, ok := req.Form["delta"] // format checked
+	if ok {
+		if timestampFilter.MatchString(delta[0]) {
+			n, err := strconv.ParseInt(delta[0], 10, 64)
+			if err != nil {
+				return 0
+			}
+			//r.logger.Println("delta:", n)
 			return n
 		} else {
 			r.logger.Println("bad req", req.Form)
@@ -185,6 +207,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	result := new(tmplVar)
 	req.ParseForm()
 	result.Timestamp = r.parseParam_t(req)
+	result.Delta = time.Duration(r.parseParam_delta(req)) * time.Second
 	r.CheckData()
 
 	result.list_rank = r.parseParam_rank(req)
