@@ -37,7 +37,7 @@ var RESOURCE_CACHE_DIR string = BASE + "/data/resourcesbeta/"
 // *4 for hour
 //var INTERVAL int = 15 * 60 * 4
 var INTERVAL0 time.Duration = 15 * time.Minute
-var INTERVAL time.Duration = 4 * INTERVAL0
+var INTERVAL time.Duration = 4 * INTERVAL0 // * 24
 var LOG_FILE = "rankserver.log"
 var CONFIG_FILE = "rankserver.yaml"
 var SECRET_FILE = "secret.yaml"
