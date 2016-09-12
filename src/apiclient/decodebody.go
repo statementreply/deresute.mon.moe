@@ -41,7 +41,8 @@ func DecodeBody(body []byte, msg_iv string) map[string]interface{} {
 	mp := make([]byte, base64.StdEncoding.DecodedLen(len(plain2)))
 	n, err = base64.StdEncoding.Decode(mp, plain2)
 	if err != nil {
-		log.Println(hex.Dump(plain2))
+		// too long
+		//log.Println(hex.Dump(plain2))
 		debug.PrintStack()
 		log.Println("base64 Decode", err)
 	}
