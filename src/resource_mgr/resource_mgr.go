@@ -128,6 +128,28 @@ func (r *ResourceMgr) LoadManifest() string {
 	return dest
 }
 
+func (r *ResourceMgr) ParseResource(hash string) string {
+	manifest := r.LoadManifest()
+	db, err := sql.Open("sqlite3", manifest)
+	if err != nil {
+		log.Println("x1", err)
+		return ""
+	}
+	defer db.Close()
+	row := db.QueryRow("SELECT name FROM manifests WHERE hash == $1;", hash)
+	var name string
+	err = row.Scan(&name)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return ""
+		} else {
+			log.Println("sql error", err)
+			return ""
+		}
+	}
+	return name
+}
+
 func (r *ResourceMgr) LoadMaster() string {
 	dest := r.LoadManifest()
 	//log.Println("to open", dest)
