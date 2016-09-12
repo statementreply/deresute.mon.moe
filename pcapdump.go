@@ -240,6 +240,7 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 
 var rvFilter = regexp.MustCompile(`^/dl/(\d+)/`)
 var rscFilter = regexp.MustCompile(`^/dl/resources/.*/([0-9a-f]+)$`)
+
 func processResourceAPI(URL *url.URL) {
 	path := URL.Path
 	fmt.Printf("resource %s\n", path)

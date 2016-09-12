@@ -56,7 +56,7 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 		return u
 	}
 	if param.Delta != 0 {
-		u += "delta=" + fmt.Sprintf("%d", int64(param.Delta / time.Second))
+		u += "delta=" + fmt.Sprintf("%d", int64(param.Delta/time.Second))
 		u += "&"
 		//r.logger.Println("delta:", u)
 	}
