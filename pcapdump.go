@@ -183,9 +183,10 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 	list_udid, ok := req.Header["Udid"]
 	var content map[string]interface{}
 	var isDereAPI bool
+	var msg_iv string
 	if ok {
 		udid = list_udid[0]
-		msg_iv := apiclient.Unlolfuscate(udid)
+		msg_iv = apiclient.Unlolfuscate(udid)
 		content = apiclient.DecodeBody(body, msg_iv)
 		//yy, err := yaml.Marshal(content)
 		if err != nil {
@@ -211,12 +212,16 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 		outputLock.Lock()
 		fmt.Println("=======================================================")
 		fmt.Println(t+" URL:", Host, URL, h.net, h.transport)
+		fmt.Println("udid:", msg_iv)
+		fmt.Println("user:", apiclient.Unlolfuscate(req.Header.Get("USER_ID")))
+		//fmt.Println("viewer_id:", content["viewer_id"])
 		//fmt.Println("bodylen: ", len(body))
 		//fmt.Println("msg_iv ", msg_iv)
 		//fmt.Println("yamllen:", len(yy))
 		//fmt.Println(string(yy))
 		if content != nil {
 			fmt.Println(content)
+			fmt.Println("viewer_id:", content["viewer_id"])
 			if *isDebug {
 				fmt.Printf("%t\n", content)
 			}
@@ -225,6 +230,8 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 			if _, ok := content["data_headers"]; ok {
 				result_code := content["data_headers"].(map[interface{}]interface{})["result_code"]
 				fmt.Printf("%T %#v\n", result_code, result_code)
+				viewer_id := content["data_headers"].(map[interface{}]interface{})["viewer_id"]
+				fmt.Println("viewer_id:", viewer_id)
 			}
 			if *showYAML {
 				yy, _ := yaml.Marshal(content)
