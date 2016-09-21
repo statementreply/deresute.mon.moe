@@ -77,7 +77,6 @@ func main() {
 			//log.Println(t.String(), _isRunning, lastRun.String())
 			q = (time.Duration(t.UnixNano()) - r) / mod
 			if (q > q0) || NeedToRun() {
-				fmt.Println("runCommand", t.String())
 				q0 = q
 				go runCommand(df)
 			}
@@ -88,6 +87,7 @@ func main() {
 func runCommand(df *datafetcher.DataFetcher) {
 	if !IsRunning() {
 		SetRunning()
+		fmt.Println("runCommand", t.String())
 		err := df.Run()
 		SetFinished()
 		if err != nil {
