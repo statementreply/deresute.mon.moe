@@ -265,7 +265,8 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 		return local_timestamp, "-", nil
 	}
 
-	time.Sleep(1020 * time.Millisecond)
+	//time.Sleep(1320 * time.Millisecond)
+	time.Sleep(3560 * time.Millisecond)
 	ranking_list, servertime, err := df.GetPage(event_type, ranking_type, page)
 	if err != nil {
 		return "", "", err
