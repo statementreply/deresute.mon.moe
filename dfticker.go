@@ -78,13 +78,13 @@ func main() {
 			q = (time.Duration(t.UnixNano()) - r) / mod
 			if (q > q0) || NeedToRun() {
 				q0 = q
-				go runCommand(df)
+				go runCommand(df, t)
 			}
 		}
 	}
 }
 
-func runCommand(df *datafetcher.DataFetcher) {
+func runCommand(df *datafetcher.DataFetcher, t time.Time) {
 	if !IsRunning() {
 		SetRunning()
 		fmt.Println("runCommand", t.String())
