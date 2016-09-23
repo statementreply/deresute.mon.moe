@@ -57,9 +57,15 @@ func main() {
 		[2]int{2, 50001},   // tier 3 medley
 	}
 	// extra data points
-	for index := 0; index < 61; index++ {
+	// from 1 to 300k+1, by 10k
+	for index := 0; index < 31; index++ {
 		key_point = append(key_point, [2]int{1, index*10000 + 1})
 		key_point = append(key_point, [2]int{2, index*10000 + 1})
+	}
+	// from 300k+1 to 800k+1, by 20k
+	for index := 1; index < 26; index++ {
+		key_point = append(key_point, [2]int{1, 300000 + index*20000 + 1})
+		key_point = append(key_point, [2]int{2, 300000 + index*20000 + 1})
 	}
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 	df := datafetcher.NewDataFetcher(client, key_point, RANK_DB, RESOURCE_CACHE_DIR)
