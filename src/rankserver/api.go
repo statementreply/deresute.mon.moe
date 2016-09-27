@@ -176,9 +176,10 @@ func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Reque
 		interval:    INTERVAL0 * 4,
 	}
 	if r.currentEvent != nil {
+		// FIXME move to resource_mgr.event
 		if r.currentEvent.Type() == 1 {
 			param.list_rank = []int{5001, 10001, 40001}
-		} else if r.currentEvent.Type() == 3 {
+		} else if (r.currentEvent.Type() == 3) || (r.currentEvent.Type() == 5) {
 			param.list_rank = []int{5001, 10001, 50001}
 		}
 	}
