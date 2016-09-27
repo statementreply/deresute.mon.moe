@@ -35,6 +35,7 @@ var ErrEventClose = errors.New("event closed")
 var ErrUnknown = errors.New("unknown error")
 var ErrDataHeaders = errors.New("no data_headers")
 var ErrDataHeadersBad = errors.New("bad data_headers")
+var ErrAppVer = errors.New("app_ver outdated")
 
 type ApiClient struct {
 	// constant after constructor
@@ -209,6 +210,8 @@ func (client *ApiClient) ParseResultCode(content map[string]interface{}) error {
 		return nil
 	case 201: // session error
 		return ErrSession
+	case 204:
+		return ErrAppVer
 	case 13001, 11001:
 		//ERROR_CODE_MEDLEY_CLOSE            //ERROR_CODE_ATAPON_CLOSE
 		return ErrEventClose
