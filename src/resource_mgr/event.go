@@ -75,7 +75,7 @@ func (e *EventDetail) LoginBonusCount() int {
 }
 
 func (e *EventDetail) HasRanking() bool {
-	if (e.typ == 1) || (e.typ == 3) {
+	if (e.typ == 1) || (e.typ == 3) || (e.typ == 5) {
 		return true
 	} else {
 		return false

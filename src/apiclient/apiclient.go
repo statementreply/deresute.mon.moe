@@ -275,6 +275,11 @@ func (client *ApiClient) GetAtaponRanking(rankingType int, page int) map[string]
 	return r1
 }
 
+func (client *ApiClient) GetTourRanking(rankingType int, page int) map[string]interface{} {
+	r1 := client.Call("/event/tour/ranking_list", map[string]interface{}{"ranking_type": rankingType, "page": page})
+	return r1
+}
+
 func (client *ApiClient) GetLiveDetailRanking(live_detail_id, page int) map[string]interface{} {
 	return client.Call("/live/get_live_detail_ranking",
 		map[string]interface{}{"live_detail_id": live_detail_id, "page": page})

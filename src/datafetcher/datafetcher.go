@@ -326,6 +326,8 @@ func (df *DataFetcher) GetPage(event_type, ranking_type, page int) ([]interface{
 		resp = df.Client.GetAtaponRanking(ranking_type, page)
 	} else if event_type == 3 {
 		resp = df.Client.GetMedleyRanking(ranking_type, page)
+	} else if event_type == 5 {
+		resp = df.Client.GetTourRanking(ranking_type, page)
 	} else {
 		return nil, 0, ErrEventType
 	}
