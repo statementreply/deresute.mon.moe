@@ -11,16 +11,6 @@ import (
 )
 
 // tag: database, sqlite
-func (r *RankServer) setCacheSize() {
-	_, err := r.db.Exec("PRAGMA cache_size = -6000;")
-	if err != nil {
-		log.Println("set cache_size", err)
-		log.Printf("%#v", err)
-		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
-	}
-}
-
-// tag: database, sqlite
 func (r *RankServer) UpdateTimestamp() {
 	rows, err := r.db.Query("SELECT timestamp FROM timestamp;")
 	if err != nil {

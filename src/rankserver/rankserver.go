@@ -74,7 +74,7 @@ func MakeRankServer() *RankServer {
 	if err != nil {
 		r.logger.Fatalln("sql error", err)
 	}
-	r.setCacheSize()
+	//r.setCacheSize()
 
 	r.keyFile, ok = config["KEY_FILE"]
 	if !ok {
