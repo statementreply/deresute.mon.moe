@@ -78,6 +78,8 @@ type tmplVar struct {
 	RankingType   int
 	ListTimeOfDay []*TimeOfSelector
 	ListDate      []*TimeOfSelector
+	// for twitter card
+	TwitterCardURL string
 }
 
 type RankServer struct {
