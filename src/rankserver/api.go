@@ -162,6 +162,10 @@ func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Reque
 		rankingType: 0,
 		interval:    INTERVAL0 * 4,
 	}
+	if r.currentEvent.Type() == 5 {
+		fmt.Fprint(w, "EMPTY")
+		return
+	}
 	r.twitterHandler_common(w, req, param)
 }
 
@@ -186,8 +190,7 @@ func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Reque
 		} else if r.currentEvent.Type() == 3 {
 			param.list_rank = []int{5001, 10001, 50001}
 		} else if r.currentEvent.Type() == 5 {
-			fmt.Fprint(w, "EMPTY")
-			return
+			param.list_rank = []int{5001, 10001, 50001}
 		}
 	}
 
