@@ -17,7 +17,6 @@
 package main
 
 import (
-	//"apiclient"
 	//"bytes"
 	"bufio"
 	//"encoding/hex"
@@ -29,8 +28,7 @@ import (
 	"net/http"
 	//"net/url"
 	"os"
-	"regexp"
-	//"resource_mgr"
+	//"regexp"
 	"sync"
 	"time"
 
@@ -48,7 +46,7 @@ var iface = flag.String("i", "", "Interface to get packets from")
 var snaplen = flag.Int("s", 1600, "SnapLen for pcap packet capture")
 var filter = flag.String("f", "tcp", "BPF filter for pcap")
 var logAllPackets = flag.Bool("v", false, "Logs every packet in great detail")
-var showAllHTTP = flag.Bool("a", false, "Show every http request/response")
+//var showAllHTTP = flag.Bool("a", false, "Show every http request/response")
 var isDebug = flag.Bool("d", false, "(debug) show types")
 var showYAML = flag.Bool("y", false, "(debug) show yaml")
 var filterHost = flag.String("h", "", "filter host")
@@ -182,25 +180,6 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 
 	Host := req.Host
 	URL := req.URL
-	//var udid string
-	//list_udid, ok := req.Header["Udid"]
-	//var content map[string]interface{}
-	//var isDereAPI bool
-	//var msg_iv string
-	//if ok {
-		//udid = list_udid[0]
-		//msg_iv = apiclient.Unlolfuscate(udid)
-		//content = apiclient.DecodeBody(body, msg_iv)
-		//yy, err := yaml.Marshal(content)
-		//isDereAPI = true
-	//} else {
-		// cannot decrypt without UDID
-		// normal http packet
-		// print request
-	//}
-
-	//var isResourceAPI bool
-	//isResourceAPI = Host == "storage.game.starlight-stage.jp"
 
 	if *filterHost != "" {
 		if *filterHost != Host {
@@ -208,45 +187,14 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 		}
 	}
 
-	if *showAllHTTP {
+	if true {
 		outputLock.Lock()
 		fmt.Println("=======================================================")
 		fmt.Println(t+" URL:", Host, URL, h.net, h.transport)
-		fmt.Println("length of body:", len(body))
-		//fmt.Println("udid:", msg_iv)
-		//fmt.Println("user:", apiclient.Unlolfuscate(req.Header.Get("USER_ID")))
-		//fmt.Println("viewer_id:", content["viewer_id"])
-		//fmt.Println("bodylen: ", len(body))
-		//fmt.Println("msg_iv ", msg_iv)
-		//fmt.Println("yamllen:", len(yy))
-		//fmt.Println(string(yy))
-		/*if isResourceAPI {
-			processResourceAPI(URL)
-		}*/
+		fmt.Println("bodylen: ", len(body))
 		outputLock.Unlock()
 	}
 }
-
-var rvFilter = regexp.MustCompile(`^/dl/(\d+)/`)
-var rscFilter = regexp.MustCompile(`^/dl/resources/.*/([0-9a-f]+)$`)
-
-/*
-func processResourceAPI(URL *url.URL) {
-	path := URL.Path
-	fmt.Printf("resource %s\n", path)
-	submatch := rvFilter.FindStringSubmatch(path)
-	if submatch != nil {
-		fmt.Println("res_ver", submatch[1])
-		//mgr.Set_res_ver(submatch[1])
-	}
-	submatch = rscFilter.FindStringSubmatch(path)
-	if submatch != nil {
-		fmt.Println("rsc hash", submatch[1])
-		//name := mgr.ParseResource(submatch[1])
-		fmt.Println("rsc name", name)
-	}
-}
-*/
 
 func main() {
 	log.SetOutput(os.Stderr)
@@ -283,8 +231,6 @@ func main() {
 	packets := packetSource.Packets()
 	ticker := time.Tick(time.Minute)
 
-	//conf := apiclient.ParseConfig("secret.yaml")
-	//mgr = resource_mgr.NewResourceMgr(conf.ResVer, "data/resourcesbeta")
 PacketLoop:
 	for {
 		select {
