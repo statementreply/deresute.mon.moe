@@ -27,10 +27,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
+	//"net/url"
 	"os"
 	"regexp"
-	"resource_mgr"
+	//"resource_mgr"
 	"sync"
 	"time"
 
@@ -63,7 +63,7 @@ var pendingRequestLock sync.RWMutex
 // for printing to stdout, maybe use log
 var outputLock sync.Mutex
 
-var mgr *resource_mgr.ResourceMgr
+//var mgr *resource_mgr.ResourceMgr
 
 func addRequest(net, transport gopacket.Flow, req *http.Request) {
 	//log.Println("ADD", net, transport)
@@ -202,8 +202,8 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 		// print request
 	}
 
-	var isResourceAPI bool
-	isResourceAPI = Host == "storage.game.starlight-stage.jp"
+	//var isResourceAPI bool
+	//isResourceAPI = Host == "storage.game.starlight-stage.jp"
 
 	if *filterHost != "" {
 		if *filterHost != Host {
@@ -211,7 +211,7 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 		}
 	}
 
-	if isDereAPI || isResourceAPI || *showAllHTTP {
+	if isDereAPI || *showAllHTTP {
 		outputLock.Lock()
 		fmt.Println("=======================================================")
 		fmt.Println(t+" URL:", Host, URL, h.net, h.transport)
@@ -241,9 +241,9 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 				fmt.Print(string(yy))
 			}
 		}
-		if isResourceAPI {
+		/*if isResourceAPI {
 			processResourceAPI(URL)
-		}
+		}*/
 		outputLock.Unlock()
 	}
 }
@@ -251,21 +251,23 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 var rvFilter = regexp.MustCompile(`^/dl/(\d+)/`)
 var rscFilter = regexp.MustCompile(`^/dl/resources/.*/([0-9a-f]+)$`)
 
+/*
 func processResourceAPI(URL *url.URL) {
 	path := URL.Path
 	fmt.Printf("resource %s\n", path)
 	submatch := rvFilter.FindStringSubmatch(path)
 	if submatch != nil {
 		fmt.Println("res_ver", submatch[1])
-		mgr.Set_res_ver(submatch[1])
+		//mgr.Set_res_ver(submatch[1])
 	}
 	submatch = rscFilter.FindStringSubmatch(path)
 	if submatch != nil {
 		fmt.Println("rsc hash", submatch[1])
-		name := mgr.ParseResource(submatch[1])
+		//name := mgr.ParseResource(submatch[1])
 		fmt.Println("rsc name", name)
 	}
 }
+*/
 
 func main() {
 	log.SetOutput(os.Stderr)
@@ -302,8 +304,8 @@ func main() {
 	packets := packetSource.Packets()
 	ticker := time.Tick(time.Minute)
 
-	conf := apiclient.ParseConfig("secret.yaml")
-	mgr = resource_mgr.NewResourceMgr(conf.ResVer, "data/resourcesbeta")
+	//conf := apiclient.ParseConfig("secret.yaml")
+	//mgr = resource_mgr.NewResourceMgr(conf.ResVer, "data/resourcesbeta")
 PacketLoop:
 	for {
 		select {
