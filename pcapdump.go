@@ -54,9 +54,13 @@ var showYAML = flag.Bool("y", false, "(debug) show yaml")
 var filterHost = flag.String("h", "", "filter host")
 var wg sync.WaitGroup
 
-// FIXME use lock to prevent concurrent rw
+// use lock to prevent concurrent rw
+// map[net-flow: IP pair]
+//   map[transport-flow: port pair]
 var pendingRequest map[gopacket.Flow]map[gopacket.Flow]*http.Request = make(map[gopacket.Flow]map[gopacket.Flow]*http.Request)
 var pendingRequestLock sync.RWMutex
+
+// for printing to stdout, maybe use log
 var outputLock sync.Mutex
 
 var mgr *resource_mgr.ResourceMgr
@@ -79,7 +83,6 @@ func addRequest(net, transport gopacket.Flow, req *http.Request) {
 func matchRequest(net, transport gopacket.Flow) *http.Request {
 	rnet := net.Reverse()
 	rtransport := transport.Reverse()
-	//log.Println("DEL", rnet, rtransport)
 	pendingRequestLock.RLock()
 	_, ok := pendingRequest[rnet]
 	pendingRequestLock.RUnlock()
@@ -94,6 +97,7 @@ func matchRequest(net, transport gopacket.Flow) *http.Request {
 	}
 	//log.Println("matched req ", rnet, rtransport, req)
 	pendingRequestLock.Lock()
+	//log.Println("DEL", rnet, rtransport)
 	delete(pendingRequest[rnet], rtransport)
 	pendingRequestLock.Unlock()
 	return req
@@ -117,7 +121,6 @@ func (h *httpStreamFactory) New(net, transport gopacket.Flow) tcpassembly.Stream
 		transport: transport,
 		r:         tcpreader.NewReaderStream(),
 	}
-	//fmt.Println("WGADD", net, transport)
 	wg.Add(1)
 	go hstream.run() // Important... we must guarantee that data from the reader stream is read.
 
@@ -329,7 +332,5 @@ PacketLoop:
 	}
 	// close all connections
 	assembler.FlushAll()
-	//log.Print("wait", wg)
 	wg.Wait()
-	//log.Print("done")
 }
