@@ -140,9 +140,11 @@ func (h *httpStream) run() {
 			req := matchRequest(h.net, h.transport)
 			resp, err := http.ReadResponse(buf, req)
 			// FIXME: why io.ErrUnexpectedEOF
-			// FIXME: ignore io.EOF io.ErrUnexpectedEOF and other errors
+			// ignore io.EOF io.ErrUnexpectedEOF and other errors?
 			if err != nil {
-				//log.Printf("Error reading stream %s %s : %#v\n", h.net, h.transport, err)
+				if err != io.EOF && err != io.ErrUnexpectedEOF {
+					log.Printf("Error reading stream %s %s : %#v\n", h.net, h.transport, err)
+				}
 				break
 			} else {
 				processHTTP("Resp", req, resp.Body, h)
@@ -152,7 +154,9 @@ func (h *httpStream) run() {
 		for {
 			req, err := http.ReadRequest(buf)
 			if err != nil {
-				//log.Printf("Error reading stream %s %s : %#v\n", h.net, h.transport, err)
+				if err != io.EOF {
+					log.Printf("Error reading stream %s %s : %#v\n", h.net, h.transport, err)
+				}
 				break
 			} else {
 				addRequest(h.net, h.transport, req)
