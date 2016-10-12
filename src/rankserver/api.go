@@ -141,7 +141,7 @@ func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {
 		rankingType: 0,
 		interval:    INTERVAL0,
 	}
-	if r.currentEvent.Type() == 5 {
+	if (r.currentEvent != nil) && (r.currentEvent.Type() == 5) {
 		fmt.Fprint(w, "EMPTY")
 		return
 	}
@@ -162,7 +162,7 @@ func (r *RankServer) twitterEmblemHandler(w http.ResponseWriter, req *http.Reque
 		rankingType: 0,
 		interval:    INTERVAL0 * 4,
 	}
-	if r.currentEvent.Type() == 5 {
+	if (r.currentEvent != nil) && (r.currentEvent.Type() == 5) {
 		fmt.Fprint(w, "EMPTY")
 		return
 	}
