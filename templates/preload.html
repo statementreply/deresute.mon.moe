@@ -41,15 +41,19 @@ dataurl = $("#dataurl", currentPage).text();
 fancychart = $("#fancychart", currentPage).text();
 // packages 'corechart' 'annotationchart'
 // 'line' for material design
-google.charts.load('current', {packages: ['corechart', 'annotationchart']});
-google.charts.setOnLoadCallback(drawLineChart);
-google.charts.setOnLoadCallback(drawDistChart);
+google.charts.load('current', {packages: ['corechart', 'annotationchart', 'calendar']});
+google.charts.setOnLoadCallback(drawChart);
 google.charts.setOnLoadCallback(pageChange);
+function drawChart() {
+    drawLineChart();
+    drawDistChart();
+    drawEventChart();
+}
+
 function pageChange() {
     //console.log("pagechange");
     $(window).on("pagechange", function() {
-        drawLineChart();
-        drawDistChart();
+        drawChart();
         //console.log("pagechange");
     });
     //$("body").pagecontainer()
@@ -62,8 +66,7 @@ function pageChange() {
         //console.log("pageshow");
     });
     $(window).on("orientationchange", function() {
-        drawLineChart();
-        drawDistChart();
+        drawChart();
         //console.log("orientationchange");
     });
 };
@@ -259,6 +262,39 @@ function drawDistChart() {
         //chart_density.draw(data_density_pt, options);
         //chart_density_score.draw(data_density_score, options_score);
     })
+}
+
+function drawEventChart() {
+    currentPage = $("body").pagecontainer("getActivePage");
+    myEventChart = $("#eventCalendar", currentPage);
+    if (myEventChart.length == 0) {
+            return;
+    }
+    dataurl = "/d_event";
+    var dataTable = new google.visualization.DataTable();
+    dataTable.addColumn({ type: 'date', id: 'date' });
+    dataTable.addColumn({ type: 'number', id: 'status' });
+    dataTable.addColumn({ type: 'string', id: 'event', role: 'tooltip' });
+    $.getJSON(dataurl, "", function (data) {
+        for (i=0; i<data.length; i++) {
+            dataTable.addRows([ [ new Date(data[i]['t']*1000), data[i]['status'], data[i]['tooltip'] ] ]);
+        }
+
+       var chart = new google.visualization.Calendar(myEventChart.get(0));
+
+       var options = {
+         title: "イベント一覧",
+         height: 350,
+         colorAxis: {
+            colors: ['green', 'blue', 'red', 'yellow'],
+            values: [0, 5, 10, 15]
+            },
+         legend: 'none',
+         tooltip: {isHtml: false},
+       };
+
+       chart.draw(dataTable, options);
+    });
 }
     </script>
     </head>

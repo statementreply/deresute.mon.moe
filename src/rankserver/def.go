@@ -82,6 +82,12 @@ type tmplVar struct {
 	TwitterCardURL string
 }
 
+type eventDataRow struct {
+	T		int64  `json:"t"`
+	Status	int	   `json:"status"`
+	Tooltip	string `json:"tooltip"`
+}
+
 type RankServer struct {
 	//    map[timestamp][rankingType][rank] = score
 	// {"1467555420":   [{10: 2034} ,{30: 203021} ]  }

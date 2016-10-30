@@ -1,6 +1,7 @@
 package rankserver
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
@@ -124,6 +125,49 @@ func (r *RankServer) distDataHandler(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 	fmt.Fprint(w, "]\n")
+}
+
+// js timezone bug
+// date overriding
+func (r *RankServer) eventDataHandler(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
+	var list_day []eventDataRow
+	for _, e := range r.resourceMgr.EventList {
+		start := e.EventStart() //.Truncate(time.Hour * 24)
+		end   := e.EventEnd() //.Truncate(time.Hour * 24)
+		name  := e.Name()
+		if time.Now().Add(50 * 24 * time.Hour).Before(start) {
+			continue
+		}
+		//fmt.Println("start:", start.Unix()/86400)
+		step := time.Hour * 8
+		for mid := start.Truncate(step).Add(step)
+			mid.Before(end.Truncate(step));
+			mid = mid.Add(step) {
+			tipStr := ts.FormatDate(mid) + "\n" + name
+			list_day = append(list_day, eventDataRow{T: mid.Unix(), Status: 5,
+													Tooltip: tipStr})
+			//fmt.Println("mid:", mid.Unix()/86400)
+		}
+		list_day = append(list_day, eventDataRow{T: start.Unix(), Status: 0,
+							Tooltip: ts.FormatDate(start) + "\n" + name})
+		list_day = append(list_day, eventDataRow{T: end.Unix(), Status: 10,
+							Tooltip: ts.FormatDate(end) + "\n" + name})
+		//fmt.Println("end:", end.Unix()/86400)
+	}
+	today_tooltip := "今日"
+	if r.currentEvent != nil {
+		today_tooltip += "\n" + r.currentEvent.Name()
+	}
+	list_day = append(list_day, eventDataRow{T: time.Now().Unix(), Status: 15,
+											Tooltip: today_tooltip})
+	b, err := json.Marshal(list_day)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//fmt.Println(string(b))
+	w.Write(b)
 }
 
 func (r *RankServer) twitterHandler(w http.ResponseWriter, req *http.Request) {

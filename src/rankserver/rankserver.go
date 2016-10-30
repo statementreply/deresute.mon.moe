@@ -172,6 +172,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/latest_data", r.latestDataHandler)
 	http.HandleFunc("/d", r.dataHandler)
 	http.HandleFunc("/d_dist", r.distDataHandler)
+	http.HandleFunc("/d_event", r.eventDataHandler)
 }
 
 func (r *RankServer) latestTimestamp() string {
