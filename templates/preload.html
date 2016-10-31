@@ -284,7 +284,8 @@ function drawEventChart() {
 
        var options = {
          title: "イベント一覧",
-         height: 350,
+         //height: 350,
+         calendar: {cellSize: 11},
          colorAxis: {
             colors: ['green', 'blue', 'red', 'yellow'],
             values: [0, 5, 10, 15]
@@ -292,6 +293,8 @@ function drawEventChart() {
          legend: 'none',
          tooltip: {isHtml: false},
        };
+       options['calendar']['cellSize'] = $(window).width() / 60;
+       console.log(options);
 
        chart.draw(dataTable, options);
     });

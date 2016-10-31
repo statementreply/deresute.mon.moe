@@ -73,6 +73,13 @@ html.twc, body.twc, div.twc {
     height: 50%;
 }
 
+#eventCalendar {
+    width: 100vw;
+    height: 35vw;
+    /*width: 1000px;*/
+    /*height: 350px;*/
+}
+
 /* jquery demo */
 
 
