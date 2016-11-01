@@ -72,7 +72,7 @@ func MakeRankServer() *RankServer {
 	r.rankDB = RANK_DB
 	r.db, err = sql.Open("sqlite3", "file:"+r.rankDB+"?mode=ro")
 	if err != nil {
-		r.logger.Fatalln("sql error", err)
+		r.logger.Fatalln("sql error open file", err)
 	}
 	//r.setCacheSize()
 

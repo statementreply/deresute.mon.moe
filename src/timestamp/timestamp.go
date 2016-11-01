@@ -25,7 +25,7 @@ func TZ() *time.Location {
 func TimestampToTime(timestamp string) time.Time {
 	itime, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {
-		log.Println("timestamp format incorrect?", err)
+		log.Println("TimestampToTime(): timestamp format incorrect?", err)
 		itime = 0
 	}
 	t := time.Unix(itime, 0).In(tz)

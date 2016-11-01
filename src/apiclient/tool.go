@@ -28,7 +28,7 @@ func Unlolfuscate(s string) string {
 	r = ""
 	r_len, err := strconv.ParseInt(s[:4], 16, 16)
 	if err != nil {
-		log.Println(err)
+		log.Println("Unlolfuscate():", err)
 		return ""
 	}
 	//fmt.Println("rlen", int(r_len))

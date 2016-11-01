@@ -14,7 +14,7 @@ import (
 func (r *RankServer) UpdateTimestamp() {
 	rows, err := r.db.Query("SELECT timestamp FROM timestamp;")
 	if err != nil {
-		r.logger.Println("sql error", err)
+		r.logger.Println("sql error UpdateTimestamp", err)
 		return
 	}
 	defer rows.Close()
@@ -23,14 +23,14 @@ func (r *RankServer) UpdateTimestamp() {
 		var ts string
 		err = rows.Scan(&ts)
 		if err != nil {
-			r.logger.Println("sql error", err)
+			r.logger.Println("sql error UpdateTimestamp", err)
 			return
 		}
 		local_list_timestamp = append(local_list_timestamp, ts)
 	}
 	err = rows.Err()
 	if err != nil {
-		r.logger.Println("sql error", err)
+		r.logger.Println("sql error UpdateTimestamp", err)
 		return
 	}
 	r.mux_timestamp.Lock()
@@ -49,7 +49,7 @@ func (r *RankServer) checkDir(timestamp string) bool {
 		if err == sql.ErrNoRows {
 			return false
 		} else {
-			r.logger.Println("sql error", err)
+			r.logger.Println("sql error checkDir", err)
 			return false
 		}
 	} else {
@@ -94,7 +94,7 @@ func (r *RankServer) fetchData(timestamp string, rankingType int, rank int) int 
 			score = -1
 		} else {
 			if err != nil {
-				r.logger.Println("sql error", err)
+				r.logger.Println("sql error fetchData", err)
 				score = -1
 			}
 		}
@@ -108,7 +108,7 @@ func (r *RankServer) fetchDataListRank(timestamp string, rankingType int) []int 
 	var listRank []int
 	rows, err := r.db.Query("SELECT rank FROM rank WHERE timestamp == $1 AND type == $2;", timestamp, rankingType+1)
 	if err != nil {
-		r.logger.Println("sql error", err)
+		r.logger.Println("sql error fetchDataListRank", err)
 		return nil
 	}
 	defer rows.Close()
@@ -116,7 +116,7 @@ func (r *RankServer) fetchDataListRank(timestamp string, rankingType int) []int 
 		var rank int
 		err = rows.Scan(&rank)
 		if err != nil {
-			r.logger.Println("sql error", err)
+			r.logger.Println("sql error fetchDataListRank", err)
 			return nil
 		}
 		if rank%10 == 1 {
@@ -125,7 +125,7 @@ func (r *RankServer) fetchDataListRank(timestamp string, rankingType int) []int 
 	}
 	err = rows.Err()
 	if err != nil {
-		r.logger.Println("sql error", err)
+		r.logger.Println("sql error fetchDataListRank", err)
 		return nil
 	}
 	return listRank
