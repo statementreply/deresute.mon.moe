@@ -384,13 +384,21 @@ func (r *RankServer) distHandler(w http.ResponseWriter, req *http.Request) {
 				Selected: t_time == int64(i*900+120),
 			})
 	}
+	// fill in event date range
 	if tmplVar.event != nil {
 		baseTime := tmplVar.event.EventStart().Truncate(time.Hour * 24)
+		baseTime0 := baseTime
 		for !baseTime.After(tmplVar.event.ResultEnd()) {
 			tmplVar.ListDate = append(tmplVar.ListDate,
 				&TimeOfSelector{
 					Second:   baseTime.Unix(),
 					Text:     baseTime.Format("2006 01-02"),
+					Selected: t_date == baseTime.Unix(),
+				})
+			tmplVar.ListEventDate = append(tmplVar.ListEventDate,
+				&TimeOfSelector{
+					Second:   baseTime.Unix(),
+					Text:	  "day " + strconv.FormatInt(int64(baseTime.Sub(baseTime0) / (24 * time.Hour)), 10),
 					Selected: t_date == baseTime.Unix(),
 				})
 			baseTime = baseTime.Add(time.Hour * 24)
