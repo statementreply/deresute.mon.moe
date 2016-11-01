@@ -280,7 +280,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	return result
 }
 
-func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) {
+func (r *RankServer) homeHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
@@ -290,7 +290,7 @@ func (r *RankServer) homeHandler_new2(w http.ResponseWriter, req *http.Request) 
 	}
 }
 
-func (r *RankServer) twcHandler_new2(w http.ResponseWriter, req *http.Request) {
+func (r *RankServer) twcHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
@@ -300,7 +300,7 @@ func (r *RankServer) twcHandler_new2(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (r *RankServer) twcTestHandler_new2(w http.ResponseWriter, req *http.Request) {
+func (r *RankServer) twcTestHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
@@ -311,7 +311,7 @@ func (r *RankServer) twcTestHandler_new2(w http.ResponseWriter, req *http.Reques
 }
 
 // mobile landscape optimized
-func (r *RankServer) homeMHandler_new2(w http.ResponseWriter, req *http.Request) {
+func (r *RankServer) homeMHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
@@ -321,7 +321,7 @@ func (r *RankServer) homeMHandler_new2(w http.ResponseWriter, req *http.Request)
 	}
 }
 
-func (r *RankServer) qchartHandler_new2(w http.ResponseWriter, req *http.Request) {
+func (r *RankServer) qchartHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
@@ -331,7 +331,7 @@ func (r *RankServer) qchartHandler_new2(w http.ResponseWriter, req *http.Request
 	}
 }
 
-func (r *RankServer) qHandler_new2(w http.ResponseWriter, req *http.Request) {
+func (r *RankServer) qHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.CheckData()
 	req.ParseForm()
@@ -348,7 +348,7 @@ func (r *RankServer) qHandler_new2(w http.ResponseWriter, req *http.Request) {
 }
 
 // distribution
-func (r *RankServer) distHandler_new2(w http.ResponseWriter, req *http.Request) {
+func (r *RankServer) distHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.CheckData()
 	req.ParseForm()
@@ -402,7 +402,7 @@ func (r *RankServer) distHandler_new2(w http.ResponseWriter, req *http.Request) 
 	}
 }
 
-func (r *RankServer) logHandler_new2(w http.ResponseWriter, req *http.Request) {
+func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.UpdateTimestamp()
 	r.CheckData()
@@ -435,7 +435,7 @@ func (r *RankServer) isEventAvailable(e *resource_mgr.EventDetail) bool {
 	}
 }
 
-func (r *RankServer) eventHandler_new2(w http.ResponseWriter, req *http.Request) {
+func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.UpdateTimestamp()
 	r.CheckData()
