@@ -94,6 +94,14 @@ func (r *RankServer) parseParam_date(req *http.Request) int64 {
 	return 0
 }
 
+func (r *RankServer) parseParam_isfinal(req *http.Request) bool {
+	isfinal, ok := req.Form["isfinal"]
+	if ok && isfinal[0] == "1" {
+		return true
+	}
+	return false
+}
+
 // returns valid timestamp or ""
 func (r *RankServer) parseParam_time(req *http.Request) int64 {
 	timestamp, ok := req.Form["time"] // format checked
@@ -356,9 +364,14 @@ func (r *RankServer) distHandler(w http.ResponseWriter, req *http.Request) {
 	//if tmplVar.Timestamp == "" {
 	//	tmplVar.Timestamp = r.latestTimestamp()
 	//}
+	if tmplVar.event == nil {
+		r.logger.Println("nil event in distHandler")
+		return
+	}
 	tmplVar.RankingType = tmplVar.rankingType
 	t_date := r.parseParam_date(req)
 	t_time := r.parseParam_time(req)
+	isFinal := r.parseParam_isfinal(req)
 	t_offset := int64(9 * 3600)
 	if (t_date > 0) && (t_time > 0) {
 		//tmplVar.Timestamp = strconv.FormatInt(t_date+t_time-t_offset, 10)
@@ -375,6 +388,18 @@ func (r *RankServer) distHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	if tmplVar.Timestamp == "" {
 		tmplVar.Timestamp = strconv.FormatInt(t_date+t_time-t_offset, 10)
+	}
+	// override Timestamp
+	if isFinal {
+		// should be in range ResultStart ResultEnd
+		// and in the current list of timestamps
+		for _, t := range r.GetListTimestamp() {
+			t0 := ts.TimestampToTime(t)
+			if ( !t0.Before(tmplVar.event.ResultStart()) ) && ( !t0.After(tmplVar.event.ResultEnd()) ) {
+				tmplVar.Timestamp = t
+				break
+			}
+		}
 	}
 	for i := 0; i < 24*4; i++ {
 		tmplVar.ListTimeOfDay = append(tmplVar.ListTimeOfDay,
