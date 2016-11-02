@@ -425,6 +425,7 @@ func (r *RankServer) distHandler(w http.ResponseWriter, req *http.Request) {
 			baseTime = baseTime.Add(time.Hour * 24)
 		}
 	}
+	tmplVar.FinalTime = tmplVar.event.ResultStart().Add(2 * time.Minute).Format("2006 01-02 15:04")
 	err := rsTmpl.ExecuteTemplate(w, "dist.html", tmplVar)
 	if err != nil {
 		r.logger.Println("html/template", err)

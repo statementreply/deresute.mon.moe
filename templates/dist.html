@@ -35,7 +35,7 @@
                         <input type="radio" name="isfinal" id="form-snapshot" value="0" {{if not .IsFinal}}checked="checked"{{end}}>
                     </label>
 
-                    <label for="form-isfinal">最終結果
+                    <label for="form-isfinal">最終結果 {{.FinalTime}}
                         <input type="radio" name="isfinal" id="form-isfinal" value="1" {{if .IsFinal}}checked="checked"{{end}}>
                     </label>
                 </div>

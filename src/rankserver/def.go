@@ -79,6 +79,7 @@ type tmplVar struct {
 	ListTimeOfDay []*TimeOfSelector
 	ListDate      []*TimeOfSelector
 	IsFinal		  bool
+	FinalTime     string
 	//ListEventDate []*TimeOfSelector
 	// for twitter card
 	TwitterCardURL string
