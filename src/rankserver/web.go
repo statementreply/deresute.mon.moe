@@ -400,6 +400,7 @@ func (r *RankServer) distHandler(w http.ResponseWriter, req *http.Request) {
 				break
 			}
 		}
+		tmplVar.IsFinal = true
 	}
 	for i := 0; i < 24*4; i++ {
 		tmplVar.ListTimeOfDay = append(tmplVar.ListTimeOfDay,

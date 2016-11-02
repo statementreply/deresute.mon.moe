@@ -78,6 +78,7 @@ type tmplVar struct {
 	RankingType   int
 	ListTimeOfDay []*TimeOfSelector
 	ListDate      []*TimeOfSelector
+	IsFinal		  bool
 	//ListEventDate []*TimeOfSelector
 	// for twitter card
 	TwitterCardURL string
