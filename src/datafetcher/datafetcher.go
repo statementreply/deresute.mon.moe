@@ -117,11 +117,12 @@ func (df *DataFetcher) FinalResultDuplicate(currentEvent *resource_mgr.EventDeta
 
 // tag: database, sqlite
 func (df *DataFetcher) setCacheSize() {
-    _, err := df.db.Exec("PRAGMA cache_size = -6000;")
-    if err != nil {
-        log.Println("set cache_size", err)
-        log.Printf("%#v", err)
-        log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)    }
+	_, err := df.db.Exec("PRAGMA cache_size = -6000;")
+	if err != nil {
+		log.Println("set cache_size", err)
+		log.Printf("%#v", err)
+		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
+	}
 }
 
 func (df *DataFetcher) Run() error {

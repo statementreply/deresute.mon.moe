@@ -78,7 +78,7 @@ type tmplVar struct {
 	RankingType   int
 	ListTimeOfDay []*TimeOfSelector
 	ListDate      []*TimeOfSelector
-	IsFinal		  bool
+	IsFinal       bool
 	FinalTime     string
 	//ListEventDate []*TimeOfSelector
 	// for twitter card
@@ -86,9 +86,9 @@ type tmplVar struct {
 }
 
 type eventDataRow struct {
-	T		int64  `json:"t"`
-	Status	int	   `json:"status"`
-	Tooltip	string `json:"tooltip"`
+	T       int64  `json:"t"`
+	Status  int    `json:"status"`
+	Tooltip string `json:"tooltip"`
 }
 
 type RankServer struct {

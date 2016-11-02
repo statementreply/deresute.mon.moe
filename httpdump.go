@@ -46,6 +46,7 @@ var iface = flag.String("i", "", "Interface to get packets from")
 var snaplen = flag.Int("s", 1600, "SnapLen for pcap packet capture")
 var filter = flag.String("f", "tcp", "BPF filter for pcap")
 var logAllPackets = flag.Bool("v", false, "Logs every packet in great detail")
+
 //var showAllHTTP = flag.Bool("a", false, "Show every http request/response")
 var isDebug = flag.Bool("d", false, "(debug) show types")
 var showYAML = flag.Bool("y", false, "(debug) show yaml")
