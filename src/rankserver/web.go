@@ -388,7 +388,7 @@ func (r *RankServer) distHandler(w http.ResponseWriter, req *http.Request) {
 	if tmplVar.event != nil {
 		baseTime := tmplVar.event.EventStart().Truncate(time.Hour * 24)
 		baseTime0 := baseTime
-		for !baseTime.After(tmplVar.event.ResultEnd()) {
+		for !baseTime.After(tmplVar.event.ResultStart()) {
 			dayText := "day " + strconv.FormatInt( 1 + int64(baseTime.Sub(baseTime0) / (24 * time.Hour)), 10) + ": " + baseTime.Format("2006 01-02")
 			tmplVar.ListDate = append(tmplVar.ListDate,
 				&TimeOfSelector{
