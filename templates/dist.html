@@ -15,6 +15,11 @@
                 </select>
                 </div>
 
+
+
+                <div class="ui-field-contain">
+                    <label for="form-snapshot">
+
                 <div class="ui-field-contain">
                 <label for="form-date">日付</label>
                 <select id="form-date" name="date" id="date">
@@ -22,7 +27,6 @@
                             <option value="{{.Second}}" {{if .Selected}}selected="selected"{{end}}>{{.Text}}</option>{{end}}
                 </select>
                 </div>
-
                 <div class="ui-field-contain">
                 <label for="form-time">時刻</label>
                 <select id="form-time" name="time" id="time">
@@ -30,6 +34,14 @@
                             <option value="{{.Second}}" {{if .Selected}}selected="selected"{{end}}>{{.Text}}</option>{{end}}
                 </select>
                 </div>
+
+                    </label>
+                    <input type="radio" name="final" id="form-snapshot" value="0">
+
+                    <label for="form-isfinal">最終結果</label>
+                    <input type="radio" name="final" id="form-isfinal" value="1">
+                </div>
+
                 <input class="s0" type="submit" value="更新">
             </form>
         </div>
