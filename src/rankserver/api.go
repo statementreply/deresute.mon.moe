@@ -141,7 +141,9 @@ func (r *RankServer) eventDataHandler(w http.ResponseWriter, req *http.Request) 
 		}
 		//fmt.Println("start:", start.Unix()/86400)
 		step := time.Hour * 8
-		for mid := start.Truncate(step).Add(step); mid.Before(end.Truncate(step)); mid = mid.Add(step) {
+		for mid := start.Truncate(step).Add(step); // init
+		mid.Before(end.Truncate(step));            // cond
+		mid = mid.Add(step) {                      // incr
 			tipStr := ts.FormatDate(mid) + "\n" + name
 			list_day = append(list_day, eventDataRow{T: mid.Unix(), Status: 5,
 				Tooltip: tipStr})
