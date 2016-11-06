@@ -332,19 +332,13 @@ function drawEventChart() {
     $.getJSON(dataurl, "", function (data) {
         for (i=0; i<data.length; i++) {
             // FIXME: use date.js
-            console.log(data[i]['tooltip']);
             d = new Date(data[i]['t']*1000);
             var o1 = d.getTimezoneOffset();
             var o2 = 9;
             var o3 = (- o1 * 2 / 60 - o2) * 100;
-            console.log(d.toString());
 
-            //console.log({d:d});
-            //console.log(d.getTimezoneOffset());
             //d.setTimezoneOffset("+0900");
             d.setTimezoneOffset(o3);
-            console.log(d.toString());
-            //console.log(d.getTimezone());
             dataTable.addRows([ [ d, data[i]['status'], data[i]['tooltip'] ] ]);
         }
 
@@ -362,12 +356,10 @@ function drawEventChart() {
          tooltip: {isHtml: false},
        };
        options['calendar']['cellSize'] = $(window).width() / 60;
-       console.log(options);
 
        var tzf = tzFormatter();
        var tzf2 = tzFormatter2();
        tzf.format(dataTable, 0);
-        console.log(Date.today().getTimezone());
        chart.draw(dataTable, options);
     });
 }
