@@ -23,13 +23,6 @@ function setAspectRatio_i(elem) {
 }
 
 function setAspectRatio() {
-    setAspectRatio_i($("#myLineChart", currentPage));
-    setAspectRatio_i($("#mySpeedChart", currentPage));
-
-    myDistChart = $("#myDistChart", currentPage);
-    myScoreDistChart = $("#myScoreDistChart", currentPage);
-    setAspectRatio_i(myDistChart);
-    setAspectRatio_i(myScoreDistChart);
 }
 
 function tzFormatter() {
@@ -65,53 +58,31 @@ $(window).on("pagecreate pageload pagechange pageshow throttledresize", function
     setAspectRatio();
 });
 dataurl = $("#dataurl", currentPage).text();
-//console.log("dataurl", dataurl);
 fancychart = $("#fancychart", currentPage).text();
 // packages 'corechart' 'annotationchart'
 // 'line' for material design
 //google.charts.load('current', {packages: ['corechart', 'annotationchart']});
 google.charts.load('current', {packages: ['corechart']});
-google.charts.setOnLoadCallback(drawLineChart);
-google.charts.setOnLoadCallback(drawDistChart);
 google.charts.setOnLoadCallback(drawChart);
 google.charts.setOnLoadCallback(pageChange);
 function pageChange() {
     //console.log("pagechange");
     $(window).on("pagechange", function() {
-        drawLineChart();
-        drawDistChart();
         drawChart();
         //console.log("pagechange");
     });
     //$("body").pagecontainer()
     $("body").on("pagecontainerload", function () {
-        //drawLineChart();
         //console.log("pagecontainerload");
     });
     $("body").on("pageshow", function () {
-        //drawLineChart();
         //console.log("pageshow");
     });
     $(window).on("orientationchange", function() {
-        drawLineChart();
-        drawDistChart();
         drawChart();
         //console.log("orientationchange");
     });
 };
-// doesn't work
-//$("#myLineChart").html("");
-//$("#mySpeedChart").html("");
-function updateLatestData() {
-    currentPage = $("body").pagecontainer("getActivePage");
-    latestdata = $("#latestdata", currentPage);
-    if (latestdata.length == 0) {
-        return;
-    }
-    jQuery.get("/latest_data", "", function (data) {
-        latestdata.html(data);
-    }, "text");
-}
 // for twitter card
 function drawChart() {
     currentPage = $("body").pagecontainer("getActivePage");
@@ -142,7 +113,7 @@ function drawChart() {
         legend: {position: 'top', alignment: 'center'},
     };
     myTWCChart = $("#myTWCChart", currentPage);
-    console.log("twc chart function");
+    //console.log("twc chart function");
     if (myTWCChart.length == 0) {
         return;
     }
@@ -193,187 +164,6 @@ function drawChart() {
         options.hAxis.ticks = xTicks;
         chart.draw(data, options);
     });
-}
-
-function drawLineChart() {
-    updateLatestData();
-    currentPage = $("body").pagecontainer("getActivePage");
-    dataurl = $("#dataurl", currentPage).text();
-    //console.log("dataurl", dataurl);
-    fancychart = $("#fancychart", currentPage).text();
-
-    var options = {
-        title: "累計",
-        hAxis: {
-            format: 'MM/dd HH:mm',
-            gridlines: {count: 12}
-        },
-        vAxis: {
-            minValue: 0,
-            textPosition: 'in',
-        },
-        interpolateNulls: true,
-        explorer: {maxZoomIn: 0.1},
-        chartArea: {width: '100%', height: '65%'},
-        legend: {position: 'top', alignment: 'center'},
-    };
-    var options_speed = $.extend({}, options);
-    options_speed['interpolateNulls'] = false;
-    options_speed['title'] = "時速";
-    //console.log(options);
-    //console.log(options_speed);
-    if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
-        return;
-    }
-    myLineChart = $("#myLineChart", currentPage);
-    mySpeedChart = $("#mySpeedChart", currentPage);
-    //console.log("drawLineChart, call setAspectRatio()");
-    setAspectRatio();
-    //console.log("drawLineChart, call setAspectRatio() return");
-    //console.log("drawLineChart,", myLineChart, mySpeedChart);
-    var chart;
-    var chart_speed;
-    if (fancychart == 0) {
-        chart = new google.visualization.LineChart(myLineChart.get(0));
-        chart_speed = new google.visualization.LineChart(mySpeedChart.get(0));
-        // try material design
-        //chart_speed = new google.charts.Line(mySpeedChart.get(0));
-    } else {
-        chart = eval("new google.visualization.AnnotationChart(myLineChart.get(0))");
-        chart_speed = eval("new google.visualization.AnnotationChart(mySpeedChart.get(0))");
-    }
-
-    $.getJSON(dataurl, "", function (data) {
-        var data_list = [];
-        for (t=0; t<2; t++) {
-            dt = {"cols": [{"id":"timestamp","label":"timestamp","type":"datetime"}],
-                "rows":[]}
-            cur = data[t];
-            //console.log("r", cur[0]);
-            // cols
-            for (i=0; i<cur[0].length; i++) {
-                dt["cols"].push({"id":cur[0][i], "label":cur[0][i], "type":"number"})
-            }
-            // rows
-            for (i=1; i<cur.length; i++) {
-                row = cur[i]
-                    row_map = {"c":[{"v":new Date(row[0] * 1000)}]}
-                for (j=1; j<row.length; j++) {
-                    row_map["c"].push({"v": row[j]})
-                }
-                dt["rows"].push(row_map)
-            }
-            //console.log(dt)
-            // t=0: dt: ranklist
-            // t=1: dt: speedlist
-            data_list[t] = dt;
-        }
-
-        var data_rank = new google.visualization.DataTable(data_list[0]);
-        var data_speed = new google.visualization.DataTable(data_list[1]);
-        //console.log("dtl", data_list[1]);
-        //console.log("draw");
-        chart.draw(data_rank, options);
-        chart_speed.draw(data_speed, options_speed);
-    })
-}
-
-function drawDistChart() {
-    setAspectRatio();
-    currentPage = $("body").pagecontainer("getActivePage");
-    timestamp = $("#timestamp", currentPage).text();
-    rankingType = $("#rankingtype", currentPage).text();
-    var options = {
-        hAxis: {
-            title: "rank",
-            minValue: 0,
-            gridlines: {count: 10},
-            format: 'short',
-        },
-        vAxis: {
-            minValue: 0,
-            textPosition: 'in',
-            logScale: false,
-            format: 'short',
-            //gridlines: {count: 5},
-            //minorGridlines: {count: 1},
-            //viewWindow: {min: 1},
-        },
-        series: {
-            0: {targetAxisIndex: 0},
-            1: {targetAxisIndex: 1},
-        },
-        vAxes: {
-            0: {title: 'pt'},
-            1: {title: 'pt密度'},
-        },
-        interpolateNulls: true,
-        explorer: {maxZoomIn: 0.1},
-        chartArea: {width: '100%', height: '65%'},
-        legend: {position: 'top', alignment: 'center'},
-    };
-    var options_score = $.extend({}, options);
-    options_score.vAxis = $.extend({}, options.vAxis);
-    options_score.vAxes = $.extend({}, options.vAxes);
-
-    options.vAxis.logScale = true;
-    options.title = "pt";
-    options_score.vAxis.logScale = false;
-    options_score.title = "score";
-    myDistChart = $("#myDistChart", currentPage);
-    myScoreDistChart = $("#myScoreDistChart", currentPage);
-    //myDensityChart = $("#myDensityChart", currentPage);
-    //myScoreDensityChart = $("#myScoreDensityChart", currentPage);
-    console.log("drawDistChart");
-    if (myDistChart.length == 0) {
-        return;
-    }
-    console.log("drawDistChart");
-    ddataurl = "/d_dist?t=" + timestamp;
-    console.log(ddataurl);
-    $.getJSON(ddataurl, "", function (data) {
-        console.log(data);
-        var data_list = [];
-        plot_label = ["pt", "score", "rank/pt（pt密度）", "rank/score（スコア密度）"];
-        for (t=0; t<2; t++) {
-            dt = {"cols": [{"id":"timestamp","label":"rank","type":"number"}],
-                "rows":[]}
-            //console.log("r", cur[0]);
-            // cols
-            dt["cols"].push({"id":plot_label[t], "label":plot_label[t], "type":"number"});
-            dt["cols"].push({"id":plot_label[t+2], "label":plot_label[t+2], "type":"number"});
-            cur = data[t];
-            cur2 = data[t+2];
-            // rows
-            for (i=0; i<cur.length; i++) {
-                row = cur[i];
-                row2 = cur2[i];
-                row_map = {"c": [{"v": row[0]}, {"v": row[1]}, {"v": row2[1]}]};
-                dt["rows"].push(row_map);
-            }
-            //console.log(dt)
-            // t=0: dt: ranklist
-            // t=1: dt: speedlist
-            data_list[t] = dt;
-        }
-
-        var data_pt = new google.visualization.DataTable(data_list[0]);
-        var data_score = new google.visualization.DataTable(data_list[1]);
-        //var data_density_pt = new google.visualization.DataTable(data_list[2]);
-        //var data_density_score = new google.visualization.DataTable(data_list[3]);
-        console.log("dtl", data_list[1]);
-        console.log("draw");
-        chart = new google.visualization.LineChart(myDistChart.get(0));
-        chart_score = new google.visualization.LineChart(myScoreDistChart.get(0));
-        //chart_density = new google.visualization.LineChart(myDensityChart.get(0));
-        //chart_density_score = new google.visualization.LineChart(myScoreDensityChart.get(0));
-        chart.draw(data_pt, options);
-        chart_score.draw(data_score, options_score);
-        options.title = "pt密度";
-        options_score.title = "スコア密度";
-        //chart_density.draw(data_density_pt, options);
-        //chart_density_score.draw(data_density_score, options_score);
-    })
 }
     </script>
     </head>

@@ -126,8 +126,7 @@ function drawLineChart() {
         title: "累計",
         hAxis: {
             // format and gridlines are overridden by ticks
-            //format: 'MM/dd HH:mm Z',
-            format: 'M/d/yy',
+            format: 'MM/dd HH:mm Z',
             gridlines: {count: 15},
             textPosition: "out",
         },
@@ -264,9 +263,6 @@ function drawDistChart() {
     options_score.title = "score";
     myDistChart = $("#myDistChart", currentPage);
     myScoreDistChart = $("#myScoreDistChart", currentPage);
-    //myDensityChart = $("#myDensityChart", currentPage);
-    //myScoreDensityChart = $("#myScoreDensityChart", currentPage);
-    //console.log("drawDistChart");
     if (myDistChart.length == 0) {
         return;
     }
@@ -296,18 +292,12 @@ function drawDistChart() {
 
         var data_pt = new google.visualization.DataTable(data_list[0]);
         var data_score = new google.visualization.DataTable(data_list[1]);
-        //var data_density_pt = new google.visualization.DataTable(data_list[2]);
-        //var data_density_score = new google.visualization.DataTable(data_list[3]);
         chart = new google.visualization.LineChart(myDistChart.get(0));
         chart_score = new google.visualization.LineChart(myScoreDistChart.get(0));
-        //chart_density = new google.visualization.LineChart(myDensityChart.get(0));
-        //chart_density_score = new google.visualization.LineChart(myScoreDensityChart.get(0));
         chart.draw(data_pt, options);
         chart_score.draw(data_score, options_score);
         options.title = "pt密度";
         options_score.title = "スコア密度";
-        //chart_density.draw(data_density_pt, options);
-        //chart_density_score.draw(data_density_score, options_score);
     })
 }
 
