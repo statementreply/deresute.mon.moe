@@ -270,17 +270,13 @@ function drawDistChart() {
     if (myDistChart.length == 0) {
         return;
     }
-    console.log("drawDistChart");
     ddataurl = "/d_dist?t=" + timestamp;
-    console.log(ddataurl);
     $.getJSON(ddataurl, "", function (data) {
-        console.log(data);
         var data_list = [];
         plot_label = ["pt", "score", "rank/pt（pt密度）", "rank/score（スコア密度）"];
         for (t=0; t<2; t++) {
             dt = {"cols": [{"id":"timestamp","label":"rank","type":"number"}],
                 "rows":[]}
-            //console.log("r", cur[0]);
             // cols
             dt["cols"].push({"id":plot_label[t], "label":plot_label[t], "type":"number"});
             dt["cols"].push({"id":plot_label[t+2], "label":plot_label[t+2], "type":"number"});
@@ -293,7 +289,6 @@ function drawDistChart() {
                 row_map = {"c": [{"v": row[0]}, {"v": row[1]}, {"v": row2[1]}]};
                 dt["rows"].push(row_map);
             }
-            //console.log(dt)
             // t=0: dt: ranklist
             // t=1: dt: speedlist
             data_list[t] = dt;
@@ -303,8 +298,6 @@ function drawDistChart() {
         var data_score = new google.visualization.DataTable(data_list[1]);
         //var data_density_pt = new google.visualization.DataTable(data_list[2]);
         //var data_density_score = new google.visualization.DataTable(data_list[3]);
-        console.log("dtl", data_list[1]);
-        console.log("draw");
         chart = new google.visualization.LineChart(myDistChart.get(0));
         chart_score = new google.visualization.LineChart(myScoreDistChart.get(0));
         //chart_density = new google.visualization.LineChart(myDensityChart.get(0));
