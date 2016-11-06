@@ -142,26 +142,39 @@ func (r *RankServer) eventDataHandler(w http.ResponseWriter, req *http.Request) 
 		//fmt.Println("start:", start.Unix()/86400)
 		step := time.Hour * 24
 		offset := time.Hour * 9
+		// first day in JST
 		for mid := start.Add(offset).Truncate(step).Add(step).Add(-offset); // init
-		mid.Before(end);            // cond
-		mid = mid.Add(step) {                      // incr
+		mid.Before(end);                                                    // cond
+		mid = mid.Add(step) {                                               // incr
 			tipStr := ts.FormatDate(mid) + "\n" + name
-			list_day = append(list_day, eventDataRow{T: mid.Unix(), Status: 5,
-				Tooltip: tipStr})
+			list_day = append(list_day, eventDataRow{
+				T:       mid.Unix(),
+				Status:  5,
+				Tooltip: tipStr,
+			})
 			//fmt.Println("mid:", mid.Unix()/86400)
 		}
-		list_day = append(list_day, eventDataRow{T: start.Unix(), Status: 0,
-			Tooltip: ts.FormatDate(start) + "\n" + name})
-		list_day = append(list_day, eventDataRow{T: end.Unix(), Status: 10,
-			Tooltip: ts.FormatDate(end) + "\n" + name})
+		list_day = append(list_day, eventDataRow{
+			T:       start.Unix(),
+			Status:  0,
+			Tooltip: ts.FormatDate(start) + "\n" + name,
+		})
+		list_day = append(list_day, eventDataRow{
+			T:       end.Unix(),
+			Status:  10,
+			Tooltip: ts.FormatDate(end) + "\n" + name,
+		})
 		//fmt.Println("end:", end.Unix()/86400)
 	}
 	today_tooltip := "今日"
 	if r.currentEvent != nil {
 		today_tooltip += "\n" + r.currentEvent.Name()
 	}
-	list_day = append(list_day, eventDataRow{T: time.Now().Unix(), Status: 15,
-		Tooltip: today_tooltip})
+	list_day = append(list_day, eventDataRow{
+		T:       time.Now().Unix(),
+		Status:  15,
+		Tooltip: today_tooltip,
+	})
 	game_start, err := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Thu Sep 3 12:00:00 +0900 JST 2015")
 	if err != nil {
 		r.logger.Fatalln(err)
