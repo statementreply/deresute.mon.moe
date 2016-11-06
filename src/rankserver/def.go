@@ -83,6 +83,8 @@ type tmplVar struct {
 	//ListEventDate []*TimeOfSelector
 	// for twitter card
 	TwitterCardURL string
+	// debugging
+	NowJST string
 }
 
 type eventDataRow struct {

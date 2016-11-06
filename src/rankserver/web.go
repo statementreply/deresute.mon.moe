@@ -285,6 +285,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	}
 	// FIXME: hardcode
 	result.TwitterCardURL = "https://deresute.mon.moe/twc"
+	result.NowJST = time.Now().In(ts.TZ()).Format(time.RFC3339)
 	return result
 }
 

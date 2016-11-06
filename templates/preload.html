@@ -12,6 +12,8 @@
     <link rel="stylesheet" type="text/css" href="/static/jquery.mobile-1.4.5.min.css" />
     <script type="text/javascript" src="/static/jquery-1.12.4.min.js"></script>
     <script type="text/javascript" src="/static/jquery.mobile-1.4.5.min.js"></script>
+    <!--<script type="text/javascript" src="/static/date-1.0.0.min.js"></script>-->
+    <script type="text/javascript" src="/static/date.js"></script>
     <!--//fmt.Fprintf(w, `<script language="javascript" type="text/javascript" src="%s"></script>`, r.generateDURL(param))-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
@@ -337,12 +339,26 @@ function drawEventChart() {
     }
     dataurl = "/d_event";
     var dataTable = new google.visualization.DataTable();
-    dataTable.addColumn({ type: 'date', id: 'date' });
+    dataTable.addColumn({ type: 'date', id: 'datetime' });
     dataTable.addColumn({ type: 'number', id: 'status' });
     dataTable.addColumn({ type: 'string', id: 'event', role: 'tooltip' });
     $.getJSON(dataurl, "", function (data) {
         for (i=0; i<data.length; i++) {
-            dataTable.addRows([ [ new Date(data[i]['t']*1000), data[i]['status'], data[i]['tooltip'] ] ]);
+            // FIXME: use date.js
+            console.log(data[i]['tooltip']);
+            d = new Date(data[i]['t']*1000);
+            var o1 = d.getTimezoneOffset();
+            var o2 = 9;
+            var o3 = (- o1 * 2 / 60 - o2) * 100;
+            console.log(d.toString());
+
+            //console.log({d:d});
+            //console.log(d.getTimezoneOffset());
+            //d.setTimezoneOffset("+0900");
+            d.setTimezoneOffset(o3);
+            console.log(d.toString());
+            //console.log(d.getTimezone());
+            dataTable.addRows([ [ d, data[i]['status'], data[i]['tooltip'] ] ]);
         }
 
        var chart = new google.visualization.Calendar(myEventChart.get(0));
@@ -361,6 +377,10 @@ function drawEventChart() {
        options['calendar']['cellSize'] = $(window).width() / 60;
        console.log(options);
 
+       var tzf = tzFormatter();
+       var tzf2 = tzFormatter2();
+       tzf.format(dataTable, 0);
+        console.log(Date.today().getTimezone());
        chart.draw(dataTable, options);
     });
 }
