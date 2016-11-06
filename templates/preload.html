@@ -195,8 +195,6 @@ function drawLineChart() {
         tzf.format(data_speed, 0);
         var xTicks = [];
         xRange = data_rank.getColumnRange(0);
-        console.log(xRange);
-        console.log(tzFloor(xRange.min));
         var tick0 = tzFloor(xRange.min);
         if ( tick0 - xRange.min < 0 ) {
             tick0 = tzNext(tick0);
@@ -268,7 +266,7 @@ function drawDistChart() {
     myScoreDistChart = $("#myScoreDistChart", currentPage);
     //myDensityChart = $("#myDensityChart", currentPage);
     //myScoreDensityChart = $("#myScoreDensityChart", currentPage);
-    console.log("drawDistChart");
+    //console.log("drawDistChart");
     if (myDistChart.length == 0) {
         return;
     }
