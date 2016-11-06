@@ -32,6 +32,37 @@ function setAspectRatio() {
     setAspectRatio_i(myDistChart);
     setAspectRatio_i(myScoreDistChart);
 }
+
+function tzFormatter() {
+    return new google.visualization.DateFormat({
+        //formatType: "medium",
+        pattern: "yyyy M-d, HH:mm",
+        timeZone: 9,
+    });
+}
+
+function tzFormatter2() {
+    return new google.visualization.DateFormat({
+        pattern: "yy MM-dd",
+        timeZone: 9,
+    });
+}
+
+function tzFloor(d) {
+    // d is a Date object
+    var day = 86400 * 1000;
+    var offset = 9 * 3600 * 1000;
+    //console.log(d.valueOf());
+    var newv = Math.floor((d.valueOf() + offset) / day) * day - offset;
+    console.log(newv);
+    return new Date(newv);
+}
+
+function tzNext(d) {
+    var day = 86400 * 1000;
+    return new Date(d.valueOf() + day);
+}
+
 $(window).on("pagecreate pageload pagechange pageshow throttledresize", function(e) {
     //console.log("pagecreate/throttledresize", e);
     setAspectRatio();
@@ -93,8 +124,14 @@ function drawLineChart() {
     var options = {
         title: "累計",
         hAxis: {
-            format: 'MM/dd HH:mm',
-            gridlines: {count: 12}
+            //format: 'MM/dd HH:mm Z',
+            //format: 'none',
+            //format: 'MMM d, y',
+            //format: "9ufaoir32q",
+            format: 'M/d/yy',
+            gridlines: {count: 15},
+            textPosition: "out",
+            //ticks: [new Date(2014,3,15)],
         },
         vAxis: {
             minValue: 0,
@@ -108,7 +145,7 @@ function drawLineChart() {
     var options_speed = $.extend({}, options);
     options_speed['interpolateNulls'] = false;
     options_speed['title'] = "時速";
-    //console.log(options);
+    console.log(options);
     //console.log(options_speed);
     if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
         return;
@@ -161,6 +198,34 @@ function drawLineChart() {
         var data_speed = new google.visualization.DataTable(data_list[1]);
         //console.log("dtl", data_list[1]);
         //console.log("draw");
+        // timezone correction
+        var tzf = tzFormatter();
+        var tzf2 = tzFormatter2();
+        tzf.format(data_rank, 0);
+        // http://stackoverflow.com/questions/28764143/formatting-timezone-of-google-charts-datetime-axis-labels
+        var xTicks = [];
+        xRange = data_rank.getColumnRange(0);
+        console.log(xRange);
+        console.log(tzFloor(xRange.min));
+        var tick0 = tzFloor(xRange.min);
+        if ( tick0 - xRange.min < 0 ) {
+            tick0 = tzNext(tick0);
+        }
+        for (var t = tick0; t - xRange.max <= 0; t = tzNext(t)) {
+            xTicks.push({
+                v: t,
+                f: tzf2.formatValue(t),
+            });
+        }
+
+        /*for (var i = 0; i < data_rank.getNumberOfRows(); i++) {
+            xTicks.push({
+                v: data_rank.getValue(i, 0),
+                f: data_rank.getFormattedValue(i, 0),
+            });
+        }*/
+        options["hAxis"]["ticks"] = xTicks;
+
         chart.draw(data_rank, options);
         chart_speed.draw(data_speed, options_speed);
     })

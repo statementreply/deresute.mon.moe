@@ -31,6 +31,37 @@ function setAspectRatio() {
     setAspectRatio_i(myDistChart);
     setAspectRatio_i(myScoreDistChart);
 }
+
+function tzFormatter() {
+    return new google.visualization.DateFormat({
+        //formatType: "medium",
+        pattern: "yyyy M-d, HH:mm",
+        timeZone: 9,
+    });
+}
+
+function tzFormatter2() {
+    return new google.visualization.DateFormat({
+        pattern: "yy MM-dd",
+        timeZone: 9,
+    });
+}
+
+function tzFloor(d) {
+    // d is a Date object
+    var day = 86400 * 1000;
+    var offset = 9 * 3600 * 1000;
+    //console.log(d.valueOf());
+    var newv = Math.floor((d.valueOf() + offset) / day) * day - offset;
+    console.log(newv);
+    return new Date(newv);
+}
+
+function tzNext(d) {
+    var day = 86400 * 1000;
+    return new Date(d.valueOf() + day);
+}
+
 $(window).on("pagecreate pageload pagechange pageshow throttledresize", function(e) {
     //console.log("pagecreate/throttledresize", e);
     setAspectRatio();
@@ -40,7 +71,8 @@ dataurl = $("#dataurl", currentPage).text();
 fancychart = $("#fancychart", currentPage).text();
 // packages 'corechart' 'annotationchart'
 // 'line' for material design
-google.charts.load('current', {packages: ['corechart', 'annotationchart']});
+//google.charts.load('current', {packages: ['corechart', 'annotationchart']});
+google.charts.load('current', {packages: ['corechart']});
 google.charts.setOnLoadCallback(drawLineChart);
 google.charts.setOnLoadCallback(drawDistChart);
 google.charts.setOnLoadCallback(drawChart);
@@ -123,20 +155,25 @@ function drawChart() {
         console.log(data);
         var data_list = [];
         plot_label = ["pt", "時速"];
+        // loop-1?
         for (t=0; t<1; t++) {
             dt = {"cols": [{"id":"timestamp","label":"time","type":"datetime"}],
-                "rows":[]}
+                "rows":[]};
             //console.log("r", cur[0]);
             // cols
             dt["cols"].push({"id":plot_label[t], "label":plot_label[t], "type":"number"});
             dt["cols"].push({"id":plot_label[t+1], "label":plot_label[t+1], "type":"number"});
+            // data[0]: [ [x, y], [x, y], ... [] ]
             cur = data[t];
+            // data[1]
             cur2 = data[t+1];
             // rows
-            for (i=0; i<cur.length; i++) {
+            // skip 1
+            for (i=1; i<cur.length; i++) {
                 row = cur[i];
                 row2 = cur2[i];
                 row_map = {"c": [{"v": new Date(row[0]*1000)}, {"v": row[1]}, {"v": row2[1]}]};
+                console.log(new Date(row[0]*1000));
                 dt["rows"].push(row_map);
             }
             //console.log(dt)
@@ -145,6 +182,24 @@ function drawChart() {
             data_list[t] = dt;
         }
         var data = new google.visualization.DataTable(data_list[0]);
+        var tzf = tzFormatter();
+        var tzf2 = tzFormatter2();
+        tzf.format(data, 0);
+        var xTicks = [];
+        xRange = data.getColumnRange(0);
+        console.log("xRange");
+        console.log(xRange);
+        var tick0 = tzFloor(xRange.min);
+        if ( tick0 - xRange.min < 0 ) {
+            tick0 = tzNext(tick0);
+        }
+        for (var t = tick0; t - xRange.max <= 0; t = tzNext(t)) {
+            xTicks.push({
+                v: t,
+                f: tzf2.formatValue(t),
+            });
+        }
+        options.hAxis.ticks = xTicks;
         chart.draw(data, options);
     });
 }
