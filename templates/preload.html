@@ -204,6 +204,7 @@ function drawLineChart() {
         var tzf = tzFormatter();
         var tzf2 = tzFormatter2();
         tzf.format(data_rank, 0);
+        tzf.format(data_speed, 0);
         // http://stackoverflow.com/questions/28764143/formatting-timezone-of-google-charts-datetime-axis-labels
         var xTicks = [];
         xRange = data_rank.getColumnRange(0);
