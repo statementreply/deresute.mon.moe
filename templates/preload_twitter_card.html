@@ -51,9 +51,7 @@ function tzFloor(d) {
     // d is a Date object
     var day = 86400 * 1000;
     var offset = 9 * 3600 * 1000;
-    //console.log(d.valueOf());
     var newv = Math.floor((d.valueOf() + offset) / day) * day - offset;
-    console.log(newv);
     return new Date(newv);
 }
 
@@ -119,7 +117,6 @@ function drawChart() {
     currentPage = $("body").pagecontainer("getActivePage");
     dataurl = $("#dataurl", currentPage).text();
     eventTitle = $("#eventtitle", currentPage).text();
-    //console.log("dataurl", dataurl);
     fancychart = $("#fancychart", currentPage).text();
     var options = {
         title: eventTitle + " 12万位ボーダー",
@@ -152,14 +149,12 @@ function drawChart() {
     //setAspectRatio_i(myTWCChart);
     chart = new google.visualization.LineChart(myTWCChart.get(0));
     $.getJSON(dataurl, "", function (data) {
-        console.log(data);
         var data_list = [];
         plot_label = ["pt", "時速"];
         // loop-1?
         for (t=0; t<1; t++) {
             dt = {"cols": [{"id":"timestamp","label":"time","type":"datetime"}],
                 "rows":[]};
-            //console.log("r", cur[0]);
             // cols
             dt["cols"].push({"id":plot_label[t], "label":plot_label[t], "type":"number"});
             dt["cols"].push({"id":plot_label[t+1], "label":plot_label[t+1], "type":"number"});
@@ -173,10 +168,8 @@ function drawChart() {
                 row = cur[i];
                 row2 = cur2[i];
                 row_map = {"c": [{"v": new Date(row[0]*1000)}, {"v": row[1]}, {"v": row2[1]}]};
-                console.log(new Date(row[0]*1000));
                 dt["rows"].push(row_map);
             }
-            //console.log(dt)
             // t=0: dt: ranklist
             // t=1: dt: speedlist
             data_list[t] = dt;
@@ -187,8 +180,6 @@ function drawChart() {
         tzf.format(data, 0);
         var xTicks = [];
         xRange = data.getColumnRange(0);
-        console.log("xRange");
-        console.log(xRange);
         var tick0 = tzFloor(xRange.min);
         if ( tick0 - xRange.min < 0 ) {
             tick0 = tzNext(tick0);

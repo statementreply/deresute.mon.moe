@@ -35,6 +35,7 @@ function setAspectRatio() {
     setAspectRatio_i(myScoreDistChart);
 }
 
+// JST datetime formatters
 function tzFormatter() {
     return new google.visualization.DateFormat({
         //formatType: "medium",
@@ -50,16 +51,16 @@ function tzFormatter2() {
     });
 }
 
+// truncate to day in JST
 function tzFloor(d) {
     // d is a Date object
     var day = 86400 * 1000;
     var offset = 9 * 3600 * 1000;
-    //console.log(d.valueOf());
     var newv = Math.floor((d.valueOf() + offset) / day) * day - offset;
-    console.log(newv);
     return new Date(newv);
 }
 
+// next day
 function tzNext(d) {
     var day = 86400 * 1000;
     return new Date(d.valueOf() + day);
@@ -70,10 +71,10 @@ $(window).on("pagecreate pageload pagechange pageshow throttledresize", function
     setAspectRatio();
 });
 dataurl = $("#dataurl", currentPage).text();
-//console.log("dataurl", dataurl);
 fancychart = $("#fancychart", currentPage).text();
 // packages 'corechart' 'annotationchart'
 // 'line' for material design
+// 'calendar' for event date calendar
 google.charts.load('current', {packages: ['corechart', 'annotationchart', 'calendar']});
 google.charts.setOnLoadCallback(drawChart);
 google.charts.setOnLoadCallback(pageChange);
@@ -84,7 +85,6 @@ function drawChart() {
 }
 
 function pageChange() {
-    //console.log("pagechange");
     $(window).on("pagechange", function() {
         drawChart();
         //console.log("pagechange");
@@ -120,20 +120,16 @@ function drawLineChart() {
     updateLatestData();
     currentPage = $("body").pagecontainer("getActivePage");
     dataurl = $("#dataurl", currentPage).text();
-    //console.log("dataurl", dataurl);
     fancychart = $("#fancychart", currentPage).text();
 
     var options = {
         title: "累計",
         hAxis: {
+            // format and gridlines are overridden by ticks
             //format: 'MM/dd HH:mm Z',
-            //format: 'none',
-            //format: 'MMM d, y',
-            //format: "9ufaoir32q",
             format: 'M/d/yy',
             gridlines: {count: 15},
             textPosition: "out",
-            //ticks: [new Date(2014,3,15)],
         },
         vAxis: {
             minValue: 0,
@@ -147,17 +143,12 @@ function drawLineChart() {
     var options_speed = $.extend({}, options);
     options_speed['interpolateNulls'] = false;
     options_speed['title'] = "時速";
-    console.log(options);
-    //console.log(options_speed);
     if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
         return;
     }
     myLineChart = $("#myLineChart", currentPage);
     mySpeedChart = $("#mySpeedChart", currentPage);
-    //console.log("drawLineChart, call setAspectRatio()");
     setAspectRatio();
-    //console.log("drawLineChart, call setAspectRatio() return");
-    //console.log("drawLineChart,", myLineChart, mySpeedChart);
     var chart;
     var chart_speed;
     if (fancychart == 0) {
@@ -172,12 +163,11 @@ function drawLineChart() {
 
     $.getJSON(dataurl, "", function (data) {
         var data_list = [];
-        for (t=0; t<2; t++) {
+        for (t=0; t<2; t++) { // loop: t=0, t=1
             dt = {"cols": [{"id":"timestamp","label":"timestamp","type":"datetime"}],
                 "rows":[]}
             cur = data[t];
-            //console.log("r", cur[0]);
-            // cols
+            // cols: cur[0] contains column labels
             for (i=0; i<cur[0].length; i++) {
                 dt["cols"].push({"id":cur[0][i], "label":cur[0][i], "type":"number"})
             }
@@ -190,7 +180,6 @@ function drawLineChart() {
                 }
                 dt["rows"].push(row_map)
             }
-            //console.log(dt)
             // t=0: dt: ranklist
             // t=1: dt: speedlist
             data_list[t] = dt;
@@ -198,14 +187,12 @@ function drawLineChart() {
 
         var data_rank = new google.visualization.DataTable(data_list[0]);
         var data_speed = new google.visualization.DataTable(data_list[1]);
-        //console.log("dtl", data_list[1]);
-        //console.log("draw");
+
         // timezone correction
         var tzf = tzFormatter();
         var tzf2 = tzFormatter2();
         tzf.format(data_rank, 0);
         tzf.format(data_speed, 0);
-        // http://stackoverflow.com/questions/28764143/formatting-timezone-of-google-charts-datetime-axis-labels
         var xTicks = [];
         xRange = data_rank.getColumnRange(0);
         console.log(xRange);
@@ -221,6 +208,7 @@ function drawLineChart() {
             });
         }
 
+        // http://stackoverflow.com/questions/28764143/formatting-timezone-of-google-charts-datetime-axis-labels
         /*for (var i = 0; i < data_rank.getNumberOfRows(); i++) {
             xTicks.push({
                 v: data_rank.getValue(i, 0),
