@@ -11,7 +11,9 @@ my $config = LoadFile("secret.yaml");
 if ((exists $$config{"twitter_dummy"}) and ($$config{"twitter_dummy"} != 0)) {
     # testmode
     print "twitter.pl called: <@ARGV>\n";
-    exit 0;
+    #exit 0;
+    # test retry
+    exit 1;
 }
 my $nt = Net::Twitter->new(
     "ssl"      => 1,
@@ -37,7 +39,9 @@ eval {
 
 if ($@) {
     print "err: $@\n";
+    exit 1;
 } else {
     print "no err: $result\n";
+    exit 0;
 }
 

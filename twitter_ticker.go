@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"regexp"
 	"sync"
@@ -123,6 +124,8 @@ func (p *Periodic) Run() {
 				err = ioutil.WriteFile(p.cache_filename, body, 0644)
 				if err != nil {
 					log.Println("cannot write file", err)
+					// FIXME
+					goto Retry
 				}
 
 				if p.dryrun {
@@ -133,6 +136,10 @@ func (p *Periodic) Run() {
 				log.Println(string(result))
 				if err != nil {
 					log.Println("error occured", err)
+					err = os.Remove(p.cache_filename)
+					if err != nil {
+						log.Println("cannot remove file", p.cache_filename)
+					}
 					goto Retry
 				}
 
@@ -140,6 +147,7 @@ func (p *Periodic) Run() {
 				quotient = quotient_new
 				break
 			Retry: // continue block
+				log.Println("in retry")
 				time.Sleep(p.interval)
 			}
 		}
