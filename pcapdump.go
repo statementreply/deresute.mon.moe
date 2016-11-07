@@ -215,8 +215,10 @@ func processHTTP(t string, req *http.Request, bodyReader io.ReadCloser, h *httpS
 		outputLock.Lock()
 		fmt.Println("=======================================================")
 		fmt.Println(t+" URL:", Host, URL, h.net, h.transport)
-		fmt.Println("udid:", msg_iv)
-		fmt.Println("user:", apiclient.Unlolfuscate(req.Header.Get("USER_ID")))
+		if isDereAPI {
+			fmt.Println("udid:", msg_iv)
+			fmt.Println("user:", apiclient.Unlolfuscate(req.Header.Get("USER_ID")))
+		}
 		//fmt.Println("viewer_id:", content["viewer_id"])
 		//fmt.Println("bodylen: ", len(body))
 		//fmt.Println("msg_iv ", msg_iv)
