@@ -5,6 +5,7 @@ use Net::Twitter;
 use YAML qw(LoadFile);
 use Encode qw(decode encode);
 use utf8;
+use Scalar::Util 'blessed';
 
 my $config = LoadFile("secret.yaml");
 #print "$config\n";
