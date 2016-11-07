@@ -38,7 +38,10 @@ eval {
 };
 
 if ($@) {
-    print "err: $@\n";
+    my $err = $@;
+    print "err: $err\n";
+    die $err unless blessed $err && $err->isa("Net::Twitter::Error");
+    print "err msg <", $err->error, ">\n";
     exit 1;
 } else {
     print "no err: $result\n";
