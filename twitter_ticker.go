@@ -111,9 +111,11 @@ func (p *Periodic) Run() {
 				}
 
 				if bytes.Equal(body, content) {
+					log.Println("body content equal")
 					goto Retry
 				}
 				if updatingFilter.Match(body) {
+					log.Println("updatingfilter match")
 					goto Retry
 				}
 				if emptyFilter.Match(body) {
