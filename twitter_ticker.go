@@ -81,7 +81,7 @@ func (p *Periodic) Run() {
 			for {
 				content, err := ioutil.ReadFile(p.cache_filename)
 				if err != nil {
-					log.Println("cannot read cache_file", err)
+					log.Println(p.url, "cannot read cache_file", err)
 					content = []byte("")
 				}
 				//log.Println("content is", string(content))
@@ -89,43 +89,43 @@ func (p *Periodic) Run() {
 
 				resp, err := http.Get(p.url)
 				if err != nil {
-					log.Println("cannot get url", err)
+					log.Println(p.url, "cannot get url", err)
 					goto Retry
 				}
 
 				body, err = ioutil.ReadAll(resp.Body)
 				resp.Body.Close()
 				if err != nil {
-					log.Println("cannot read respbody", err)
+					log.Println(p.url, "cannot read respbody", err)
 					goto Retry
 				}
 
 				//log.Println("body is", string(body))
 				if waitFilter.Match(body) {
-					log.Println("wait filter matched")
+					log.Println(p.url, "wait filter matched")
 					goto Finish
 				}
 				if resultFilter.Match(content) && resultFilter.Match(body) {
-					log.Println("don't post final twice")
+					log.Println(p.url, "don't post final twice")
 					goto Finish
 				}
 
 				if bytes.Equal(body, content) {
-					log.Println("body content equal")
+					log.Println(p.url, "body content equal")
 					goto Retry
 				}
 				if updatingFilter.Match(body) {
-					log.Println("updatingfilter match")
+					log.Println(p.url, "updatingfilter match")
 					goto Retry
 				}
 				if emptyFilter.Match(body) {
-					log.Println("empty response")
+					log.Println(p.url, "empty response")
 					goto Finish
 				}
 
 				err = ioutil.WriteFile(p.cache_filename, body, 0644)
 				if err != nil {
-					log.Println("cannot write file", err)
+					log.Println(p.url, "cannot write file", err)
 					// FIXME
 					goto Retry
 				}
@@ -137,10 +137,10 @@ func (p *Periodic) Run() {
 				result, err = exec.Command("perl", "twitter.pl", string(body)).CombinedOutput()
 				log.Println(string(result))
 				if err != nil {
-					log.Println("error occured", err)
+					log.Println(p.url, "error occured", err)
 					err = os.Remove(p.cache_filename)
 					if err != nil {
-						log.Println("cannot remove file", p.cache_filename)
+						log.Println(p.url, "cannot remove file", p.cache_filename)
 					}
 					goto Retry
 				}
@@ -149,7 +149,7 @@ func (p *Periodic) Run() {
 				quotient = quotient_new
 				break
 			Retry: // continue block
-				log.Println("in retry")
+				log.Println(p.url, "in retry")
 				time.Sleep(p.interval)
 			}
 		}
