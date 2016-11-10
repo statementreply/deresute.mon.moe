@@ -37,33 +37,42 @@ func (e *EventDetail) Id() int {
 	return e.id
 }
 
-// not exported: NoticeStart
+// time-related
+func demask(t time.Time) time.Time {
+	if t.Year() < 2099 {
+		return t
+	} else {
+		ynow := time.Now().Year()
+		return t.AddDate(ynow - t.Year(), 0, 0)
+	}
+}
+
 func (e *EventDetail) NoticeStart() time.Time {
-	return e.notice_start
+	return demask(e.notice_start)
 }
 
 func (e *EventDetail) EventStart() time.Time {
-	return e.event_start
+	return demask(e.event_start)
 }
 
 func (e *EventDetail) SecondHalfStart() time.Time {
-	return e.second_half_start
+	return demask(e.second_half_start)
 }
 
 func (e *EventDetail) EventEnd() time.Time {
-	return e.event_end
+	return demask(e.event_end)
 }
 
 func (e *EventDetail) CalcStart() time.Time {
-	return e.calc_start
+	return demask(e.calc_start)
 }
 
 func (e *EventDetail) ResultStart() time.Time {
-	return e.result_start
+	return demask(e.result_start)
 }
 
 func (e *EventDetail) ResultEnd() time.Time {
-	return e.result_end
+	return demask(e.result_end)
 }
 
 func (e *EventDetail) LoginBonusType() int {
