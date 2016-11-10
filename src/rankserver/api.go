@@ -166,9 +166,9 @@ func (r *RankServer) eventDataHandler(w http.ResponseWriter, req *http.Request) 
 		})
 		//fmt.Println("end:", end.Unix()/86400)
 	}
-	today_tooltip := "今日"
-	if r.currentEvent != nil {
-		// FIXME: this also includes result period
+	today_tooltip := "今日 " + ts.FormatDate(time.Now())
+	// FIXME: cut at event_end
+	if r.currentEvent != nil && !time.Now().After(r.currentEvent.EventEnd()) {
 		today_tooltip += "\n" + r.currentEvent.Name()
 	}
 	list_day = append(list_day, eventDataRow{
