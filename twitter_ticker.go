@@ -69,11 +69,11 @@ func (p *Periodic) Run() {
 	//quotient := (time.Duration(time.Now().UnixNano()) - p.rem) / p.div;
 	quotient := time.Duration(0)
 
+	// too complex state transition
+	// the presence of a cache file indicates that the post action SUCCEEDED
 	for {
 		select {
-		case t := <-ticker.C:
-			// discard...
-			_ = t
+		case _ := <-ticker.C: // discard return value
 			quotient_new := (time.Duration(time.Now().UnixNano()) - p.rem) / p.div
 			if quotient_new <= quotient {
 				continue
