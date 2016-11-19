@@ -287,7 +287,7 @@ func (r *ResourceMgr) ParseEvent() {
 			limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count, ""}
 		if e.typ == 3 {
 			e.music_name = r.FindMedleyTitle(e.id)
-			log.Println("find groove music name", e.music_name)
+			//log.Println("find groove music name", e.music_name)
 		}
 		// deduplicate
 		// new override old
@@ -342,7 +342,7 @@ func (r *ResourceMgr) FindMedleyTitle(id int) string {
 			log.Println("err scan music_data_id")
 			break
 		}
-		log.Println("event id", id, "music_data_id", music_data_id)
+		//log.Println("event id", id, "music_data_id", music_data_id)
 	}
 	err = rows.Err()
 	if err != nil {
