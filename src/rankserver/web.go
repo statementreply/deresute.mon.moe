@@ -488,6 +488,7 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 				EventEnd:   formatter(e.EventEnd()),
 			},
 		)
+		r.logger.Println("test FindMedleyTitle", r.resourceMgr.FindMedleyTitle(e.Id()))
 	}
 	err := rsTmpl.ExecuteTemplate(w, "event.html", tmplVar)
 	if err != nil {

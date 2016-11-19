@@ -174,6 +174,7 @@ func (r *ResourceMgr) LoadMaster() string {
 		var category string
 		var decrypt_key []byte
 		err = rows.Scan(&name, &hash, &attr, &category, &decrypt_key)
+		// FIXME err handling
 		if name == "master.mdb" {
 			//log.Println(name, hash, attr, category, decrypt_key)
 			master, err = r.FetchLz4("dl/resources/Generic//" + hash)
@@ -313,4 +314,50 @@ func (r *ResourceMgr) FindLatestEvent() *EventDetail {
 
 func (r *ResourceMgr) FindEventById(id int) *EventDetail {
 	return r.EventList.FindEventById(id)
+}
+
+// medley event id to music title
+func (r *ResourceMgr) FindMedleyTitle(id int) string {
+	var music_data_id int
+	var music_name string
+	master := r.LoadMaster()
+	db, err := sql.Open("sqlite3", master)
+	if err != nil {
+		log.Println("open masterdb", err)
+		return ""
+	}
+	defer db.Close()
+	// FIXME sanity check id is in range 1000-10000?
+	rows, err := db.Query("SELECT music_data_id FROM live_data WHERE sort=$1;", id)
+	// FIXME err handling
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&music_data_id)
+		if err != nil {
+			log.Println("err scan music_data_id")
+			break
+		}
+		log.Println("event id", id, "music_data_id", music_data_id)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Println("err scan music_data_id xxx")
+		return ""
+	}
+
+	rows, err = db.Query("SELECT name FROM music_data WHERE id=$1;", music_data_id)
+	if err != nil {
+		log.Println("bad")
+		return ""
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&music_name)
+		if err != nil {
+			log.Println("err music_data")
+			break
+		}
+		log.Println("event_id", id, "music_data_id", music_data_id, "title", music_name)
+	}
+	return music_name
 }

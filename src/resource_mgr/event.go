@@ -172,3 +172,15 @@ func (eventList *EventDetailList) Overwrite(e_new *EventDetail) {
 		}
 	}
 }
+
+// from groove event id to music title
+// event id 3012 => あいくるしい
+// music id 5029
+// live data 317, 527
+
+// event id 3011 =>
+// music id 9009
+// live id 313 523
+
+// live_data table
+// id, music_data_id, sort = event_id
