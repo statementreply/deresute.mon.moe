@@ -281,9 +281,14 @@ func (r *ResourceMgr) ParseEvent() {
 		//log.Println(ParseTime(event_start), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end))
 		//log.Println(id, typ, name, limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count)
 		//ParseTime(notice_start), event_start, second_half_start, event_end, calc_start, result_start, result_end,
+		// FIXME: order-dependent**
 		e := &EventDetail{id, typ, name,
 			ParseTime(notice_start), ParseTime(event_start), ParseTime(second_half_start), ParseTime(event_end), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end),
-			limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count}
+			limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count, ""}
+		if e.typ == 3 {
+			e.music_name = r.FindMedleyTitle(e.id)
+			log.Println("find groove music name", e.music_name)
+		}
 		// deduplicate
 		// new override old
 		if r.EventList.FindEventById(e.Id()) == nil {

@@ -2,12 +2,14 @@ package resource_mgr
 
 import (
 	"regexp"
+	"strings"
 	"time"
 )
 
 var grooveFilter = regexp.MustCompile("LIVE Groove")
 
 type EventDetail struct {
+	// content of table event_data
 	id, typ                                   int
 	name                                      string
 	notice_start                              time.Time
@@ -15,6 +17,8 @@ type EventDetail struct {
 	calc_start, result_start, result_end      time.Time
 	limit_flag, bg_type, bg_id                int
 	login_bonus_type, login_bonus_count       int
+	// extra, for medley event
+	music_name string
 }
 
 func (e *EventDetail) Type() int {
@@ -184,3 +188,10 @@ func (eventList *EventDetailList) Overwrite(e_new *EventDetail) {
 
 // live_data table
 // id, music_data_id, sort = event_id
+
+func (e *EventDetail) MusicName() string {
+	if e.typ != 3 {
+		return e.name
+	}
+	return strings.Replace(e.music_name, "\\n", "", -1)
+}

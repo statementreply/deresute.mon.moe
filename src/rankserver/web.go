@@ -479,6 +479,10 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 			name_tmp := `<a href="qchart?event=` + strconv.Itoa(e.Id()) + `">` + string(name) + `</a>`
 			name = template.HTML(name_tmp)
 		}
+		// FIXME: visible change
+		if e.Type() == 3 {
+			name += template.HTML(template.HTMLEscapeString(" = " + e.MusicName()))
+		}
 		tmplVar.EventList = append(
 			tmplVar.EventList,
 			&eventInfo{
@@ -488,7 +492,7 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 				EventEnd:   formatter(e.EventEnd()),
 			},
 		)
-		r.logger.Println("test FindMedleyTitle", r.resourceMgr.FindMedleyTitle(e.Id()))
+		//r.logger.Println("test FindMedleyTitle", r.resourceMgr.FindMedleyTitle(e.Id()))
 	}
 	err := rsTmpl.ExecuteTemplate(w, "event.html", tmplVar)
 	if err != nil {
