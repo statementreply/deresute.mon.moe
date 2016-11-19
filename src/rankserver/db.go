@@ -69,6 +69,7 @@ func (r *RankServer) CheckData() {
 	// check new res_ver
 	// FIXME need some test
 	// FIXME race condition
+	// FIXME: check at event start time (less than 1hr?)
 	if (time.Now().Sub(r.lastCheck) >= 1*time.Hour) || ((r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 2*time.Hour)) {
 		r.logger.Println("recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
 		r.lastCheck = time.Now()

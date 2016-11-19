@@ -71,6 +71,7 @@ func (p *Periodic) Run() {
 
 	// too complex state transition
 	// the presence of a cache file indicates that the post action SUCCEEDED
+	// FIXME: must parse twitter content to determine timestamp
 	for {
 		select {
 		case _ := <-ticker.C: // discard return value
