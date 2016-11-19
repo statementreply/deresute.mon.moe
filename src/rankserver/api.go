@@ -180,10 +180,19 @@ func (r *RankServer) eventDataHandler(w http.ResponseWriter, req *http.Request) 
 	if err != nil {
 		r.logger.Fatalln(err)
 	}
+	game_start2, err := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Thu Sep 10 12:00:00 +0900 JST 2015")
+	if err != nil {
+		r.logger.Fatalln(err)
+	}
 	list_day = append(list_day, eventDataRow{
 		T:       game_start.Unix(),
 		Status:  0,
-		Tooltip: "150903\n配信開始",
+		Tooltip: "150903\nAndroid版配信開始",
+	})
+	list_day = append(list_day, eventDataRow{
+		T:       game_start2.Unix(),
+		Status:  0,
+		Tooltip: "150910\niOS版配信開始",
 	})
 	b, err := json.Marshal(list_day)
 	if err != nil {
