@@ -74,7 +74,7 @@ func (p *Periodic) Run() {
 	// FIXME: must parse twitter content to determine timestamp
 	for {
 		select {
-		case _ := <-ticker.C: // discard return value
+		case _ = <-ticker.C: // discard return value
 			quotient_new := (time.Duration(time.Now().UnixNano()) - p.rem) / p.div
 			if quotient_new <= quotient {
 				continue
