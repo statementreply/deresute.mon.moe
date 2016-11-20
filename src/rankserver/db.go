@@ -75,13 +75,16 @@ func (r *RankServer) CheckData() {
 		r.lastCheck = time.Now()
 		// try to restart session (session expires after certain time)
 		r.client.Reset_sid()
+		old_rv := r.client.Get_res_ver()
 		r.client.LoadCheck()
 		rv := r.client.Get_res_ver()
-		r.resourceMgr.Set_res_ver(rv)
-		r.logger.Println("new res_ver:", rv)
-		r.resourceMgr.ParseEvent()
-		r.currentEvent = r.resourceMgr.FindCurrentEvent()
-		r.latestEvent = r.resourceMgr.FindLatestEvent()
+		if rv != old_rv {
+			r.resourceMgr.Set_res_ver(rv)
+			r.logger.Println("new res_ver:", rv)
+			r.resourceMgr.ParseEvent()
+			r.currentEvent = r.resourceMgr.FindCurrentEvent()
+			r.latestEvent = r.resourceMgr.FindLatestEvent()
+		}
 	}
 }
 
