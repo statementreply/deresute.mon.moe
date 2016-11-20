@@ -322,6 +322,7 @@ func (r *ResourceMgr) FindEventById(id int) *EventDetail {
 }
 
 // medley event id to music title
+// bug sort is bad...
 func (r *ResourceMgr) FindMedleyTitle(id int) string {
 	var music_data_id int
 	var music_name string
@@ -333,36 +334,25 @@ func (r *ResourceMgr) FindMedleyTitle(id int) string {
 	}
 	defer db.Close()
 	// FIXME sanity check id is in range 1000-10000?
-	rows, err := db.Query("SELECT music_data_id FROM live_data WHERE sort=$1;", id)
-	// FIXME err handling
-	defer rows.Close()
-	for rows.Next() {
-		err = rows.Scan(&music_data_id)
-		if err != nil {
-			log.Println("err scan music_data_id")
-			break
-		}
-		//log.Println("event id", id, "music_data_id", music_data_id)
-	}
-	err = rows.Err()
+	row := db.QueryRow("SELECT music_data_id FROM live_data WHERE sort=$1;", id)
+	err = row.Scan(&music_data_id)
 	if err != nil {
-		log.Println("err scan music_data_id xxx")
+		if err == sql.ErrNoRows {
+			return ""
+		}
+		log.Println("err scan music_data_id")
 		return ""
 	}
 
-	rows, err = db.Query("SELECT name FROM music_data WHERE id=$1;", music_data_id)
+	row = db.QueryRow("SELECT name FROM music_data WHERE id=$1;", music_data_id)
+	err = row.Scan(&music_name)
 	if err != nil {
-		log.Println("bad")
+		if err == sql.ErrNoRows {
+			return ""
+		}
+		log.Println("err music_data")
 		return ""
 	}
-	defer rows.Close()
-	for rows.Next() {
-		err = rows.Scan(&music_name)
-		if err != nil {
-			log.Println("err music_data")
-			break
-		}
-		log.Println("event_id", id, "music_data_id", music_data_id, "title", music_name)
-	}
+	log.Println("event_id", id, "music_data_id", music_data_id, "title", music_name)
 	return music_name
 }
