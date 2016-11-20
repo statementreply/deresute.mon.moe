@@ -398,7 +398,7 @@ Map02:
 		return ""
 	}
 
-//Map03:
+	//Map03:
 	row = db.QueryRow("SELECT title FROM story_category WHERE id=$1;", category_id)
 	err = row.Scan(&title)
 	if err != nil {

@@ -47,7 +47,7 @@ func demask(t time.Time) time.Time {
 		return t
 	} else {
 		ynow := time.Now().Year()
-		return t.AddDate(ynow - t.Year(), 0, 0)
+		return t.AddDate(ynow-t.Year(), 0, 0)
 	}
 }
 
@@ -189,7 +189,6 @@ func (eventList *EventDetailList) Overwrite(e_new *EventDetail) {
 
 // live_data table
 // id, music_data_id, sort = event_id
-
 
 // new workflow
 // event id
