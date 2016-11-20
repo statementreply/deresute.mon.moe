@@ -179,6 +179,7 @@ func (eventList *EventDetailList) Overwrite(e_new *EventDetail) {
 
 // from groove event id to music title
 // event id 3012 => あいくるしい
+// story category id 272
 // music id 5029
 // live data 317, 527
 
@@ -189,8 +190,18 @@ func (eventList *EventDetailList) Overwrite(e_new *EventDetail) {
 // live_data table
 // id, music_data_id, sort = event_id
 
+
+// new workflow
+// event id
+// => medley_story_detail  *tour_story_detail   "event_id -> id"
+// story id
+// => story detail   "id -> category_id"
+// story category id
+// => story_category "id -> title"
+// title
+
 func (e *EventDetail) MusicName() string {
-	if e.typ != 3 {
+	if e.typ != 3 && e.typ != 5 {
 		return e.name
 	}
 	return strings.Replace(e.music_name, "\\n", "", -1)

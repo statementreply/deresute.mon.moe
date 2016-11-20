@@ -285,8 +285,8 @@ func (r *ResourceMgr) ParseEvent() {
 		e := &EventDetail{id, typ, name,
 			ParseTime(notice_start), ParseTime(event_start), ParseTime(second_half_start), ParseTime(event_end), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end),
 			limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count, ""}
-		if e.typ == 3 {
-			e.music_name = r.FindMedleyTitle(e.id)
+		if e.typ == 3 || e.typ == 5 {
+			e.music_name = r.FindMedleyTitle(e)
 			//log.Println("find groove music name", e.music_name)
 		}
 		// deduplicate
@@ -323,9 +323,18 @@ func (r *ResourceMgr) FindEventById(id int) *EventDetail {
 
 // medley event id to music title
 // bug sort is bad...
-func (r *ResourceMgr) FindMedleyTitle(id int) string {
-	var music_data_id int
-	var music_name string
+func (r *ResourceMgr) FindMedleyTitle(e *EventDetail) string {
+	var id int
+	id = e.Id()
+	var typ int
+	typ = e.Type()
+
+	var story_id int
+	story_id = -1
+	var category_id int
+	var title string
+
+	var row *sql.Row
 	master := r.LoadMaster()
 	db, err := sql.Open("sqlite3", master)
 	if err != nil {
@@ -333,19 +342,54 @@ func (r *ResourceMgr) FindMedleyTitle(id int) string {
 		return ""
 	}
 	defer db.Close()
+
 	// FIXME sanity check id is in range 1000-10000?
-	row := db.QueryRow("SELECT music_data_id FROM live_data WHERE sort=$1;", id)
-	err = row.Scan(&music_data_id)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return ""
-		}
-		log.Println("err scan music_data_id")
+
+	if typ == 3 {
+		goto Map01Medley
+	} else if typ == 5 {
+		goto Map01Tour
+	} else if typ == 1 {
+		goto Map01Atapon
+	} else {
 		return ""
 	}
+Map01Medley:
+	row = db.QueryRow("SELECT id FROM medley_story_detail WHERE event_id=$1;", id)
+	err = row.Scan(&story_id)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Println("err scan music_data_id")
+		}
+		return ""
+	}
+	goto Map02
 
-	row = db.QueryRow("SELECT name FROM music_data WHERE id=$1;", music_data_id)
-	err = row.Scan(&music_name)
+Map01Tour:
+	row = db.QueryRow("SELECT id FROM tour_story_detail WHERE event_id=$1;", id)
+	err = row.Scan(&story_id)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Println("err scan music_data_id")
+		}
+		return ""
+	}
+	goto Map02
+
+Map01Atapon:
+	row = db.QueryRow("SELECT id FROM atapon_story_detail WHERE event_id=$1;", id)
+	err = row.Scan(&story_id)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Println("err scan music_data_id")
+		}
+		return ""
+	}
+	goto Map02
+
+Map02:
+	row = db.QueryRow("SELECT category_id FROM story_detail WHERE id=$1;", story_id)
+	err = row.Scan(&category_id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return ""
@@ -353,6 +397,18 @@ func (r *ResourceMgr) FindMedleyTitle(id int) string {
 		log.Println("err music_data")
 		return ""
 	}
-	log.Println("event_id", id, "music_data_id", music_data_id, "title", music_name)
-	return music_name
+
+//Map03:
+	row = db.QueryRow("SELECT title FROM story_category WHERE id=$1;", category_id)
+	err = row.Scan(&title)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return ""
+		}
+		log.Println("err music_data")
+		return ""
+	}
+
+	log.Println("event_id", id, "story_id", story_id, "category_id", category_id, "title", title)
+	return title
 }

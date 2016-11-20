@@ -480,7 +480,7 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 			name = template.HTML(name_tmp)
 		}
 		// FIXME: visible change
-		if e.Type() == 3 {
+		if e.Type() == 3 || e.Type() == 5 {
 			name += template.HTML(template.HTMLEscapeString(" = " + e.MusicName()))
 		}
 		tmplVar.EventList = append(
