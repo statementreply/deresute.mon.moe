@@ -206,8 +206,14 @@ func (e *EventDetail) MusicName() string {
 	}
 	// special case live groove without story
 
-	//if e.id == xxx {
-	//	return ""
-	//}
+	if e.id == 3001 {
+		return "夢色ハーモニー"
+	}
+	if e.id == 3002 {
+		return "流れ星キセキ"
+	}
+	if e.id == 3005 {
+		return "Absolute NIne"
+	}
 	return strings.Replace(e.music_name, "\\n", "", -1)
 }
