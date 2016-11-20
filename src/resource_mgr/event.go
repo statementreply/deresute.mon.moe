@@ -204,5 +204,10 @@ func (e *EventDetail) MusicName() string {
 	if e.typ != 3 && e.typ != 5 {
 		return e.name
 	}
+	// special case live groove without story
+
+	//if e.id == xxx {
+	//	return ""
+	//}
 	return strings.Replace(e.music_name, "\\n", "", -1)
 }
