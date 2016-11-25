@@ -473,7 +473,9 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	tmplVar := r.getTmplVar(w, req)
 	formatter := ts.FormatTime
-	for _, e := range r.resourceMgr.EventList {
+	n := len(r.resourceMgr.EventList)
+	tmplVar.EventList = make([]*eventInfo, n)
+	for i, e := range r.resourceMgr.EventList {
 		name := template.HTML(template.HTMLEscapeString(e.Name()))
 		if r.isEventAvailable(e) {
 			name_tmp := `<a href="qchart?event=` + strconv.Itoa(e.Id()) + `">` + string(name) + `</a>`
@@ -483,6 +485,7 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 		if e.Type() == 3 || e.Type() == 5 {
 			name += template.HTML(template.HTMLEscapeString(" = " + e.MusicName()))
 		}
+		/*
 		tmplVar.EventList = append(
 			tmplVar.EventList,
 			&eventInfo{
@@ -492,6 +495,14 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 				EventEnd:   formatter(e.EventEnd()),
 			},
 		)
+		*/
+		tmplVar.EventList[n-i-1] =
+			&eventInfo{
+				EventLink:  name,
+				EventStart: formatter(e.EventStart()),
+				EventHalf:  formatter(e.SecondHalfStart()),
+				EventEnd:   formatter(e.EventEnd()),
+			}
 		//r.logger.Println("test FindMedleyTitle", r.resourceMgr.FindMedleyTitle(e.Id()))
 	}
 	err := rsTmpl.ExecuteTemplate(w, "event.html", tmplVar)
