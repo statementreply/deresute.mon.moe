@@ -487,15 +487,15 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 			name += template.HTML(template.HTMLEscapeString(" = " + e.MusicName()))
 		}
 		/*
-		tmplVar.EventList = append(
-			tmplVar.EventList,
-			&eventInfo{
-				EventLink:  name,
-				EventStart: formatter(e.EventStart()),
-				EventHalf:  formatter(e.SecondHalfStart()),
-				EventEnd:   formatter(e.EventEnd()),
-			},
-		)
+			tmplVar.EventList = append(
+				tmplVar.EventList,
+				&eventInfo{
+					EventLink:  name,
+					EventStart: formatter(e.EventStart()),
+					EventHalf:  formatter(e.SecondHalfStart()),
+					EventEnd:   formatter(e.EventEnd()),
+				},
+			)
 		*/
 		tmplVar.EventList[n-i-1] =
 			&eventInfo{
