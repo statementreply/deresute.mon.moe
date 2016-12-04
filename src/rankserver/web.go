@@ -394,6 +394,7 @@ func (r *RankServer) distHandler(w http.ResponseWriter, req *http.Request) {
 	if isFinal {
 		// should be in range ResultStart ResultEnd
 		// and in the current list of timestamps
+		// FIXME when the final result is not yet available
 		for _, t := range r.GetListTimestamp() {
 			t0 := ts.TimestampToTime(t)
 			if (!t0.Before(tmplVar.event.ResultStart())) && (!t0.After(tmplVar.event.ResultEnd())) {
