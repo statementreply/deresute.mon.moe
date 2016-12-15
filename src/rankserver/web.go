@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 	"regexp"
 	"resource_mgr"
 	"sort"
@@ -512,6 +513,28 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func Exists(fileName string) bool {
+    _, err := os.Stat(fileName)
+    if err == nil {
+        return true
+    } else {
+        if os.IsNotExist(err) {
+            return false
+        } else {
+            return true
+        }
+    }
+}
+
+func IsDir(fileName string) bool {
+	fi, err := os.Stat(fileName)
+	if err == nil {
+		return fi.IsDir()
+	} else {
+		return false
+	}
+}
+
 func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	if !staticFilter.MatchString(req.URL.Path) {
@@ -524,6 +547,11 @@ func (r *RankServer) staticHandler(w http.ResponseWriter, req *http.Request) {
 
 	//r.logger.Println(req.URL, filename, "<"+path+">")
 	r.logger.Println("[INFO] servefile", filename)
+	// block dir
+	if Exists(filename) && (!IsDir(filename)) {
+	} else {
+		filename = "/dev/null"
+	}
 	http.ServeFile(w, req, filename)
 }
 
