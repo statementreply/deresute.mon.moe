@@ -58,16 +58,7 @@ func MakeRankServer() *RankServer {
 	r.config = config
 	fmt.Println(config)
 
-	confLOG_FILE, ok := config["LOG_FILE"]
-	if ok {
-		LOG_FILE = confLOG_FILE
-	}
-	log.Print("logfile is ", LOG_FILE)
-	fh, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
-	if err != nil {
-		log.Fatalln("open log file", err)
-	}
-	r.logger = log.New(fh, "", log.LstdFlags)
+	r.openLog()
 
 	r.rankDB = RANK_DB
 	r.db, err = sql.Open("sqlite3", "file:"+r.rankDB+"?mode=ro")
@@ -76,6 +67,7 @@ func MakeRankServer() *RankServer {
 	}
 	//r.setCacheSize()
 
+	var ok bool
 	r.keyFile, ok = config["KEY_FILE"]
 	if !ok {
 		r.keyFile = ""
@@ -147,6 +139,27 @@ func MakeRankServer() *RankServer {
 	//log.Println(r.currentEvent.Name(), r.latestEvent.Name())
 	r.lastCheck = time.Now()
 	return r
+}
+
+func (r *RankServer) openLog() {
+	confLOG_FILE, ok := r.config["LOG_FILE"]
+	if ok {
+		LOG_FILE = confLOG_FILE
+	}
+	log.Print("logfile is ", LOG_FILE)
+	fh, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
+	if err != nil {
+		log.Fatalln("open log file", err)
+	}
+	if r.logger == nil {
+		r.logger = log.New(fh, "", log.LstdFlags)
+	} else {
+		r.logger.SetOutput(fh)
+	}
+	if r.log_fh != nil {
+		r.log_fh.Close()
+	}
+	r.log_fh = fh
 }
 
 func (r *RankServer) setHandleFunc() {

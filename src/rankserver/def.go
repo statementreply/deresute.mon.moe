@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"resource_mgr"
 	"stoppableListener"
 	"sync"
@@ -103,6 +104,7 @@ type RankServer struct {
 	rankDB       string
 	db           *sql.DB
 	logger       *log.Logger
+	log_fh       *os.File
 	keyFile      string
 	certFile     string
 	plainServer  *http.Server
