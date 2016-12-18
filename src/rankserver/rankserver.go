@@ -451,6 +451,19 @@ func Main() {
 
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+
+	ch_reload := make(chan os.Signal)
+	signal.Notify(ch_reload, syscall.SIGHUP)
+	go func() {
+		for {
+			select {
+			case s := <-ch_reload:
+				r.openLog()
+				r.logger.Println("reopened logfile", s)
+			}
+		}
+	}()
+	// wait for SIGTERM
 	r.logger.Println(<-ch)
 	r.stop()
 	log.Print("RankServer exiting")
