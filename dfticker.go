@@ -30,12 +30,17 @@ var lastRun = time.Unix(0, 0)
 // global const
 var sleepDuration = time.Second * 150
 
-func main() {
+func openLog() *os.File {
 	fh, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
 		log.Fatalln("logfile", err)
 	}
 	log.SetOutput(fh)
+	return fh
+}
+
+func main() {
+	fh := openLog()
 
 	ch_reload := make(chan os.Signal)
 	signal.Notify(ch_reload, syscall.SIGHUP)
@@ -43,11 +48,7 @@ func main() {
 		for {
 			select {
 			case s := <-ch_reload:
-				fh_new, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
-				if err != nil {
-					log.Fatalln("logfile", err)
-				}
-				log.SetOutput(fh_new)
+				fh_new := openLog()
 				log.Println("reopened logfile", s)
 				if fh != nil {
 					fh.Close()
@@ -56,7 +57,6 @@ func main() {
 			}
 		}
 	}()
-
 
 	log.Println("local-timestamp", ts.GetLocalTimestamp())
 	key_point := [][2]int{
