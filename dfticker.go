@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"path"
 	"sync"
+	"syscall"
 	"time"
 	ts "timestamp"
 )
@@ -34,6 +36,27 @@ func main() {
 		log.Fatalln("logfile", err)
 	}
 	log.SetOutput(fh)
+
+	ch_reload := make(chan os.Signal)
+	signal.Notify(ch_reload, syscall.SIGHUP)
+	go func() {
+		for {
+			select {
+			case s := <-ch_reload:
+				fh_new, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
+				if err != nil {
+					log.Fatalln("logfile", err)
+				}
+				log.SetOutput(fh_new)
+				log.Println("reopened logfile", s)
+				if fh != nil {
+					fh.Close()
+				}
+				fh = fh_new
+			}
+		}
+	}()
+
 
 	log.Println("local-timestamp", ts.GetLocalTimestamp())
 	key_point := [][2]int{
