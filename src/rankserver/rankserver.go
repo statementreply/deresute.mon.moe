@@ -147,7 +147,7 @@ func (r *RankServer) openLog() {
 		LOG_FILE = confLOG_FILE
 	}
 	log.Print("logfile is ", LOG_FILE)
-	fh, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
+	fh, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0640)
 	if err != nil {
 		log.Fatalln("open log file", err)
 	}

@@ -31,7 +31,7 @@ var lastRun = time.Unix(0, 0)
 var sleepDuration = time.Second * 150
 
 func openLog() *os.File {
-	fh, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
+	fh, err := os.OpenFile(LOG_FILE, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0640)
 	if err != nil {
 		log.Fatalln("logfile", err)
 	}
