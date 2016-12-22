@@ -514,16 +514,16 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func Exists(fileName string) bool {
-    _, err := os.Stat(fileName)
-    if err == nil {
-        return true
-    } else {
-        if os.IsNotExist(err) {
-            return false
-        } else {
-            return true
-        }
-    }
+	_, err := os.Stat(fileName)
+	if err == nil {
+		return true
+	} else {
+		if os.IsNotExist(err) {
+			return false
+		} else {
+			return true
+		}
+	}
 }
 
 func IsDir(fileName string) bool {
