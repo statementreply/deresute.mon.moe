@@ -264,18 +264,22 @@ func (r *ResourceMgr) ParseEvent() {
 		return
 	}
 	defer db.Close()
+	// FIXME: schema dependent
 	rows, err := db.Query("SELECT * FROM event_data;")
 	defer rows.Close()
 	for rows.Next() {
 		var id, typ int
 		var name string
 		var notice_start, event_start, second_half_start, event_end, calc_start, result_start, result_end string
-		var limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count int
+		var limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count, master_plus_support int
 		err = rows.Scan(&id, &typ,
 			&name,
 			&notice_start, &event_start, &second_half_start,
 			&event_end, &calc_start, &result_start, &result_end,
-			&limit_flag, &bg_type, &bg_id, &login_bonus_type, &login_bonus_count)
+			&limit_flag, &bg_type, &bg_id, &login_bonus_type, &login_bonus_count, &master_plus_support)
+		if err != nil {
+			log.Println("sql error", err)
+		}
 		//log.Println(id, typ, name,
 		//ParseTime(notice_start), event_start, second_half_start, event_end, calc_start, result_start, result_end, limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count)
 		//log.Println(ParseTime(event_start), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end))
@@ -284,7 +288,7 @@ func (r *ResourceMgr) ParseEvent() {
 		// FIXME: order-dependent**
 		e := &EventDetail{id, typ, name,
 			ParseTime(notice_start), ParseTime(event_start), ParseTime(second_half_start), ParseTime(event_end), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end),
-			limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count, ""}
+			limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count, master_plus_support, ""}
 		if e.typ == 3 || e.typ == 5 {
 			e.music_name = r.FindMedleyTitle(e)
 			//log.Println("find groove music name", e.music_name)
@@ -301,6 +305,7 @@ func (r *ResourceMgr) ParseEvent() {
 }
 
 func ParseTime(tstr string) time.Time {
+	//log.Println("tstr is <", tstr, ">")
 	t, err := time.Parse("2006-01-02 15:04:05 -0700 MST", tstr+" +0900 JST")
 	if err != nil {
 		log.Println("time parse", err)

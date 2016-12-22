@@ -17,6 +17,7 @@ type EventDetail struct {
 	calc_start, result_start, result_end      time.Time
 	limit_flag, bg_type, bg_id                int
 	login_bonus_type, login_bonus_count       int
+	master_plus_support                       int
 	// extra, for medley event
 	music_name string
 }
