@@ -75,7 +75,8 @@ html.twc, body.twc, div.twc {
 
 #eventCalendar {
     width: 100vw;
-    height: 35vw;
+    /* FIXME: not adaptable? */
+    height: 54vw;
     /*width: 1000px;*/
     /*height: 350px;*/
 }
