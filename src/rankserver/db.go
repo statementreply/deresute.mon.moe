@@ -69,8 +69,13 @@ func (r *RankServer) CheckData() {
 	// check new res_ver
 	// FIXME need some test
 	// FIXME race condition
-	// FIXME: check at event start time (less than 1hr?)
-	if (time.Now().Sub(r.lastCheck) >= 1*time.Hour) || ((r.currentEvent == nil) && (time.Now().Sub(latest_time) <= 2*time.Hour)) {
+
+	if	// check every 1 hour
+		(time.Now().Sub(r.lastCheck) >= 1*time.Hour) ||
+		// if currentEvent is not defined, then every 2 min
+		((r.currentEvent == nil) && (time.Now().Sub(latest_time) >= 2*time.Minute)) ||
+		// if currentEvent is defined but expired, then immediately
+		((r.currentEvent != nil) && !r.currentEvent.InPeriod(time.Now())) {
 		r.logger.Println("recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
 		r.lastCheck = time.Now()
 		// try to restart session (session expires after certain time)
@@ -82,9 +87,10 @@ func (r *RankServer) CheckData() {
 			r.resourceMgr.Set_res_ver(rv)
 			r.logger.Println("new res_ver:", rv)
 			r.resourceMgr.ParseEvent()
-			r.currentEvent = r.resourceMgr.FindCurrentEvent()
-			r.latestEvent = r.resourceMgr.FindLatestEvent()
 		}
+		// FIXME: depends on current time, update even if res_ver doesn't change
+		r.currentEvent = r.resourceMgr.FindCurrentEvent()
+		r.latestEvent = r.resourceMgr.FindLatestEvent()
 	}
 }
 

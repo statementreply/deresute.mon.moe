@@ -113,6 +113,7 @@ type RankServer struct {
 	slTLS        *stoppableListener.StoppableListener
 	hostname     string
 	resourceMgr  *resource_mgr.ResourceMgr
+	// current/latest: different for data/display?
 	currentEvent *resource_mgr.EventDetail
 	latestEvent  *resource_mgr.EventDetail
 	client       *apiclient.ApiClient

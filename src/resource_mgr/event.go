@@ -110,6 +110,25 @@ func (e *EventDetail) RankingAvailable() bool {
 	}
 }
 
+// in competition period
+func (e *EventDetail) IsActive(t time.Time) bool {
+	if !t.Before(e.event_start) && !t.After(e.event_end) {
+		return true
+	} else {
+		return false
+	}
+}
+
+// in full event period
+func (e *EventDetail) InPeriod(t time.Time) bool {
+	if !t.Before(e.event_start) && !t.After(e.result_end) {
+		return true
+	} else {
+		return false
+	}
+}
+
+// in calculating period
 func (e *EventDetail) IsCalc(t time.Time) bool {
 	if t.After(e.calc_start) && t.Before(e.result_start) {
 		return true
@@ -118,6 +137,7 @@ func (e *EventDetail) IsCalc(t time.Time) bool {
 	}
 }
 
+// in result publishing period
 func (e *EventDetail) IsFinal(t time.Time) bool {
 	if !t.Before(e.result_start) && !t.After(e.result_end) {
 		return true
@@ -126,16 +146,18 @@ func (e *EventDetail) IsFinal(t time.Time) bool {
 	}
 }
 
+// only current event in period
 func FindCurrentEvent(eventList []*EventDetail) *EventDetail {
 	now := time.Now()
 	for _, e := range eventList {
-		if !now.Before(e.event_start) && !now.After(e.result_end) {
+		if e.InPeriod(now) {
 			return e
 		}
 	}
 	return nil
 }
 
+// the last event that has started and has ranking
 func FindLatestEvent(eventList []*EventDetail) *EventDetail {
 	now := time.Now()
 	for i := len(eventList) - 1; i >= 0; i-- {
