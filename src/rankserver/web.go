@@ -241,7 +241,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	result.PrefillEvent = ""
 	if result.event != nil {
 		result.PrefillEvent = strconv.Itoa(result.event.Id())
-		result.EventTitle = result.event.Name()
+		result.EventTitle = result.event.LongName()
 	}
 	result.rankingType = r.parseParam_type(req)
 	result.PrefillCheckedType = []template.HTMLAttr{"", ""}
@@ -260,7 +260,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	if r.currentEvent != nil {
 		result.EventInfo += "<p>"
 		result.EventInfo += "イベント開催中："
-		result.EventInfo += template.HTML(template.HTMLEscapeString(r.currentEvent.Name()))
+		result.EventInfo += template.HTML(template.HTMLEscapeString(r.currentEvent.LongName()))
 		if r.currentEvent.LoginBonusType() > 0 {
 			result.EventInfo += "<br>ログインボーナスがあるので、イベントページにアクセスを忘れないように。"
 		}

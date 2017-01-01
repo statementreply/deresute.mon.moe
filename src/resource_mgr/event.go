@@ -222,6 +222,7 @@ func (eventList *EventDetailList) Overwrite(e_new *EventDetail) {
 // => story_category "id -> title"
 // title
 
+// for live groove and live parade: title of the song
 func (e *EventDetail) MusicName() string {
 	if e.typ != 3 && e.typ != 5 {
 		return e.name
@@ -238,4 +239,12 @@ func (e *EventDetail) MusicName() string {
 		return "Absolute NIne"
 	}
 	return strings.Replace(e.music_name, "\\n", "", -1)
+}
+
+func (e *EventDetail) LongName() string {
+	long := e.name
+	if e.typ == 3 || e.typ == 5 {
+		long += " = " + e.MusicName()
+	}
+	return long
 }

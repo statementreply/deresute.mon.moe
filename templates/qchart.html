@@ -17,7 +17,7 @@
 
                 <select name="event">
                     {{range .EventAvailable}}
-                    <option value="{{.Id}}" {{if .EventSelected}}selected="selected"{{end}}>{{.Name}}</option>
+                    <option value="{{.Id}}" {{if .EventSelected}}selected="selected"{{end}}>{{.LongName}}</option>
                     {{end}}
                 </select>
 
