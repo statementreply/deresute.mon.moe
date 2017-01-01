@@ -31,6 +31,10 @@ func (e *EventDetail) Name() string {
 }
 
 func (e *EventDetail) ShortName() string {
+	// for groove/parade
+	if e.typ == 3 || e.typ == 5 {
+		return e.MusicName()
+	}
 	if grooveFilter.MatchString(e.name) {
 		return "LIVE Groove"
 	} else {
@@ -238,7 +242,11 @@ func (e *EventDetail) MusicName() string {
 	if e.id == 3005 {
 		return "Absolute NIne"
 	}
-	return strings.Replace(e.music_name, "\\n", "", -1)
+	if e.music_name != "" {
+		return strings.Replace(e.music_name, "\\n", "", -1)
+	} else {
+		return e.name
+	}
 }
 
 func (e *EventDetail) LongName() string {
