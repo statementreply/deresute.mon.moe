@@ -15,7 +15,7 @@ import (
 )
 
 type qchartParam struct {
-	rankingType int
+	RankingType int
 	list_rank   []int
 	event       *resource_mgr.EventDetail
 	fancyChart  bool
@@ -76,7 +76,7 @@ type tmplVar struct {
 	// for "/event"
 	EventList []*eventInfo
 	// for "/dist"
-	RankingType   int
+	//RankingType   int
 	ListTimeOfDay []*TimeOfSelector
 	ListDate      []*TimeOfSelector
 	IsFinal       bool

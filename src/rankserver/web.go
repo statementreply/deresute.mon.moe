@@ -49,7 +49,7 @@ func (r *RankServer) generateDURL(param *qchartParam) string {
 	if param == nil {
 		return u
 	}
-	u += "type=" + fmt.Sprintf("%d", param.rankingType) + "&"
+	u += "type=" + fmt.Sprintf("%d", param.RankingType) + "&"
 	for _, rank := range param.list_rank {
 		u += "rank=" + strconv.Itoa(rank) + "&"
 	}
@@ -243,9 +243,9 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 		result.PrefillEvent = strconv.Itoa(result.event.Id())
 		result.EventTitle = result.event.LongName()
 	}
-	result.rankingType = r.parseParam_type(req)
+	result.RankingType = r.parseParam_type(req)
 	result.PrefillCheckedType = []template.HTMLAttr{"", ""}
-	result.PrefillCheckedType[result.rankingType] = " checked"
+	result.PrefillCheckedType[result.RankingType] = " checked"
 
 	result.AChart = r.parseParam_achart(req)
 	result.fancyChart = false
@@ -370,7 +370,7 @@ func (r *RankServer) distHandler(w http.ResponseWriter, req *http.Request) {
 		r.logger.Println("nil event in distHandler")
 		return
 	}
-	tmplVar.RankingType = tmplVar.rankingType
+	//tmplVar.RankingType = tmplVar.rankingType
 	t_date := r.parseParam_date(req)
 	t_time := r.parseParam_time(req)
 	isFinal := r.parseParam_isfinal(req)
