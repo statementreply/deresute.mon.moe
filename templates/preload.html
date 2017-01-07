@@ -120,6 +120,7 @@ function drawLineChart() {
     currentPage = $("body").pagecontainer("getActivePage");
     dataurl = $("#dataurl", currentPage).text();
     fancychart = $("#fancychart", currentPage).text();
+    rankingType = $("#rankingtype", currentPage).text();
 
     var options = {
         title: "累計",
@@ -141,6 +142,13 @@ function drawLineChart() {
     var options_speed = $.extend({}, options);
     options_speed['interpolateNulls'] = false;
     options_speed['title'] = "時速";
+    if (rankingType == "1") {
+        console.log("set logScale");
+        options_speed.vAxis.logScale = true;
+    } else {
+        console.log("no set logScale");
+    }
+
     if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
         return;
     }
