@@ -321,13 +321,14 @@ function drawEventChart() {
     dataTable.addColumn({ type: 'string', id: 'event', role: 'tooltip' });
     $.getJSON(dataurl, "", function (data) {
         for (i=0; i<data.length; i++) {
-            // FIXME: use date.js
             // Get browser timezone, replace it with JST offset.
             d = new Date(data[i]['t']*1000);
+            // getTimezoneOffset is builtin?
             var o1 = d.getTimezoneOffset();
             var o2 = 9;
             var o3 = (- o1 * 2 / 60 - o2) * 100;
 
+            // setTimezoneOffset is in date.js
             //d.setTimezoneOffset("+0900");
             d.setTimezoneOffset(o3);
             dataTable.addRows([ [ d, data[i]['status'], data[i]['tooltip'] ] ]);
