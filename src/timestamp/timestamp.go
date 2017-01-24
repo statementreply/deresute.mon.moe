@@ -61,7 +61,7 @@ func FormatTime_short(t time.Time) string {
 }
 
 func FormatDate(t time.Time) string {
-	st := t.Format("060102")
+	st := t.In(tz).Format("060102")
 	return st
 }
 
