@@ -322,6 +322,7 @@ function drawEventChart() {
     $.getJSON(dataurl, "", function (data) {
         for (i=0; i<data.length; i++) {
             // FIXME: use date.js
+            // Get browser timezone, replace it with JST offset.
             d = new Date(data[i]['t']*1000);
             var o1 = d.getTimezoneOffset();
             var o2 = 9;
