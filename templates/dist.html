@@ -23,14 +23,14 @@
                     <div class="ui-field-contain">
                         <div class="ui-field-contain">
                             <label for="form-date">日付</label>
-                            <select id="form-date" name="date" id="date">
+                            <select id="form-date" name="date">
                                 {{range .ListDate}}
                                         <option value="{{.Second}}" {{if .Selected}}selected="selected"{{end}}>{{.Text}}</option>{{end}}
                             </select>
                         </div>
                         <div class="ui-field-contain">
                             <label for="form-time">時刻</label>
-                            <select id="form-time" name="time" id="time">
+                            <select id="form-time" name="time">
                                 {{range .ListTimeOfDay}}
                                         <option value="{{.Second}}" {{if .Selected}}selected="selected"{{end}}>{{.Text}}</option>{{end}}
                             </select>
