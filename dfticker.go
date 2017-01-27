@@ -80,6 +80,26 @@ func main() {
 		[2]int{2, 50001},   // tier 3 medley
 	}
 	// extra data points
+	// from 1 to 100, all
+	for index := 0; index < 10; index++ {
+		key_point = append(key_point, [2]int{1, index*10 + 1})
+		key_point = append(key_point, [2]int{2, index*10 + 1})
+	}
+	// from 101 to 1000, increase by 100
+	for index := 1; index < 10; index++ {
+		key_point = append(key_point, [2]int{1, index*100 + 1})
+		key_point = append(key_point, [2]int{2, index*100 + 1})
+	}
+	// from 1k to 10k, by 1k
+	for index := 1; index < 10; index++ {
+		key_point = append(key_point, [2]int{1, index*1000 + 1})
+		key_point = append(key_point, [2]int{2, index*1000 + 1})
+	}
+	// from 10k to 100k, by 10k
+	for index := 1; index < 10; index++ {
+		key_point = append(key_point, [2]int{1, index*10000 + 1})
+		key_point = append(key_point, [2]int{2, index*10000 + 1})
+	}
 	// from 1 to 300k+1, by 10k
 	for index := 0; index < 31; index++ {
 		key_point = append(key_point, [2]int{1, index*10000 + 1})
@@ -90,6 +110,8 @@ func main() {
 		key_point = append(key_point, [2]int{1, 300000 + index*20000 + 1})
 		key_point = append(key_point, [2]int{2, 300000 + index*20000 + 1})
 	}
+	//fmt.Println(key_point);
+	//return;
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 	df := datafetcher.NewDataFetcher(client, key_point, RANK_DB, RESOURCE_CACHE_DIR)
 
