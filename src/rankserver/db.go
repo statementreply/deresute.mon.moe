@@ -73,7 +73,7 @@ func (r *RankServer) CheckData() {
 	if	// check every 1 hour
 		(time.Now().Sub(r.lastCheck) >= 1*time.Hour) ||
 		// if currentEvent is not defined, then every 2 min
-		((r.currentEvent == nil) && (time.Now().Sub(latest_time) >= 2*time.Minute)) ||
+		((r.currentEvent == nil) && (time.Now().Sub(r.lastCheck) >= 10*time.Minute)) ||
 		// if currentEvent is defined but expired, then immediately
 		((r.currentEvent != nil) && !r.currentEvent.InPeriod(time.Now())) {
 		r.logger.Println("recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
@@ -91,6 +91,7 @@ func (r *RankServer) CheckData() {
 		// FIXME: depends on current time, update even if res_ver doesn't change
 		r.currentEvent = r.resourceMgr.FindCurrentEvent()
 		r.latestEvent = r.resourceMgr.FindLatestEvent()
+		r.logger.Println("currentEvent", r.currentEvent)
 	}
 }
 
