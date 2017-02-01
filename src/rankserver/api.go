@@ -127,6 +127,25 @@ func (r *RankServer) distDataHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(w, "]\n")
 }
 
+func (r *RankServer) distCompareDataHandler(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
+	r.CheckData()
+	req.ParseForm()
+	events := r.parseParam_events(req)
+	// list of [timestamp, event_name]
+	var result [][]string
+	for _, event := range events {
+		eventTs := r.latestEventTimestamp(event)
+		result = append(result, []string{eventTs, event.LongName()})
+	}
+	b, err := json.Marshal(result)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	w.Write(b)
+}
+
 // js timezone bug
 // date overriding
 func (r *RankServer) eventDataHandler(w http.ResponseWriter, req *http.Request) {

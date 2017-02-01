@@ -171,6 +171,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/log", r.logHandler)
 	http.HandleFunc("/event", r.eventHandler)
 	http.HandleFunc("/dist", r.distHandler)
+	http.HandleFunc("/dist_compare", r.distCompareHandler)
 	http.HandleFunc("/twc", r.twcHandler)
 	http.HandleFunc("/twc_test", r.twcTestHandler)
 	// auxiliary
@@ -185,6 +186,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/latest_data", r.latestDataHandler)
 	http.HandleFunc("/d", r.dataHandler)
 	http.HandleFunc("/d_dist", r.distDataHandler)
+	http.HandleFunc("/d_dist_compare", r.distCompareDataHandler)
 	http.HandleFunc("/d_event", r.eventDataHandler)
 }
 
@@ -201,6 +203,20 @@ func (r *RankServer) latestTimestamp() string {
 		}
 	}
 	return latest
+}
+
+// bad efficiency?
+func (r *RankServer) latestEventTimestamp(event *resource_mgr.EventDetail) string {
+	r.UpdateTimestamp()
+	local_timestamp := r.GetListTimestamp()
+	for ind := len(local_timestamp) - 1; ind >= 0; ind-- {
+		t1 := local_timestamp[ind]
+		time1 := ts.TimestampToTime(t1)
+		if event.InPeriod(time1) {
+			return t1
+		}
+	}
+	return ""
 }
 
 // latestTimestamp() == truncateTimestamp(time.Now())

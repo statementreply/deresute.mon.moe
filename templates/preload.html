@@ -273,6 +273,11 @@ function drawDistChart() {
     if (myDistChart.length == 0) {
         return;
     }
+    // FIXME
+    if (document.documentURI.indexOf("/dist_compare") > 0) {
+        drawDistCompareChart();
+        return;
+    }
     ddataurl = "/d_dist?t=" + timestamp;
     $.getJSON(ddataurl, "", function (data) {
         var data_list = [];
@@ -306,6 +311,113 @@ function drawDistChart() {
         options.title = "pt密度";
         options_score.title = "スコア密度";
     })
+}
+
+// FIXME
+// do more on javascript side
+function drawDistCompareChart() {
+    var myUri = document.documentURI;
+    setAspectRatio();
+    currentPage = $("body").pagecontainer("getActivePage");
+    var options = {
+        hAxis: {
+            title: "rank",
+            minValue: 0,
+            gridlines: {count: 10},
+            format: 'short',
+        },
+        vAxis: {
+            minValue: 0,
+            textPosition: 'in',
+            logScale: true,
+            format: 'short',
+            //gridlines: {count: 5},
+            //minorGridlines: {count: 1},
+            //viewWindow: {min: 1},
+        },
+        series: {
+            0: {targetAxisIndex: 0},
+        },
+        vAxes: {
+            0: {title: 'pt'},
+        },
+        interpolateNulls: true,
+        explorer: {maxZoomIn: 0.1},
+        chartArea: {width: '100%', height: '65%'},
+        legend: {position: 'top', alignment: 'center'},
+    };
+    options.lineWidth = 0;
+    options.pointSize = 2;
+
+    console.log("myUri");
+    console.log(myUri);
+    if (myUri.indexOf("hlog") > 0) {
+        console.log("set hlog");
+        options.hAxis.logScale = true;
+    }
+
+    myDistChart = $("#myDistChart", currentPage);
+    eventName1 = "LIVE Groove Visual burst = 命燃やして恋せよ乙女";
+    ddataurl1 = "/d_dist?t=1484017320";
+    eventName2 = "ラブレター";
+    ddataurl2 = "/d_dist?t=1474945320";
+    //eventName3 = ""
+    var core = function (data1, data2) {
+        var data_list = [];
+        plot_label = [eventName1, eventName2];
+        // t == 0
+        for (t=0; t<1; t++) {
+            dt = {"cols": [{"id":"rank","label":"rank","type":"number"}],
+                "rows":[]}
+            // cols
+            dt["cols"].push({"id":plot_label[0], "label":plot_label[0], "type":"number"});
+            dt["cols"].push({"id":plot_label[1], "label":plot_label[1], "type":"number"});
+            cur1 = data1[t];
+            cur2 = data2[t];
+            //cur2 = data[t+2];
+            var rankMap = new Map();
+
+            // rows
+            for (i=0; i<cur1.length; i++) {
+                row = cur1[i];
+                rankMap.set(row[0], [row[1]]);
+                console.log("here01");
+            }
+            for (i=0; i<cur2.length; i++) {
+                row = cur2[i];
+                orig = rankMap.get(row[0]);
+                if (orig != undefined) {
+                } else {
+                    orig = [null];
+                }
+                orig.push(row[1]);
+                rankMap.set(row[0], orig);
+                console.log("here02");
+            }
+            console.log(JSON.stringify(rankMap));
+            console.log(rankMap);
+
+            for (var [rank, row] of rankMap)
+            {
+                row_map = {"c": [{"v": rank}, {"v": row[0]}, {"v": row[1]}]};
+                dt["rows"].push(row_map);
+            }
+            // t=0: dt: ranklist
+            // t=1: dt: speedlist
+            data_list[t] = dt;
+        }
+        var data_pt = new google.visualization.DataTable(data_list[0]);
+        chart = new google.visualization.LineChart(myDistChart.get(0));
+        //console.log(data_list[0]);
+        //console.log(JSON.stringify(data_list[0]));
+        chart.draw(data_pt, options);
+    };
+    $.getJSON(ddataurl1, "", function (data1) {
+            $.getJSON(ddataurl2, "", function (data2) {
+                core(data1, data2);
+            });
+    });
+
 }
 
 function drawEventChart() {

@@ -178,6 +178,26 @@ func (r *RankServer) parseParam_event(req *http.Request) *resource_mgr.EventDeta
 	return event
 }
 
+// multiple events
+func (r *RankServer) parseParam_events(req *http.Request) []*resource_mgr.EventDetail {
+	var events []*resource_mgr.EventDetail
+	event_id_str_list, ok := req.Form["event"] // checked Atoi
+	if ok {
+		for _, event_id_str := range event_id_str_list {
+			// skip empty string
+			if event_id_str != "" {
+				event_id, err := strconv.Atoi(event_id_str)
+				if err == nil {
+					events = append(events, r.resourceMgr.FindEventById(event_id))
+				} else {
+					r.logger.Println("bad event id", err, event_id_str)
+				}
+			}
+		}
+	}
+	return events
+}
+
 // returns 0 or 1
 func (r *RankServer) parseParam_type(req *http.Request) int {
 	rankingType_str_list, ok := req.Form["type"] // checked Atoi
@@ -434,6 +454,22 @@ func (r *RankServer) distHandler(w http.ResponseWriter, req *http.Request) {
 		r.logger.Println("html/template", err)
 	}
 }
+
+// dist_compare
+// input: event ids
+// output: [(timestamp, event_name)]
+// timestamp = event final
+func (r *RankServer) distCompareHandler(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
+	r.CheckData()
+	req.ParseForm()
+	tmplVar := r.getTmplVar(w, req)
+	err := rsTmpl.ExecuteTemplate(w, "dist_compare.html", tmplVar)
+	if err != nil {
+		r.logger.Println("html/template", err)
+	}
+}
+
 
 func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
