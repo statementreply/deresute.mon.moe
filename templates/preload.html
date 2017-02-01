@@ -366,9 +366,9 @@ function drawDistCompareChart() {
     eventName4 = "Lunatic Show";
     ddataurl4 = "/d_dist?t=1485572520";
     //eventName3 = ""
-    var core = function (data1, data2, data3) {
+    var core = function (data1, data2, data3, data4) {
         var data_list = [];
-        plot_label = [eventName1, eventName2, eventName3];
+        plot_label = [eventName1, eventName2, eventName3, eventName4];
         // t == 0
         for (t=0; t<1; t++) {
             dt = {"cols": [{"id":"rank","label":"rank","type":"number"}],
@@ -377,9 +377,11 @@ function drawDistCompareChart() {
             dt["cols"].push({"id":plot_label[0], "label":plot_label[0], "type":"number"});
             dt["cols"].push({"id":plot_label[1], "label":plot_label[1], "type":"number"});
             dt["cols"].push({"id":plot_label[2], "label":plot_label[2], "type":"number"});
+            dt["cols"].push({"id":plot_label[3], "label":plot_label[3], "type":"number"});
             cur1 = data1[t];
             cur2 = data2[t];
             cur3 = data3[t];
+            cur4 = data4[t];
             //cur2 = data[t+2];
             var rankMap = new Map();
 
@@ -409,6 +411,16 @@ function drawDistCompareChart() {
                 orig.push(row[1]);
                 rankMap.set(row[0], orig);
             }
+            for (i=0; i<cur4.length; i++) {
+                row = cur4[i];
+                orig = rankMap.get(row[0]);
+                if (orig != undefined) {
+                } else {
+                    orig = [null, null, null];
+                }
+                orig.push(row[1]);
+                rankMap.set(row[0], orig);
+            }
             console.log(JSON.stringify(rankMap));
             console.log(rankMap);
 
@@ -418,7 +430,8 @@ function drawDistCompareChart() {
                     {"v": rank},
                     {"v": row[0]},
                     {"v": row[1]},
-                    {"v": row[2]}
+                    {"v": row[2]},
+                    {"v": row[3]}
                 ]};
                 dt["rows"].push(row_map);
             }
@@ -435,7 +448,9 @@ function drawDistCompareChart() {
     $.getJSON(ddataurl1, "", function (data1) {
             $.getJSON(ddataurl2, "", function (data2) {
                 $.getJSON(ddataurl3, "", function (data3) {
-                    core(data1, data3, data3);
+                    $.getJSON(ddataurl4, "", function (data4) {
+                        core(data1, data2, data3, data4);
+                    });
                 });
             });
     });
