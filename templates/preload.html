@@ -357,14 +357,18 @@ function drawDistCompareChart() {
     }
 
     myDistChart = $("#myDistChart", currentPage);
-    eventName1 = "LIVE Groove Visual burst = 命燃やして恋せよ乙女";
-    ddataurl1 = "/d_dist?t=1484017320";
-    eventName2 = "ラブレター";
-    ddataurl2 = "/d_dist?t=1474945320";
+    eventName1 = "ラブレター";
+    ddataurl1 = "/d_dist?t=1474945320";
+    eventName2 = "命燃やして恋せよ乙女";
+    ddataurl2 = "/d_dist?t=1484017320";
+    eventName3 = "あんきら ! ？狂騒曲";
+    ddataurl3 = "/d_dist?t=1482894120";
+    eventName4 = "Lunatic Show";
+    ddataurl4 = "/d_dist?t=1485572520";
     //eventName3 = ""
-    var core = function (data1, data2) {
+    var core = function (data1, data2, data3) {
         var data_list = [];
-        plot_label = [eventName1, eventName2];
+        plot_label = [eventName1, eventName2, eventName3];
         // t == 0
         for (t=0; t<1; t++) {
             dt = {"cols": [{"id":"rank","label":"rank","type":"number"}],
@@ -372,8 +376,10 @@ function drawDistCompareChart() {
             // cols
             dt["cols"].push({"id":plot_label[0], "label":plot_label[0], "type":"number"});
             dt["cols"].push({"id":plot_label[1], "label":plot_label[1], "type":"number"});
+            dt["cols"].push({"id":plot_label[2], "label":plot_label[2], "type":"number"});
             cur1 = data1[t];
             cur2 = data2[t];
+            cur3 = data3[t];
             //cur2 = data[t+2];
             var rankMap = new Map();
 
@@ -392,14 +398,28 @@ function drawDistCompareChart() {
                 }
                 orig.push(row[1]);
                 rankMap.set(row[0], orig);
-                console.log("here02");
+            }
+            for (i=0; i<cur3.length; i++) {
+                row = cur3[i];
+                orig = rankMap.get(row[0]);
+                if (orig != undefined) {
+                } else {
+                    orig = [null, null];
+                }
+                orig.push(row[1]);
+                rankMap.set(row[0], orig);
             }
             console.log(JSON.stringify(rankMap));
             console.log(rankMap);
 
             for (var [rank, row] of rankMap)
             {
-                row_map = {"c": [{"v": rank}, {"v": row[0]}, {"v": row[1]}]};
+                row_map = {"c": [
+                    {"v": rank},
+                    {"v": row[0]},
+                    {"v": row[1]},
+                    {"v": row[2]}
+                ]};
                 dt["rows"].push(row_map);
             }
             // t=0: dt: ranklist
@@ -414,7 +434,9 @@ function drawDistCompareChart() {
     };
     $.getJSON(ddataurl1, "", function (data1) {
             $.getJSON(ddataurl2, "", function (data2) {
-                core(data1, data2);
+                $.getJSON(ddataurl3, "", function (data3) {
+                    core(data1, data3, data3);
+                });
             });
     });
 
