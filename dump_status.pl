@@ -1,5 +1,6 @@
 #!/usr/bin/perl
-# usage: perl twitter.pl "status"  # utf8 encoded
+# import data from @deresute_border to data/twitter.db
+# this script was not used to import to data/rank.db
 use common::sense;
 use warnings;
 use strict;
