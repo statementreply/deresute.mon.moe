@@ -1,8 +1,12 @@
 package main
 // read csv, compare with previous data, add if new
 
+// arguments: timestamp filename.csv
+
 import (
 	"database/sql"
+	"encoding/csv"
+	"fmt"
 	sqlite3 "github.com/mattn/go-sqlite3"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -25,6 +29,32 @@ var fnFilter = regexp.MustCompile("r\\d{2}\\.(\\d+)$")
 var rankingTypeFilter = regexp.MustCompile("r01\\.\\d+$")
 
 func main() {
+	var timestamp, csvFilename string
+	if len(os.Args) == 3 {
+		timestamp = os.Args[1]
+		csvFilename = os.Args[2]
+	} else {
+		log.Fatalln("usage: " + os.Args[0] + " timestamp filename.csv")
+	}
+	log.Println(timestamp)
+
+	csvFile, err := os.Open(csvFilename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	csvReader := csv.NewReader(csvFile)
+	csvRecords, err := csvReader.ReadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, record := range csvRecords {
+		fmt.Println(record)
+	}
+	csvFile.Close()
+	return
+}
+
+func oldMain() {
 	db, err := sql.Open("sqlite3", "file:"+RANK_DB+"?mode=rwc")
 	if err != nil {
 		log.Println("cannot open db", err)
