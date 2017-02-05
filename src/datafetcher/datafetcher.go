@@ -267,7 +267,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 			return "", "", err
 		}
 	} else {
-		// sql hit
+		// sql cache hit, no need to download again
 		//log.Println("[INFO] hit table rank", local_timestamp)
 	}
 
