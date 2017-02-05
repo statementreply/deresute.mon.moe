@@ -79,6 +79,12 @@ func main() {
 		[2]int{2, 40001},   // tier 3 atapon
 		[2]int{2, 50001},   // tier 3 medley
 	}
+	// TODO: collect more around borders, only for result[start, end]?
+	// (1, 2001), (1, 10001), (1, 20001), (1, 60001), (1, 100001), (1, 120001)
+	// (1, 501), (1, 5001), (1, 50001)
+	// (2, 5001), (2, 10001), (2, 40001), (2, 50001)
+	// +- 1000?: 200pages
+	// +- 100: all, +- 2000: by 100: 30pages
 	// extra data points
 	// from 1 to 100, all
 	for index := 0; index < 10; index++ {
