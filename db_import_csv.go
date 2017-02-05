@@ -35,6 +35,7 @@ var fnFilter = regexp.MustCompile("r\\d{2}\\.(\\d+)$")
 var rankingTypeFilter = regexp.MustCompile("r01\\.\\d+$")
 
 var insertCount = 0
+var badCount = 0
 
 func main() {
 	var timestamp, csvFilename string
@@ -86,6 +87,7 @@ func main() {
 		queryCompare(db, timestamp, rankingType, rank, score);
 	}
 	log.Println("insertCount:", insertCount)
+	log.Println("badCount:", badCount)
 	return
 }
 
@@ -121,6 +123,7 @@ func queryCompare(db *sql.DB, timestamp string, rankingType int, rank int, newSc
 		}
 		fmt.Println(status, "score", score, "newScore", newScore);
 		if score != newScore {
+			badCount += 1
 			//log.Fatal("data different")
 			// only very few, ignore them for now
 		}
