@@ -15,7 +15,7 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
-	sqlite3 "github.com/mattn/go-sqlite3"
+	_ "github.com/mattn/go-sqlite3"
 	//"io/ioutil"
 	"log"
 	"os"
@@ -33,6 +33,8 @@ var RANK_DB string = BASE + "/data/rank.db"
 var tsFilter = regexp.MustCompile("^\\d+$")
 var fnFilter = regexp.MustCompile("r\\d{2}\\.(\\d+)$")
 var rankingTypeFilter = regexp.MustCompile("r01\\.\\d+$")
+
+var insertCount = 0
 
 func main() {
 	var timestamp, csvFilename string
@@ -83,12 +85,13 @@ func main() {
 		fmt.Println("timestamp=" + timestamp + "; type=" + strconv.Itoa(rankingType) + "; rank=" + strconv.Itoa(rank) + "; score=" + strconv.Itoa(score) + "; viewer_id=0")
 		queryCompare(db, timestamp, rankingType, rank, score);
 	}
+	log.Println("insertCount:", insertCount)
 	return
 }
 
 func openDb() *sql.DB {
-	// change to mode=rwc when ready to write
-	db, err := sql.Open("sqlite3", "file:"+RANK_DB+"?mode=ro")
+	// change to mode=rw when ready to write
+	db, err := sql.Open("sqlite3", "file:"+RANK_DB+"?mode=rw")
 	if err != nil {
 		log.Fatalln("cannot open db", err)
 	}
@@ -104,7 +107,7 @@ func queryCompare(db *sql.DB, timestamp string, rankingType int, rank int, newSc
 		if err == sql.ErrNoRows {
 			// no old data for this data point
 			fmt.Println("ADD", "score", "null", "newScore", newScore)
-			//insertNewScore(db, timestamp, rankingType, rank, newScore)
+			insertNewScore(db, timestamp, rankingType, rank, newScore)
 		} else {
 			log.Fatal(err)
 		}
@@ -136,5 +139,6 @@ func insertNewScore(db *sql.DB, timestamp string, rankingType int, rank int, new
 	if rs != 1 {
 		log.Fatal("affected rows", rs)
 	}
+	insertCount += 1
 	// else: good
 }
