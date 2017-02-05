@@ -1,4 +1,5 @@
 package main
+// extract and debug resources
 
 import (
 	"fmt"
@@ -7,7 +8,7 @@ import (
 	"log"
 	"resource_mgr"
 	//"time"
-	//"unicode/utf8"
+	_ "unicode/utf8"
 	"os"
 )
 
@@ -29,6 +30,7 @@ func main() {
 		_ = e
 		//fmt.Println(e.NoticeStart(), e.EventStart(), e.Name())
 		//fmt.Println(utf8.RuneCountInString(e.Name()), e.Name())
+		fmt.Println(e.ResultStart().Unix(), e.ResultEnd().Unix(), e.LongName())
 	}
 	currentEvent := resource_mgr.FindCurrentEvent(r.EventList)
 	if currentEvent != nil {
@@ -36,7 +38,7 @@ func main() {
 	}
 
 	// download musicscores
-	r.LoadMusic()
+	//r.LoadMusic()
 
 	//fmt.Println(r.LoadMaster())
 
