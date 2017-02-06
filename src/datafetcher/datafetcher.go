@@ -287,6 +287,8 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	server_timestamp_i := ts.RoundTimestamp(time.Unix(int64(servertime), 0)).Unix()
 	server_timestamp := fmt.Sprintf("%d", server_timestamp_i)
 
+	// FIXME: Limit this check only to event active period
+	// and disable for event result period?
 	if server_timestamp != local_timestamp {
 		log.Println("[NOTICE] change to server_timestamp:", server_timestamp, "local:", local_timestamp)
 	}
