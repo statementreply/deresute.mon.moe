@@ -132,7 +132,8 @@ func main() {
 		key_point = append(key_point, [2]int{1, 300000 + index*20000 + 1})
 		key_point = append(key_point, [2]int{2, 300000 + index*20000 + 1})
 	}
-	//fmt.Println(key_point);
+	key_point = appendNeighborhood(key_point, 1, 2001)
+	fmt.Println(key_point);
 	//return;
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
 	df := datafetcher.NewDataFetcher(client, key_point, RANK_DB, RESOURCE_CACHE_DIR)

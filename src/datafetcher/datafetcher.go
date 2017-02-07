@@ -198,7 +198,8 @@ func (df *DataFetcher) Run() error {
 		}
 		fmt.Print(statusStr) // progress bar
 	}
-	// if every datapoint is ok
+	// if every datapoint is ok, mark final
+	// FIXME: what will happen if we want to add new datapoints during result period
 	if currentEvent.IsFinal(local_time) {
 		df.currentResultEnd = currentEvent.ResultEnd()
 	} else {
