@@ -1,4 +1,5 @@
 package main
+
 // read csv, compare with previous data, add if new
 
 // arguments: timestamp filename.csv
@@ -84,7 +85,7 @@ func main() {
 		}
 		//fmt.Println(record)
 		fmt.Println("timestamp=" + timestamp + "; type=" + strconv.Itoa(rankingType) + "; rank=" + strconv.Itoa(rank) + "; score=" + strconv.Itoa(score) + "; viewer_id=0")
-		queryCompare(db, timestamp, rankingType, rank, score);
+		queryCompare(db, timestamp, rankingType, rank, score)
 	}
 	log.Println("insertCount:", insertCount)
 	log.Println("badCount:", badCount)
@@ -103,8 +104,8 @@ func openDb() *sql.DB {
 func queryCompare(db *sql.DB, timestamp string, rankingType int, rank int, newScore int) {
 	var score int
 	// LIMIT 1: not necessary because of primary key
-	row := db.QueryRow("SELECT score FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3 LIMIT 1;", timestamp, rankingType, rank);
-	err := row.Scan(&score);
+	row := db.QueryRow("SELECT score FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3 LIMIT 1;", timestamp, rankingType, rank)
+	err := row.Scan(&score)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// no old data for this data point
@@ -121,7 +122,7 @@ func queryCompare(db *sql.DB, timestamp string, rankingType int, rank int, newSc
 		} else {
 			status = "bad"
 		}
-		fmt.Println(status, "score", score, "newScore", newScore);
+		fmt.Println(status, "score", score, "newScore", newScore)
 		if score != newScore {
 			badCount += 1
 			//log.Fatal("data different")

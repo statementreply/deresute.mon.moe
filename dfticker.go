@@ -210,21 +210,21 @@ func NeedToRun() bool {
 func appendNeighborhood(oldKeyPoint [][2]int, rankingType int, basepoint int) [][2]int {
 	var newKeyPoint = oldKeyPoint
 	// firstly check parameter sanity
-	if (rankingType != 1 && rankingType != 2) {
+	if rankingType != 1 && rankingType != 2 {
 		log.Fatalln("bad rankingType", rankingType)
 	}
-	if (basepoint <= 0 || basepoint % 10 != 1) {
+	if basepoint <= 0 || basepoint%10 != 1 {
 		log.Fatalln("bad basepoint", basepoint)
 	}
 
 	// loop
 	for i := -100; i <= 100; i += 10 {
-		if basepoint + i > 0 {
+		if basepoint+i > 0 {
 			newKeyPoint = append(newKeyPoint, [2]int{rankingType, basepoint + i})
 		}
 	}
 	for i := -2000; i <= 2000; i += 50 {
-		if basepoint + i > 0 {
+		if basepoint+i > 0 {
 			newKeyPoint = append(newKeyPoint, [2]int{rankingType, basepoint + i})
 		}
 	}

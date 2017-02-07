@@ -70,8 +70,8 @@ func (r *RankServer) CheckData() {
 	// FIXME need some test
 	// FIXME race condition
 
-	if	// check every 1 hour
-		(time.Now().Sub(r.lastCheck) >= 1*time.Hour) ||
+	if // check every 1 hour
+	(time.Now().Sub(r.lastCheck) >= 1*time.Hour) ||
 		// if currentEvent is not defined, then every 2 min
 		((r.currentEvent == nil) && (time.Now().Sub(r.lastCheck) >= 10*time.Minute)) ||
 		// if currentEvent is defined but expired, then immediately

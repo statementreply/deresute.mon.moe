@@ -1,4 +1,5 @@
 package main
+
 // extract and debug resources
 
 import (
@@ -8,8 +9,8 @@ import (
 	"log"
 	"resource_mgr"
 	//"time"
-	_ "unicode/utf8"
 	"os"
+	_ "unicode/utf8"
 )
 
 var CONFIG_FILE = "secret.yaml"

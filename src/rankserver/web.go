@@ -470,7 +470,6 @@ func (r *RankServer) distCompareHandler(w http.ResponseWriter, req *http.Request
 	}
 }
 
-
 func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.UpdateTimestamp()

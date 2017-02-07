@@ -101,18 +101,18 @@ type RankServer struct {
 	// for both read and write
 	mux_timestamp sync.RWMutex
 	// sql
-	rankDB       string
-	db           *sql.DB
-	logger       *log.Logger
-	log_fh       *os.File
-	keyFile      string
-	certFile     string
-	plainServer  *http.Server
-	tlsServer    *http.Server
-	slHTTP       *stoppableListener.StoppableListener
-	slTLS        *stoppableListener.StoppableListener
-	hostname     string
-	resourceMgr  *resource_mgr.ResourceMgr
+	rankDB      string
+	db          *sql.DB
+	logger      *log.Logger
+	log_fh      *os.File
+	keyFile     string
+	certFile    string
+	plainServer *http.Server
+	tlsServer   *http.Server
+	slHTTP      *stoppableListener.StoppableListener
+	slTLS       *stoppableListener.StoppableListener
+	hostname    string
+	resourceMgr *resource_mgr.ResourceMgr
 	// current/latest: different for data/display?
 	currentEvent *resource_mgr.EventDetail
 	latestEvent  *resource_mgr.EventDetail
