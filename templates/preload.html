@@ -490,10 +490,10 @@ function drawEventChart() {
          //height: 350,
          calendar: {cellSize: 11},
          colorAxis: {
-            colors: ['green', 'blue', 'red', 'yellow'],
+            colors: ['blue', 'blue', 'blue', 'yellow'],
             values: [0, 5, 10, 15]
             },
-         legend: 'none',
+         legend: {position: 'none'},
          tooltip: {isHtml: false},
        };
        options['calendar']['cellSize'] = $(window).width() / 60;
