@@ -1,3 +1,25 @@
+Main components
+- rankserver: web server (listens on http/4001, https/4002 by default)
+- dfticker: periodic data fetcher
+- twitter_ticker: periodic twitter poster
+
+Dependency
+- make
+- Go
+- Perl
+- msgpack: "github.com/ugorji/go/codec"
+- lz4: "github.com/bkaradzic/go-lz4"
+- sqlite3: "github.com/mattn/go-sqlite3"
+- yaml: "gopkg.in/yaml.v2"
+- Net::Twitter: Perl module
+- [optional] gopacket: "github.com/google/gopacket"
+
+To run a full service
+- write config files
+- make fetch
+- make server
+- make twitter
+
 TODO
 - [done] event datetime filter based on sqlite3
 - [pydone] translate python/perl to go? (perl Net::Twitter remains)
@@ -5,15 +27,11 @@ TODO
 - dfticker save less?
 - concurrent map rw?
 - error message tags: sql/database locked, ...
+- manual restart rankserver needed for app_ver update
 
-manual restart rankserver needed for app_ver update
-
-
-[outdated] Data flow           when to run
-- python main2.py   periodic
-- rankserver.go     alltime    prevent mem leak?
-- twitter.pl        trigger by periodic_twitter.pl
-- periodic_twitter.pl alltime
+Thanks to marcan:
+- much of the apiclient/resource_mgr framework comes from deresuteme
+  https://github.com/marcan/deresuteme.git
 
 
 Other bots:
