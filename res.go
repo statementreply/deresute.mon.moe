@@ -37,7 +37,7 @@ func main() {
 	var config map[string]string
 	yaml.Unmarshal(content, &config)
 
-	//log.Println("res_ver", config["res_ver"])
+	log.Println("res_ver", config["res_ver"])
 	r := resource_mgr.NewResourceMgr(config["res_ver"], "data/resourcesbeta")
 	log.Println("master is", r.LoadMaster())
 	r.ParseEvent()
