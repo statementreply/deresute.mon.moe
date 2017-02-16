@@ -325,9 +325,10 @@ function drawDistCompareChart() {
     var options = {
         hAxis: {
             title: "rank",
-            minValue: 0,
+            minValue: 0.92,
             gridlines: {count: 10},
             format: 'short',
+            viewWindow: {max: 320000},
         },
         vAxis: {
             minValue: 0,
@@ -336,7 +337,7 @@ function drawDistCompareChart() {
             format: 'short',
             //gridlines: {count: 5},
             //minorGridlines: {count: 1},
-            //viewWindow: {min: 1},
+            viewWindow: {min: 8000},
         },
         series: {
             0: {targetAxisIndex: 0},
@@ -357,6 +358,7 @@ function drawDistCompareChart() {
     if (myUri.indexOf("hlog") > 0) {
         console.log("set hlog");
         options.hAxis.logScale = true;
+        //options.hAxis.scaleType = 'mirrorLog';
     }
 
     myDistChart = $("#myDistChart", currentPage);
