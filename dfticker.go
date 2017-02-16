@@ -221,9 +221,9 @@ func NeedToRun() bool {
 
 // Add datapoints
 // +- 100: all, 20pages
-// +- 2000: by 100: 40pages
+// #+- 2000: by 100: 40pages
 // +- 2000 by 50: 80pages
-// +- 10000 by 200: 100 pages
+// #+- 10000 by 200: 100 pages
 func appendNeighborhood(oldKeyPoint [][2]int, rankingType int, basepoint int) [][2]int {
 	var newKeyPoint = oldKeyPoint
 	// firstly check parameter sanity
