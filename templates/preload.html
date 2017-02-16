@@ -287,14 +287,17 @@ function drawDistChart() {
                 "rows":[]}
             // cols
             dt["cols"].push({"id":plot_label[t], "label":plot_label[t], "type":"number"});
-            dt["cols"].push({"id":plot_label[t+2], "label":plot_label[t+2], "type":"number"});
+            // FIXME: disable density
+            //dt["cols"].push({"id":plot_label[t+2], "label":plot_label[t+2], "type":"number"});
             cur = data[t];
             cur2 = data[t+2];
             // rows
             for (i=0; i<cur.length; i++) {
                 row = cur[i];
                 row2 = cur2[i];
-                row_map = {"c": [{"v": row[0]}, {"v": row[1]}, {"v": row2[1]}]};
+                // FIXME: disable density
+                //row_map = {"c": [{"v": row[0]}, {"v": row[1]}, {"v": row2[1]}]};
+                row_map = {"c": [{"v": row[0]}, {"v": row[1]}]};
                 dt["rows"].push(row_map);
             }
             // t=0: dt: ranklist
