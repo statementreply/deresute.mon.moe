@@ -273,8 +273,9 @@ function drawDistChart() {
     if (myDistChart.length == 0) {
         return;
     }
-    // FIXME
-    if (document.documentURI.indexOf("/dist_compare") > 0) {
+    // originally: depending on the presence of certain ids for divs
+    // FIXME: redirect to dist_compare based on url
+    if (document.documentURI.indexOf("dist_compare") > 0) {
         drawDistCompareChart();
         return;
     }

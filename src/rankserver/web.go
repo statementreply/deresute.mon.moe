@@ -239,6 +239,20 @@ func (r *RankServer) parseParam_achart(req *http.Request) int {
 	return 0
 }
 
+// returns a string for ChartType
+func (r *RankServer) parseParam_ctype(req *http.Request) string {
+	// the default
+	chartType := "myTWCChart"
+	chartType_str_list, ok := req.Form["ctype"]
+	if ok {
+		chartType_str := chartType_str_list[0]
+		if chartType_str == "myDistChart" {
+			chartType = chartType_str
+		}
+	}
+	return chartType
+}
+
 // parse parameters
 // available parameters
 // - t:       single timestamp
@@ -319,7 +333,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 		}
 	}
 	// FIXME: hardcode
-	result.TwitterCardURL = "https://deresute.mon.moe/twc"
+	result.TwitterCardURL = template.HTML("https://" + r.hostname + "/twc")
 	result.NowJST = time.Now().In(ts.TZ()).Format(time.RFC3339)
 	return result
 }
@@ -338,6 +352,9 @@ func (r *RankServer) twcHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.CheckData()
 	tmplVar := r.getTmplVar(w, req)
+	// parse div
+	//tmplVar.ChartType = "myTWCChart"
+	tmplVar.ChartType = r.parseParam_ctype(req)
 	err := rsTmpl.ExecuteTemplate(w, "twitter_card.html", tmplVar)
 	if err != nil {
 		r.logger.Println("html/template", err)
@@ -478,6 +495,8 @@ func (r *RankServer) distCompareHandler(w http.ResponseWriter, req *http.Request
 	r.CheckData()
 	req.ParseForm()
 	tmplVar := r.getTmplVar(w, req)
+	tmplVar.TwitterCardURL = template.HTML("https://" + r.hostname + "/twc?ctype=myDistChart&arg=dist_compare")
+
 	err := rsTmpl.ExecuteTemplate(w, "dist_compare.html", tmplVar)
 	if err != nil {
 		r.logger.Println("html/template", err)

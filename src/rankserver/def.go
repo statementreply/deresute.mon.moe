@@ -97,7 +97,8 @@ type tmplVar struct {
 	FinalTime     string
 	//ListEventDate []*TimeOfSelector
 	// for twitter card
-	TwitterCardURL string
+	TwitterCardURL template.HTML
+	ChartType      string
 	// debugging
 	NowJST string
 }

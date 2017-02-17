@@ -1,8 +1,19 @@
 // FIXME
 // do more on javascript side
+google.charts.setOnLoadCallback(drawDistCompareChart);
+google.charts.setOnLoadCallback(pageChange2);
+function pageChange2() {
+    $(window).on("pagechange", function() {
+        drawDistCompareChart();
+    });
+    $(window).on("orientationchange", function() {
+        drawDistCompareChart();
+    });
+};
+
 function drawDistCompareChart() {
     var myUri = document.documentURI;
-    setAspectRatio();
+    //setAspectRatio();
     currentPage = $("body").pagecontainer("getActivePage");
     var options = {
         hAxis: {
@@ -44,6 +55,10 @@ function drawDistCompareChart() {
     }
 
     myDistChart = $("#myDistChart", currentPage);
+    if (myDistChart.length == 0) {
+        return;
+    }
+    setAspectRatio_i(myDistChart);
     eventName1 = "ラブレター";
     ddataurl1 = "/d_dist?t=1474945320";
     eventName2 = "命燃やして恋せよ乙女";
