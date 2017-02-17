@@ -7,10 +7,10 @@ Dependency
 - make
 - Go
 - Perl
-- msgpack: "https://github.com/ugorji/go/codec"
-- lz4: "https://github.com/bkaradzic/go-lz4"
-- sqlite3: "https://github.com/mattn/go-sqlite3"
-- yaml: "https://gopkg.in/yaml.v2"
+- msgpack:      "https://github.com/ugorji/go/codec"
+- lz4:          "https://github.com/bkaradzic/go-lz4"
+- sqlite3:      "https://github.com/mattn/go-sqlite3"
+- yaml:         "https://gopkg.in/yaml.v2"
 - Net::Twitter: "https://metacpan.org/release/Net-Twitter"
 - [optional] gopacket: "https://github.com/google/gopacket"
 
@@ -34,15 +34,19 @@ TODO
 - [pydone] translate python/perl to go? (perl Net::Twitter remains)
 - dfticker mem leak?
 - dfticker save less?
-- concurrent map rw?
+- [done] concurrent map rw?: now moved to sqlite
 - error message tags: sql/database locked, ...
 - manual restart rankserver needed for app_ver update
+- twitter card adaptable to different pages
+- df/dfticker: collect more data for log-graph dist_compare
 
-Thanks to marcan:
+Thanks to @marcan, @ApricotMoai:
 - much of the apiclient/resource_mgr framework comes from deresuteme
   https://github.com/marcan/deresuteme.git
+- final result border data for 6 events from ApricotMoai
 
 
-Other bots:
-https://twitter.com/llborder_update
-https://twitter.com/deresute_border
+Similar bots:
+- https://twitter.com/llborder_update (retired)
+- https://twitter.com/deresute_border (no longer updating)
+- https://twitter.com/imas_cg_ss
