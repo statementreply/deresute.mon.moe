@@ -237,6 +237,8 @@ function drawDistChart() {
             minValue: 0,
             gridlines: {count: 10},
             format: 'short',
+            logScale: true,
+            viewWindow: {},
         },
         vAxis: {
             minValue: 0,
@@ -266,6 +268,7 @@ function drawDistChart() {
 
     options.vAxis.logScale = true;
     options.title = "pt";
+    options.hAxis.viewWindow.max = 320000;
     options_score.vAxis.logScale = false;
     options_score.title = "score";
     myDistChart = $("#myDistChart", currentPage);
