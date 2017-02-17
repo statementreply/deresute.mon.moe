@@ -58,7 +58,9 @@ function drawDistCompareChart() {
     if (myDistChart.length == 0) {
         return;
     }
-    setAspectRatio_i(myDistChart);
+    // when we are in twc mode, height/weight is set by css
+    // but in normal page, it's set here
+    //setAspectRatio_i(myDistChart);
     eventName1 = "ラブレター";
     ddataurl1 = "/d_dist?t=1474945320";
     eventName2 = "命燃やして恋せよ乙女";

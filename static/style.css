@@ -69,6 +69,11 @@ html.twc, body.twc, div.twc {
     width: 100%;
 }
 
+#myDistChart {
+    height: 96%;
+    width: 100%;
+}
+
 #myTWCChart.twc-test {
     height: 50%;
 }
