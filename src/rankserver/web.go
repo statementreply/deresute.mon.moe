@@ -495,7 +495,7 @@ func (r *RankServer) distCompareHandler(w http.ResponseWriter, req *http.Request
 	r.CheckData()
 	req.ParseForm()
 	tmplVar := r.getTmplVar(w, req)
-	tmplVar.TwitterCardURL = template.HTML("https://" + r.hostname + "/twc?ctype=myDistChart&arg=dist_compare")
+	tmplVar.TwitterCardURL = template.HTML("https://" + r.hostname + "/twc?ctype=myDistChart&arg=dist_compare&hlog=1")
 
 	err := rsTmpl.ExecuteTemplate(w, "dist_compare.html", tmplVar)
 	if err != nil {
