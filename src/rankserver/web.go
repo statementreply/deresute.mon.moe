@@ -152,11 +152,12 @@ func (r *RankServer) parseParam_delta(req *http.Request) int64 {
 }
 
 // returns list_rank or nil (list could be empty but not nil?)
+// FIXME: limit list length to 20, avoid high cpu usage
 func (r *RankServer) parseParam_rank(req *http.Request) []int {
 	list_rank_str, ok := req.Form["rank"] // format checked split, strconv.Atoi
 	var list_rank []int
 	if ok {
-		list_rank = make([]int, 0, len(list_rank_str))
+		list_rank = make([]int, 0, 20)
 		for _, v := range list_rank_str {
 			// now v can contain more than one number
 			//fmt.Println("str<"+v+">")
@@ -165,6 +166,9 @@ func (r *RankServer) parseParam_rank(req *http.Request) []int {
 				n, err := strconv.Atoi(vv)
 				if (err == nil) && (n >= 1) && (n <= 1000001) {
 					list_rank = append(list_rank, n)
+					if (len(list_rank) >= 20) {
+						break
+					}
 				}
 			}
 		}
