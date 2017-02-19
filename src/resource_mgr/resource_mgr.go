@@ -341,7 +341,7 @@ func (r *ResourceMgr) FindEventById(id int) *EventDetail {
 }
 
 // medley event id to music title
-// bug sort is bad...
+// BUG/FIXME: sort is bad...
 func (r *ResourceMgr) FindMedleyTitle(e *EventDetail) string {
 	var id int
 	id = e.Id()
