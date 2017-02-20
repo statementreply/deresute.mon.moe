@@ -3,6 +3,7 @@
     <div data-role="page" data-dom-cache="false">
 {{template "qchart_info.html" .}}
 {{template "navbar.html"}}
+    <div class="ui-body">
         <div class="form">
             <p>イベント：{{.EventTitle}}</p>
             <form action="/dist" method="get">
@@ -51,6 +52,7 @@
 <div class="ui-block-a" id="myDistChart">loading...</div>
 <div class="ui-block-b" id="myScoreDistChart">loading...</div>
 </div>
+    </div>
     </div>
 </body>
 {{template "postload.html"}}

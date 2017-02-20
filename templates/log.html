@@ -2,10 +2,12 @@
 <body>
     <div data-role="page" data-dom-cache="false">
 {{template "navbar.html"}}
+    <div class="ui-body">
         <!--<h2>デレステイベントボーダー</h2>-->
         <!--<a href="..">最新ボーダー</a><br>-->
 {{range .TimestampList}}
         <a href="{{.Link}}">{{.Text}}</a><br>{{end}}
+    </div>
     </div>
 </body>
 {{template "postload.html"}}

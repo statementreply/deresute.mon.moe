@@ -3,6 +3,7 @@
 <body>
     <div data-role="page" data-dom-cache="false">
 {{template "navbar.html"}}
+    <div class="ui-body">
         <div id="eventCalendar"></div>
         current time in JST {{.NowJST}}
         <table class="columns">
@@ -10,6 +11,7 @@
 {{range .EventList}}
             <tr><td>{{.EventLink}}</td><td>{{.EventStart}}</td><td>{{.EventHalf}}</td><td>{{.EventEnd}}</td></tr>{{end}}
         </table>
+    </div>
     </div>
 </body>
 </html>

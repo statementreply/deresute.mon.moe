@@ -3,6 +3,7 @@
     <div data-role="page" data-dom-cache="false">
 {{template "qchart_info.html" .}}
 {{template "navbar.html"}}
+        <div class="ui-body">
         <div class="form">
             <p>イベント：{{.EventTitle}}</p>
             <p>customized border graph：</p>
@@ -45,6 +46,7 @@
         </div>
         <div class="note"><p>javascript library from <code>https://www.gstatic.com/charts/loader.js</code></p>
         </div>
+    </div>
     </div>
 </body>
 {{template "postload.html"}}
