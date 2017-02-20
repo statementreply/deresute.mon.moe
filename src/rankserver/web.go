@@ -196,7 +196,8 @@ func (r *RankServer) parseParam_event(req *http.Request) *resource_mgr.EventDeta
 	return event
 }
 
-// multiple events
+// FIXME: parse multiple events
+// return at most 10 event ids
 func (r *RankServer) parseParam_events(req *http.Request) []*resource_mgr.EventDetail {
 	var events []*resource_mgr.EventDetail
 	event_id_str_list, ok := req.Form["event"] // checked Atoi
@@ -207,6 +208,9 @@ func (r *RankServer) parseParam_events(req *http.Request) []*resource_mgr.EventD
 				event_id, err := strconv.Atoi(event_id_str)
 				if err == nil {
 					events = append(events, r.resourceMgr.FindEventById(event_id))
+					if len(events) >= 10 {
+						break
+					}
 				} else {
 					r.logger.Println("bad event id", err, event_id_str)
 				}
