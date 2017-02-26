@@ -65,6 +65,7 @@ func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_db, re
 	return df
 }
 
+// FIXME
 func (df *DataFetcher) FinalResultDuplicate(currentEvent *resource_mgr.EventDetail) bool {
 	// condition
 	// now is in [result start, result end]
@@ -186,9 +187,10 @@ func (df *DataFetcher) Run() error {
 		return nil
 	}
 
+	// looping will be slow because of Sleep(): to reduce load on the server
 	for _, key := range df.key_point {
 		//log.Println("rankingtype:", key[0], "rank:", key[1])
-		timestamp, statusStr, err := df.GetCache(currentEvent, key[0], RankToPage(key[1]))
+		timestamp, statusStr, err := df.GetCache(currentEvent, key[0], RankToPage(key[1]), local_timestamp)
 		if err != nil {
 			//log.Fatal(err)
 			return err
@@ -236,7 +238,7 @@ func DumpToFile(v interface{}, fileName string) {
 }
 
 //return timestamp, statuscode("-", "*", ""), err
-func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_type int, page int) (string, string, error) {
+func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_type int, page int, local_timestamp_in string) (string, string, error) {
 
 	event_type := currentEvent.Type()
 	//log.Println("current event type:", event_type)
@@ -248,7 +250,16 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	}
 
 	//localtime := float64(time.Now().UnixNano()) / 1e9 // for debug
-	local_timestamp := ts.GetLocalTimestamp()
+
+	// The timestamp that will be used to commit to db,
+	// and query for hit/miss
+	// When event is active, get a new commit_timestamp on each GetCache()
+	// When event is final/result, use the local_timestamp_in param, so that
+	// each Run() will have the same timestamp for each GetCache() call.
+	commit_timestamp := local_timestamp_in
+	if currentEvent.IsActive(ts.TimestampToTime(commit_timestamp)) {
+		commit_timestamp = ts.GetLocalTimestamp()
+	}
 
 	hit := true
 
@@ -256,7 +267,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	// query timestamp local_timestamp
 	// query rank local_timestamp, ranking_type, page-to-rank
 	var ts_discard string
-	row := df.db.QueryRow("SELECT timestamp FROM timestamp WHERE timestamp == $1 LIMIT 1;", local_timestamp)
+	row := df.db.QueryRow("SELECT timestamp FROM timestamp WHERE timestamp == $1 LIMIT 1;", commit_timestamp)
 	err := row.Scan(&ts_discard)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -271,7 +282,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 		// sql hit
 		//log.Println("[INFO] hit table timestamp", local_timestamp)
 	}
-	row = df.db.QueryRow("SELECT timestamp FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3 LIMIT 1;", local_timestamp, ranking_type, (page-1)*10+1)
+	row = df.db.QueryRow("SELECT timestamp FROM rank WHERE timestamp == $1 AND type == $2 AND rank == $3 LIMIT 1;", commit_timestamp, ranking_type, (page-1)*10+1)
 	err = row.Scan(&ts_discard)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -288,8 +299,8 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	}
 
 	if hit {
-		log.Println("[INFO] hit", local_timestamp, ranking_type, page)
-		return local_timestamp, "-", nil
+		log.Println("[INFO] hit", commit_timestamp, ranking_type, page)
+		return commit_timestamp, "-", nil
 	}
 
 	// FIXME: wait between requests
@@ -300,14 +311,19 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	}
 	//log.Printf("localtime: %f servertime: %d lag: %f\n", localtime, servertime, float64(servertime)-localtime)
 
+	{ // limit scope for server_timestamp*
 	server_timestamp_i := ts.RoundTimestamp(time.Unix(int64(servertime), 0)).Unix()
 	server_timestamp := fmt.Sprintf("%d", server_timestamp_i)
 
 	// FIXME: Limit this check only to event active period
-	// and disable for event result period?
-	if server_timestamp != local_timestamp {
-		log.Println("[NOTICE] change to server_timestamp:", server_timestamp, "local:", local_timestamp)
+	// and disable for event result period
+	if server_timestamp != commit_timestamp {
+		log.Println("[NOTICE] server_timestamp different from commit_timestamp:", server_timestamp, "local:", commit_timestamp)
+		if currentEvent.IsActive(ts.TimestampToTime(commit_timestamp)) {
+			commit_timestamp = server_timestamp
+		}
 	}
+	} // scope ends for server_timestamp*
 
 	// write to df.db
 	for _, value := range ranking_list {
@@ -317,7 +333,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 		score := vmap["score"]
 		viewer_id := vmap["user_info"].(map[interface{}]interface{})["viewer_id"]
 		_, err := df.db.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5);",
-			server_timestamp,
+			commit_timestamp,
 			ranking_type,
 			rank,
 			score,
@@ -330,18 +346,18 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	for rank := (page-1)*10 + 1 + len(ranking_list); rank <= (page-1)*10+10; rank++ {
 		// rank, 0, 0
 		_, err := df.db.Exec("INSERT OR IGNORE INTO rank (timestamp, type, rank, score, viewer_id) VALUES ($1, $2, $3, $4, $5);",
-			server_timestamp, ranking_type, rank, 0, 0)
+			commit_timestamp, ranking_type, rank, 0, 0)
 		if err != nil {
 			log.Println("db insert err", err)
 		}
 	}
-	_, err = df.db.Exec("INSERT OR IGNORE INTO timestamp (timestamp) VALUES ($1);", server_timestamp)
+	_, err = df.db.Exec("INSERT OR IGNORE INTO timestamp (timestamp) VALUES ($1);", commit_timestamp)
 	if err != nil && err != sqlite3.ErrConstraintUnique {
 		log.Println("db insert err", err)
 		log.Printf("%#v", err)
 		log.Printf("%d %d", err.(sqlite3.Error).Code, err.(sqlite3.Error).ExtendedCode)
 	}
-	return server_timestamp, "*", nil
+	return commit_timestamp, "*", nil
 }
 
 func (df *DataFetcher) GetPage(event_type, ranking_type, page int) ([]interface{}, uint64, error) {
