@@ -193,7 +193,8 @@ func (df *DataFetcher) Run() error {
 			//log.Fatal(err)
 			return err
 		}
-		if timestamp != local_timestamp {
+		// FIXME: don't return ErrRerun for the result period
+		if timestamp != local_timestamp && currentEvent.IsActive(local_time) {
 			return ErrRerun
 		}
 		fmt.Print(statusStr) // progress bar
