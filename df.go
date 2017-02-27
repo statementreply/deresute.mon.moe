@@ -64,6 +64,7 @@ func main() {
 		key_point = append(key_point, [2]int{1, index*10000 + 1})
 		key_point = append(key_point, [2]int{2, index*10000 + 1})
 	}
+	// 1 to 50000
 	for index := 0; index < 5001; index++ {
 		key_point = append(key_point, [2]int{1, index*10 + 1})
 		key_point = append(key_point, [2]int{2, index*10 + 1})
