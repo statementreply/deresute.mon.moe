@@ -213,6 +213,19 @@ func (df *DataFetcher) Run() error {
 	return nil
 }
 
+func (df *DataFetcher) OpenDb() {
+	db, err := sql.Open("sqlite3", "file:"+df.rankDB+"?mode=rwc")
+	if err != nil {
+		log.Println("cannot open db", err)
+	}
+	df.db = db
+}
+
+func (df *DataFetcher) CloseDb() {
+	df.db.Close()
+}
+
+
 func RankToPage(rank int) int {
 	var page int
 	page = ((rank - 1) / 10) + 1

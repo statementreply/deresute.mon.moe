@@ -20,6 +20,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"resource_mgr"
 	"time"
 	ts "timestamp"
 )
@@ -68,9 +69,28 @@ func main() {
 		key_point = append(key_point, [2]int{2, index*10 + 1})
 	}
 	df := datafetcher.NewDataFetcher(client, key_point, RANK_DB, RESOURCE_CACHE_DIR)
+
+
+	df.Client.LoadCheck()
+	rv := df.Client.Get_res_ver()
+	resourceMgr := resource_mgr.NewResourceMgr(rv, RESOURCE_CACHE_DIR)
+	resourceMgr.ParseEvent()
+	currentEvent := resourceMgr.FindCurrentEvent()
+	//local_timestamp := ts.GetLocalTimestamp()
+	local_timestamp := os.Args[1]
+
+	df.OpenDb();
+	defer df.CloseDb();
+
 	//client.LoadCheck()
-	err := df.Run()
-	if err != nil {
-		log.Println(err)
+	//err := df.Run()
+	for _, key := range key_point {
+		_, statusStr, err := df.GetCache(currentEvent, key[0],
+				datafetcher.RankToPage(key[1]), local_timestamp)
+		_ = statusStr
+		if err != nil {
+			log.Println(err)
+			// TODO: append to retry
+		}
 	}
 }
