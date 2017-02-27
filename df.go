@@ -103,6 +103,7 @@ func main() {
 			log.Println(err)
 			if err == apiclient.ErrSession {
 				df.Client.LoadCheck()
+				df.Client.LoadCheck()
 			}
 			// TODO: append to retry
 		}
