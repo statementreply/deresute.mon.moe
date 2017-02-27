@@ -102,7 +102,9 @@ func main() {
 		if err != nil {
 			log.Println(err)
 			if err == apiclient.ErrSession {
+				time.Sleep(2200 * time.Millisecond)
 				df.Client.LoadCheck()
+				time.Sleep(1800 * time.Millisecond)
 				df.Client.LoadCheck()
 			}
 			// TODO: append to retry
