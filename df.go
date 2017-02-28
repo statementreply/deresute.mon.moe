@@ -28,6 +28,7 @@ import (
 var SECRET_FILE string = "secret.yaml"
 var BASE string = path.Dir(os.Args[0])
 var RANK_CACHE_DIR string = BASE + "/data/rank/"
+// separate from the main db
 var RANK_DB string = BASE + "/data/extra.db"
 var RESOURCE_CACHE_DIR string = BASE + "/data/resourcesbeta/"
 
@@ -81,6 +82,10 @@ func main() {
 	}
 	df := datafetcher.NewDataFetcher(client, key_point, RANK_DB, RESOURCE_CACHE_DIR)
 
+	// bypass some error handling in datafetch.Run()
+	//client.LoadCheck()
+	//err := df.Run()
+
 
 	df.Client.LoadCheck()
 	rv := df.Client.Get_res_ver()
@@ -88,13 +93,14 @@ func main() {
 	resourceMgr.ParseEvent()
 	currentEvent := resourceMgr.FindCurrentEvent()
 	//local_timestamp := ts.GetLocalTimestamp()
+	if len(os.Args) < 2 {
+		log.Fatal("need timestamp as cmdline param")
+	}
 	local_timestamp := os.Args[1]
 
 	df.OpenDb();
 	defer df.CloseDb();
 
-	//client.LoadCheck()
-	//err := df.Run()
 	for _, key := range key_point {
 		_, statusStr, err := df.GetCache(currentEvent, key[0],
 				datafetcher.RankToPage(key[1]), local_timestamp)
