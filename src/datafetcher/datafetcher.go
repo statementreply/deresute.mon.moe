@@ -331,8 +331,8 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	// FIXME: Limit this check only to event active period
 	// and disable for event result period
 	if server_timestamp != commit_timestamp {
-		log.Println("[NOTICE] server_timestamp different from commit_timestamp:", server_timestamp, "local:", commit_timestamp)
 		if currentEvent.IsActive(ts.TimestampToTime(commit_timestamp)) {
+			log.Println("[NOTICE] server_timestamp different from commit_timestamp:", server_timestamp, "local:", commit_timestamp)
 			commit_timestamp = server_timestamp
 		}
 	}
