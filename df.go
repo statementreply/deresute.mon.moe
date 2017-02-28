@@ -80,12 +80,16 @@ func main() {
 		key_point = append(key_point, [2]int{1, index*10 + 1})
 		key_point = append(key_point, [2]int{2, index*10 + 1})
 	}
+	// 1-130000
+	for index := 1; index < 1301; index++ {
+		key_point = append(key_point, [2]int{1, index*100 + 1})
+		key_point = append(key_point, [2]int{2, index*100 + 1})
+	}
 	df := datafetcher.NewDataFetcher(client, key_point, RANK_DB, RESOURCE_CACHE_DIR)
 
 	// bypass some error handling in datafetch.Run()
 	//client.LoadCheck()
 	//err := df.Run()
-
 
 	df.Client.LoadCheck()
 	rv := df.Client.Get_res_ver()
