@@ -317,7 +317,7 @@ func (df *DataFetcher) GetCache(currentEvent *resource_mgr.EventDetail, ranking_
 	}
 
 	// FIXME: wait between requests
-	time.Sleep(2800 * time.Millisecond)
+	time.Sleep(2400 * time.Millisecond)
 	ranking_list, servertime, err := df.GetPage(event_type, ranking_type, page)
 	if err != nil {
 		return "", "", err
