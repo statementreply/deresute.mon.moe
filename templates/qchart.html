@@ -38,9 +38,9 @@
             </form>
         </div>
         {{template "chart_snippet.html"}}
-        <div class="note">
-            <p>表示できる順位<br>
-            イベントpt：{{index .AvailableRank 0}}<br>
+        <div class="note" data-role="collapsible">
+            <h4>表示できる順位</h4>
+            <p>イベントpt：{{index .AvailableRank 0}}<br>
             ハイスコア：{{index .AvailableRank 1}}
             </p>
         </div>
