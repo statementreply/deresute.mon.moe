@@ -428,6 +428,6 @@ Map02:
 		return ""
 	}
 
-	log.Println("event_id", id, "story_id", story_id, "category_id", category_id, "title", title)
+	log.Println("[INFO]", "event_id", id, "story_id", story_id, "category_id", category_id, "title", title)
 	return title
 }
