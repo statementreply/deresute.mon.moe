@@ -82,6 +82,7 @@ func FormatDate(t time.Time) string {
 // for datafetcher
 func RoundTimestamp(in time.Time) time.Time {
 	s := in.Unix()
+	// FIXME: time step hardcode
 	rounded := ((s-120)/900)*900 + 120
 	return time.Unix(rounded, 0)
 }

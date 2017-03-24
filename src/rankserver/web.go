@@ -467,7 +467,7 @@ func (r *RankServer) distHandler(w http.ResponseWriter, req *http.Request) {
 	for i := 0; i < 24*4; i++ {
 		tmplVar.ListTimeOfDay = append(tmplVar.ListTimeOfDay,
 			&TimeOfSelector{
-				// FIXME: fix time step hardcoding
+				// FIXME: fix time step hardcode
 				Second:   int64(i*900 + 120),
 				Text:     fmt.Sprintf("%02d:%02d", i/4, (i%4)*15+2),
 				Selected: t_time == int64(i*900+120),
