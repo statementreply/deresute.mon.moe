@@ -95,6 +95,9 @@ func main() {
 		[2]int{2, 40001},   // tier 3 atapon
 		[2]int{2, 50001},   // tier 3 medley
 	}
+	// FIXME: get highscores at 15k+4 min
+	// workaround: schedule them after the 50th keypoint
+
 	// TODO: collect more around borders, only for result[start, end]?
 	// (1, 2001), (1, 10001), (1, 20001), (1, 60001), (1, 100001), (1, 120001)
 	// (1, 501), (1, 5001), (1, 50001)
@@ -103,36 +106,25 @@ func main() {
 	// +- 100: all, +- 2000: by 100: 30pages
 	// extra data points
 	// from 1 to 100, all
-	for index := 0; index < 10; index++ {
-		key_point = append(key_point, [2]int{1, index*10 + 1})
-		key_point = append(key_point, [2]int{2, index*10 + 1})
-	}
+	key_point = appendKeyPoint(key_point, 0, 10, 1, 10);
+	key_point = appendKeyPoint(key_point, 0, 10, 2, 10);
 	// from 101 to 1000, increase by 100
-	for index := 1; index < 10; index++ {
-		key_point = append(key_point, [2]int{1, index*100 + 1})
-		key_point = append(key_point, [2]int{2, index*100 + 1})
-	}
+	key_point = appendKeyPoint(key_point, 1, 10, 1, 100);
+	key_point = appendKeyPoint(key_point, 1, 10, 2, 100);
 	// from 1k to 10k, by 1k
-	for index := 1; index < 10; index++ {
-		key_point = append(key_point, [2]int{1, index*1000 + 1})
-		key_point = append(key_point, [2]int{2, index*1000 + 1})
-	}
+	key_point = appendKeyPoint(key_point, 1, 10, 1, 1000);
+	key_point = appendKeyPoint(key_point, 1, 10, 2, 1000);
 	// from 10k to 100k, by 10k
-	for index := 1; index < 10; index++ {
-		key_point = append(key_point, [2]int{1, index*10000 + 1})
-		key_point = append(key_point, [2]int{2, index*10000 + 1})
-	}
+	key_point = appendKeyPoint(key_point, 1, 10, 1, 10000);
+	key_point = appendKeyPoint(key_point, 1, 10, 2, 10000);
 	// from 1 to 300k+1, by 10k
-	for index := 0; index < 31; index++ {
-		key_point = append(key_point, [2]int{1, index*10000 + 1})
-		key_point = append(key_point, [2]int{2, index*10000 + 1})
-	}
+	key_point = appendKeyPoint(key_point, 0, 31, 1, 10000);
+	key_point = appendKeyPoint(key_point, 0, 31, 2, 10000);
 	// from 300k+1 to 800k+1, by 20k
-	for index := 1; index < 26; index++ {
-		key_point = append(key_point, [2]int{1, 300000 + index*20000 + 1})
-		key_point = append(key_point, [2]int{2, 300000 + index*20000 + 1})
-	}
+	key_point = appendKeyPoint(key_point, 16, 41, 1, 20000);
+	key_point = appendKeyPoint(key_point, 16, 41, 2, 20000);
 	key_point = appendNeighborhood(key_point, 1, 2001)
+	//key_point = appendKeyPoint(key_point, 1, 26, 1, 20000);
 	fmt.Println(key_point);
 	//return;
 	client := apiclient.NewApiClientFromConfig(SECRET_FILE)
@@ -156,6 +148,13 @@ func main() {
 			}
 		}
 	}
+}
+
+func appendKeyPoint(key_point [][2]int, start, count, typ, step int) [][2]int {
+	for index := start; index < count; index++ {
+		key_point = append(key_point, [2]int{typ, index*step + 1})
+	}
+	return key_point
 }
 
 func runCommand(df *datafetcher.DataFetcher, t time.Time) {
