@@ -89,11 +89,6 @@ func main() {
 		[2]int{1, 300001},  // tier 6
 		[2]int{1, 500001},  // tier 7 emblem-4
 		[2]int{1, 1000001}, // tier 8
-		[2]int{2, 1},       // top
-		[2]int{2, 5001},    // tier 1
-		[2]int{2, 10001},   // tier 2
-		[2]int{2, 40001},   // tier 3 atapon
-		[2]int{2, 50001},   // tier 3 medley
 	}
 	// FIXME: get highscores at 15k+4 min
 	// workaround: schedule them after the 50th keypoint
@@ -106,23 +101,35 @@ func main() {
 	// +- 100: all, +- 2000: by 100: 30pages
 	// extra data points
 	// from 1 to 100, all
-	key_point = appendKeyPoint(key_point, 0, 10, 1, 10);
-	key_point = appendKeyPoint(key_point, 0, 10, 2, 10);
 	// from 101 to 1000, increase by 100
-	key_point = appendKeyPoint(key_point, 1, 10, 1, 100);
-	key_point = appendKeyPoint(key_point, 1, 10, 2, 100);
 	// from 1k to 10k, by 1k
-	key_point = appendKeyPoint(key_point, 1, 10, 1, 1000);
-	key_point = appendKeyPoint(key_point, 1, 10, 2, 1000);
 	// from 10k to 100k, by 10k
-	key_point = appendKeyPoint(key_point, 1, 10, 1, 10000);
-	key_point = appendKeyPoint(key_point, 1, 10, 2, 10000);
 	// from 1 to 300k+1, by 10k
-	key_point = appendKeyPoint(key_point, 0, 31, 1, 10000);
-	key_point = appendKeyPoint(key_point, 0, 31, 2, 10000);
 	// from 300k+1 to 800k+1, by 20k
+	key_point = appendKeyPoint(key_point, 0, 10, 1, 10);
+	key_point = appendKeyPoint(key_point, 1, 10, 1, 100);
+	key_point = appendKeyPoint(key_point, 1, 10, 1, 1000);
+	key_point = appendKeyPoint(key_point, 1, 10, 1, 10000);
+	key_point = appendKeyPoint(key_point, 0, 31, 1, 10000);
 	key_point = appendKeyPoint(key_point, 16, 41, 1, 20000);
+
+	// FIXME: work-around for highscore update lags
+	// delay highscore updates to 15k+4 min
+	// there're at least 50 event-pt samples before the first highscore sample.
+	key_point = append(key_point,
+		[2]int{2, 1},       // top
+		[2]int{2, 5001},    // tier 1
+		[2]int{2, 10001},   // tier 2
+		[2]int{2, 40001},   // tier 3 atapon
+		[2]int{2, 50001},   // tier 3 medley
+	)
+	key_point = appendKeyPoint(key_point, 0, 10, 2, 10);
+	key_point = appendKeyPoint(key_point, 1, 10, 2, 100);
+	key_point = appendKeyPoint(key_point, 1, 10, 2, 1000);
+	key_point = appendKeyPoint(key_point, 1, 10, 2, 10000);
+	key_point = appendKeyPoint(key_point, 0, 31, 2, 10000);
 	key_point = appendKeyPoint(key_point, 16, 41, 2, 20000);
+
 	key_point = appendNeighborhood(key_point, 1, 2001)
 	//key_point = appendKeyPoint(key_point, 1, 26, 1, 20000);
 	fmt.Println(key_point);
