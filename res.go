@@ -45,7 +45,8 @@ func main() {
 		_ = e
 		//fmt.Println(e.NoticeStart(), e.EventStart(), e.Name())
 		//fmt.Println(utf8.RuneCountInString(e.Name()), e.Name())
-		fmt.Println(e.ResultStart().Unix(), e.ResultEnd().Unix(), e.LongName())
+		//fmt.Println(e.ResultStart().Unix(), e.ResultEnd().Unix(), e.LongName())
+		fmt.Println(e.EventStart().String(), e.EventEnd().String(), e.LongName())
 	}
 	currentEvent := resource_mgr.FindCurrentEvent(r.EventList)
 	if currentEvent != nil {
