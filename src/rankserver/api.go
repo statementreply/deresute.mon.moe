@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	res "resource_mgr"
 	//"strconv"
 	"strings"
 	"time"
@@ -307,7 +308,7 @@ func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Reque
 		t := ts.TimestampToTime(timestamp)
 		// for atapon and groove, every hour, but every 15 min in the last hour
 		// for live parade, every 15 min
-		if (r.currentEvent.Type() != resource_mgr.EventTour) &&
+		if (r.currentEvent.Type() != res.EventTour) &&
 		   (!ts.IsWholeHour(timestamp)) &&
 		   (r.currentEvent.EventEnd().Sub(t) >= time.Hour) {
 			fmt.Fprint(w, "EMPTY")
