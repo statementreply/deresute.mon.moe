@@ -65,8 +65,8 @@ func main() {
 		cache_filename: "cached_status_trophy",
 		url:            "https://deresuteborder.mon.moe/twitter_trophy",
 		interval:       30 * time.Second,
-		div:            60 * 60 * time.Second,
-		rem:            165 * time.Second,
+		div:            15 * 60 * time.Second,
+		rem:            240 * time.Second,
 		dryrun:         false,
 	}
 	wg.Add(3)
@@ -133,6 +133,7 @@ func (p *Periodic) Run() {
 					log.Println(p.url, "updatingfilter match")
 					goto Retry
 				}
+				// used to skip a tweet
 				if emptyFilter.Match(body) {
 					log.Println(p.url, "empty response")
 					goto Finish

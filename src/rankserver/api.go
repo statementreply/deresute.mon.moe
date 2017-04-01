@@ -302,6 +302,14 @@ func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Reque
 		} else if r.currentEvent.Type() == 5 {
 			param.list_rank = []int{5001, 10001, 50001}
 		}
+
+		timestamp := r.latestTimestamp()
+		// for atapon and groove, every hour
+		// for live parade, every 15 min
+		if (r.currentEvent.Type() != 5) && (!ts.IsWholeHour(timestamp)) {
+			fmt.Fprint(w, "EMPTY")
+			return
+		}
 	}
 
 	r.twitterHandler_common(w, req, param)

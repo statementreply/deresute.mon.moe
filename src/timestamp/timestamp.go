@@ -87,6 +87,16 @@ func RoundTimestamp(in time.Time) time.Time {
 	return time.Unix(rounded, 0)
 }
 
+// FIXME: time step hardcode
+func IsWholeHour(timestamp string) bool {
+	t := TimestampToTime(timestamp)
+	if (t.Minute() >=0 && t.Minute() <15) {
+		return true
+	} else {
+		return false
+	}
+}
+
 func GetLocalTimestamp() string {
 	return TimeToTimestamp(RoundTimestamp(time.Now()))
 }
