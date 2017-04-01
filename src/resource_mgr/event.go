@@ -22,6 +22,15 @@ import (
 
 var grooveFilter = regexp.MustCompile("LIVE Groove")
 
+// event_type
+const (
+	EventAtapon  = 1
+	EventCaravan = 2
+	EventGroove  = 3
+	EventParty   = 4
+	EventTour    = 5
+)
+
 type EventDetail struct {
 	// content of table event_data
 	id, typ                                   int

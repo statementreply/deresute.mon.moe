@@ -304,9 +304,12 @@ func (r *RankServer) twitterTrophyHandler(w http.ResponseWriter, req *http.Reque
 		}
 
 		timestamp := r.latestTimestamp()
-		// for atapon and groove, every hour
+		t := ts.TimestampToTime(timestamp)
+		// for atapon and groove, every hour, but every 15 min in the last hour
 		// for live parade, every 15 min
-		if (r.currentEvent.Type() != 5) && (!ts.IsWholeHour(timestamp)) {
+		if (r.currentEvent.Type() != resource_mgr.EventTour) &&
+		   (!ts.IsWholeHour(timestamp)) &&
+		   (r.currentEvent.EventEnd().Sub(t) >= time.Hour) {
 			fmt.Fprint(w, "EMPTY")
 			return
 		}
