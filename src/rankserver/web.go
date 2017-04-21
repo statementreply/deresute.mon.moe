@@ -343,6 +343,12 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 	// FIXME: hardcode
 	result.TwitterCardURL = template.HTML("https://" + r.hostname + "/twc")
 	result.NowJST = time.Now().In(ts.TZ()).Format(time.RFC3339)
+	result.RemainingTime = ""
+	if r.currentEvent != nil {
+		remainingTime := r.currentEvent.EventEnd().Sub(time.Now())
+		remainingTimeStr := remainingTime.String()
+		result.RemainingTime = remainingTimeStr
+	}
 	return result
 }
 

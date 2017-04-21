@@ -99,8 +99,9 @@ type tmplVar struct {
 	// for twitter card
 	TwitterCardURL template.HTML
 	ChartType      string
-	// debugging
+	// for "/event" page
 	NowJST string
+	RemainingTime string
 }
 
 type eventDataRow struct {

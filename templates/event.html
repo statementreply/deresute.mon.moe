@@ -5,7 +5,8 @@
 {{template "navbar.html"}}
     <div class="ui-body">
         <div id="eventCalendar"></div>
-        current time in JST {{.NowJST}}
+        現在時刻（JST） {{.NowJST}}
+        remaining time {{.RemainingTime}}
         <table class="columns">
             <tr><td>event</td><td>start</td><td>second-half</td><td>end</td></tr>
 {{range .EventList}}
