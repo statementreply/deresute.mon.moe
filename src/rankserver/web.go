@@ -587,6 +587,7 @@ func (r *RankServer) eventHandler(w http.ResponseWriter, req *http.Request) {
 				EventStart: formatter(e.EventStart()),
 				EventHalf:  formatter(e.SecondHalfStart()),
 				EventEnd:   formatter(e.EventEnd()),
+				EventDuration: e.EventEnd().Add(time.Second).Sub(e.EventStart()).String(),
 			}
 		//r.logger.Println("test FindMedleyTitle", r.resourceMgr.FindMedleyTitle(e.Id()))
 	}

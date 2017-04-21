@@ -5,12 +5,12 @@
 {{template "navbar.html"}}
     <div class="ui-body">
         <div id="eventCalendar"></div>
-        現在時刻（JST） {{.NowJST}}
-        remaining time {{.RemainingTime}}
+        <div>現在時刻（JST） {{.NowJST}}</div>
+        <div>イベント終了まで {{.RemainingTime}}</div>
         <table class="columns">
-            <tr><td>event</td><td>start</td><td>second-half</td><td>end</td></tr>
+            <tr><td>event</td><td>start</td><td>second-half</td><td>end</td><td>duration</td></tr>
 {{range .EventList}}
-            <tr><td>{{.EventLink}}</td><td>{{.EventStart}}</td><td>{{.EventHalf}}</td><td>{{.EventEnd}}</td></tr>{{end}}
+            <tr><td>{{.EventLink}}</td><td>{{.EventStart}}</td><td>{{.EventHalf}}</td><td>{{.EventEnd}}</td><td>{{.EventDuration}}</td></tr>{{end}}
         </table>
     </div>
     </div>

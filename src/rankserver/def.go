@@ -58,6 +58,7 @@ type eventInfo struct {
 	EventHalf     string
 	EventEnd      string
 	EventSelected bool
+	EventDuration string
 }
 
 type TimeOfSelector struct {
