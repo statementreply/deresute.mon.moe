@@ -102,6 +102,7 @@ type tmplVar struct {
 	ChartType      string
 	// for "/event" page
 	NowJST string
+	RunningTime string
 	RemainingTime string
 }
 
