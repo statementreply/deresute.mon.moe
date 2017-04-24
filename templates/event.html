@@ -9,7 +9,7 @@
         <div>イベント開催から {{.RunningTime}}</div>
         <div>イベント終了まで {{.RemainingTime}}</div>
         <table class="columns">
-            <tr><td>event</td><td>start</td><td>second-half</td><td>end</td><td>duration</td></tr>
+            <tr><td>event</td><td>start</td><td>second-half</td><td>end</td><td>duration (+1s)</td></tr>
 {{range .EventList}}
             <tr><td>{{.EventLink}}</td><td>{{.EventStart}}</td><td>{{.EventHalf}}</td><td>{{.EventEnd}}</td><td>{{.EventDuration}}</td></tr>{{end}}
         </table>
