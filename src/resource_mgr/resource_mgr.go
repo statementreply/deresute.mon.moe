@@ -67,7 +67,17 @@ func (r *ResourceMgr) Fetch(loc string) (string, error) {
 		os.MkdirAll(path.Dir(dest), 0755)
 	}
 	time.Sleep(500 * time.Millisecond)
-	resp, err := http.Get(url)
+	log.Println("Fetch url is: " + url)
+	// add custom header
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Println("NewRequest bad", err)
+		return "", ErrNotOK
+	}
+	// temp FIX FIXME
+	req.Header.Add("X-Unity-Version", "5.1.2f1")
+	//resp, err := http.Get(url)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Println("http.Get", err)
 		return "", ErrNotOK

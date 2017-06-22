@@ -3,6 +3,7 @@ EXTRA := pcapdump dumpbody unlz4 res get_profile test1 ticker df \
 	get_manifest get_master db_import_csv
 all: ${MAIN}
 extra: ${EXTRA}
+get_master: src/resource_mgr
 clean:
 	rm -fv ${MAIN} ${EXTRA}
 
