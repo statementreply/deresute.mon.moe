@@ -14,6 +14,8 @@
 
 package main
 
+// todo: retry in the same run, avoid having to restart the program
+
 import (
 	"apiclient"
 	"datafetcher"
