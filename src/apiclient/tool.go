@@ -106,6 +106,27 @@ func (client *ApiClient) Get_res_ver() string {
 	return val
 }
 
+func (client *ApiClient) GetResVer() string {
+	return client.Get_res_ver()
+}
+
+func (client *ApiClient) SetResVer(res_ver string) {
+	client.Set_res_ver(res_ver)
+}
+
+func (client *ApiClient) GetAppVer() string {
+	client.lock.RLock()
+	app_ver := client.app_ver
+	client.lock.RUnlock()
+	return app_ver
+}
+
+func (client *ApiClient) SetAppVer(app_ver string) {
+	client.lock.Lock()
+	client.app_ver = app_ver
+	client.lock.Unlock()
+}
+
 func MsgpackDecode(b []byte, v interface{}) {
 	var bh codec.MsgpackHandle
 	bh.RawToString = true
