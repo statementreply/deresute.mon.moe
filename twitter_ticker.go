@@ -93,6 +93,8 @@ func (p *Periodic) Run() {
 			if quotient_new <= quotient {
 				continue
 			}
+			// This is a while(true) loop
+			retryCount := 0
 			for {
 				content, err := ioutil.ReadFile(p.cache_filename)
 				if err != nil {
@@ -136,7 +138,9 @@ func (p *Periodic) Run() {
 				// used to skip a tweet
 				if emptyFilter.Match(body) {
 					log.Println(p.url, "empty response")
-					goto Finish
+					//goto Finish
+					// FIXME: at beginnings of events
+					goto Retry
 				}
 
 				err = ioutil.WriteFile(p.cache_filename, body, 0644)
@@ -167,6 +171,11 @@ func (p *Periodic) Run() {
 			Retry: // continue block
 				log.Println(p.url, "in retry")
 				time.Sleep(p.interval)
+				// FIXME: retry at most 10 times?
+				retryCount += 1
+				if (retryCount >= 11) {
+					goto Finish
+				}
 			}
 		}
 	}
