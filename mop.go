@@ -16,8 +16,10 @@ package main
 
 import (
 	"apiclient"
+	"fmt"
 	"log"
 	"time"
+	"gopkg.in/yaml.v2"
 )
 
 var SECRET_FILE = "secret.yaml"
@@ -30,27 +32,32 @@ func main() {
 	args := map[string]interface{}{
 		"invalid_param": 19,
 	}
-	val := client.Call("/producer_rank/index", args)
-	time.Sleep(500 * time.Millisecond)
-	log.Printf("args %#v\n", args)
-	log.Printf("top %v\n\n", val)
+	// API 01: no arguments
+	//val := client.Call("/producer_rank/index", args)
+	//time.Sleep(500 * time.Millisecond)
+	//log.Printf("args %#v\n", args)
+	//log.Printf("top %v\n\n", val)
 
+	// API 02 
 	// param: page, back_mo_flag
 	// valuetype Stage.ProducerFanRanking/eProducerRankingType: 0, 1, 2
 	// -1 => back_mo_flag
 	args = map[string]interface{}{
-		"page":         int32(4),
-		"back_mo_flag": int32(0), // -1? 0 or 1
+		"page":         int32(100),
+		"back_mo_flag": int32(1), // 0 or 1
 	}
-	val = client.Call("/producer_rank/mo_p_ranking_list", args)
+	val := client.Call("/producer_rank/mo_p_ranking_list", args)
 	log.Printf("args %v\n", args)
 	time.Sleep(500 * time.Millisecond)
-	log.Printf("rank %#v\n", val)
+	//log.Printf("rank %#v\n", val)
+	yy, _ := yaml.Marshal(val)
+	fmt.Println(string(yy))
 
-	args = map[string]interface{}{}
-	val = client.Call("/producer_rank/mo_p_rank_data", args)
-	log.Printf("args %#v\n", args)
-	log.Printf("info %v\n\n", val)
+	// API 03: not used?
+	//args = map[string]interface{}{}
+	//val = client.Call("/producer_rank/mo_p_rank_data", args)
+	//log.Printf("args %#v\n", args)
+	//log.Printf("info %v\n\n", val)
 }
 
 /* new api
