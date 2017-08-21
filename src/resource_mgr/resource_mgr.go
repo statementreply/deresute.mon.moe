@@ -289,13 +289,14 @@ func (r *ResourceMgr) ParseEvent() {
 	}
 	defer db.Close()
 	// FIXME: schema dependent
-	rows, err := db.Query("SELECT * FROM event_data;")
+	rows, err := db.Query("SELECT id, type, name, notice_start, event_start, second_half_start, event_end, calc_start, result_start, result_end, limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count, master_plus_support FROM event_data;")
 	defer rows.Close()
 	for rows.Next() {
 		var id, typ int
 		var name string
 		var notice_start, event_start, second_half_start, event_end, calc_start, result_start, result_end string
 		var limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count, master_plus_support int
+		// CREATE TABLE IF NOT EXISTS 'event_data' ('id' INTEGER NOT NULL, 'type' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'notice_start' TEXT NOT NULL, 'event_start' TEXT NOT NULL, 'second_half_start' TEXT NOT NULL, 'event_end' TEXT NOT NULL, 'calc_start' TEXT NOT NULL, 'result_start' TEXT NOT NULL, 'result_end' TEXT NOT NULL, 'limit_flag' INTEGER NOT NULL, 'bg_type' INTEGER NOT NULL, 'bg_id' INTEGER NOT NULL, 'login_bonus_type'INTEGER NOT NULL, 'login_bonus_count' INTEGER NOT NULL, 'master_plus_support' INTEGER NOT NULL, 'item_re' INTEGER NOT NULL, PRIMARY KEY('id'));
 		err = rows.Scan(&id, &typ,
 			&name,
 			&notice_start, &event_start, &second_half_start,
