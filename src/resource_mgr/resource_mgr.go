@@ -183,7 +183,7 @@ func (r *ResourceMgr) LoadMaster() string {
 		return ""
 	}
 	defer db.Close()
-	rows, err := db.Query("SELECT * FROM manifests;")
+	rows, err := db.Query("SELECT name, hash, attr, category, decrypt_key FROM manifests;")
 	//log.Println(rows)
 	if err != nil {
 		log.Println("x2", err)
