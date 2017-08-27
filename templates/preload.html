@@ -384,6 +384,7 @@ function drawTimeCompareChart() {
             table1.addColumn('number', eventName);
             table1.addRows(data[eventName]);
 
+            // FIXME: null events?
             if (isFirst != 1) {
                 // 1..eventIndex-1
                 table0 = google.visualization.data.join(table0, table1, 'full', [[0, 0]], eventCols, [1]);
