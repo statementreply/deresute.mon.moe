@@ -376,6 +376,8 @@ function drawTimeCompareChart() {
         //plot_label = [eventName1, eventName2, eventName3, eventName4];
         var table0 = new google.visualization.DataTable();
         isFirst = 1;
+        eventIndex = 1;
+        eventCols = [];
         for (var eventName in data) {
             var table1 = new google.visualization.DataTable();
             table1.addColumn('number', 'Time');
@@ -383,11 +385,14 @@ function drawTimeCompareChart() {
             table1.addRows(data[eventName]);
 
             if (isFirst != 1) {
-                table0 = google.visualization.data.join(table0, table1, 'full', [[0, 0]], [1], [1]);
+                // 1..eventIndex-1
+                table0 = google.visualization.data.join(table0, table1, 'full', [[0, 0]], eventCols, [1]);
             } else {
                 table0 = table1;
                 isFirst = 0;
             }
+            eventCols.push(eventIndex);
+            eventIndex = eventIndex + 1;
         }
         chart = new google.visualization.LineChart(myLineChart.get(0));
         //console.log(data_list[0]);
