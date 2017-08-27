@@ -106,12 +106,6 @@ func main() {
 	// from 10k to 100k, by 10k
 	// from 1 to 300k+1, by 10k
 	// from 300k+1 to 800k+1, by 20k
-	key_point = appendKeyPoint(key_point, 0, 10, 1, 10);
-	key_point = appendKeyPoint(key_point, 1, 10, 1, 100);
-	key_point = appendKeyPoint(key_point, 1, 10, 1, 1000);
-	key_point = appendKeyPoint(key_point, 1, 10, 1, 10000);
-	key_point = appendKeyPoint(key_point, 0, 31, 1, 10000);
-	key_point = appendKeyPoint(key_point, 16, 41, 1, 20000);
 
 	// FIXME: work-around for highscore update lags
 	// delay highscore updates to 15k+4 min
@@ -123,6 +117,13 @@ func main() {
 		[2]int{2, 40001},   // tier 3 atapon
 		[2]int{2, 50001},   // tier 3 medley
 	)
+	key_point = appendKeyPoint(key_point, 0, 10, 1, 10);
+	key_point = appendKeyPoint(key_point, 1, 10, 1, 100);
+	key_point = appendKeyPoint(key_point, 1, 10, 1, 1000);
+	key_point = appendKeyPoint(key_point, 1, 10, 1, 10000);
+	key_point = appendKeyPoint(key_point, 0, 31, 1, 10000);
+	key_point = appendKeyPoint(key_point, 16, 41, 1, 20000);
+
 	key_point = appendKeyPoint(key_point, 0, 10, 2, 10);
 	key_point = appendKeyPoint(key_point, 1, 10, 2, 100);
 	key_point = appendKeyPoint(key_point, 1, 10, 2, 1000);
