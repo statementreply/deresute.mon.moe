@@ -332,19 +332,19 @@ function drawTimeCompareChart() {
     var options = {
         hAxis: {
             title: "time",
-            minValue: 0.92,
-            gridlines: {count: 10},
-            format: 'short',
-            viewWindow: {max: 320000},
+            //minValue: 0.92,
+            //gridlines: {count: 10},
+            //format: 'short',
+            //viewWindow: {max: 320000},
         },
         vAxis: {
-            minValue: 0,
+            //minValue: 0,
             textPosition: 'in',
-            logScale: true,
+            logScale: false,
             format: 'short',
             //gridlines: {count: 5},
             //minorGridlines: {count: 1},
-            viewWindow: {min: 8000},
+            //viewWindow: {min: 8000},
         },
         series: {
             0: {targetAxisIndex: 0},
@@ -363,21 +363,31 @@ function drawTimeCompareChart() {
     console.log("myUri");
     console.log(myUri);
 
-    myDistChart = $("#myLineChart", currentPage);
+    myLineChart = $("#myLineChart", currentPage);
+    if (myLineChart.length == 0) {
+        console.log("FATAL ERROR");
+        return;
+    }
     ddataurl = "/d2?rank=120001&event=1013&event=1016";
 
     var core = function (data) {
         //plot_label = [eventName1, eventName2, eventName3, eventName4];
         var table0 = new google.visualization.DataTable();
+        isFirst = 1;
         for (var eventName in data) {
             var table1 = new google.visualization.DataTable();
             table1.addColumn('number', 'Time');
             table1.addColumn('number', eventName);
             table1.addRows(data[eventName]);
 
-            table0 = google.visualization.data.join(table0, table1, 'full', [[0, 0]], [1], [1]);
+            if (isFirst != 1) {
+                table0 = google.visualization.data.join(table0, table1, 'full', [[0, 0]], [1], [1]);
+            } else {
+                table0 = table1;
+                isFirst = 0;
+            }
         }
-        chart = new google.visualization.LineChart(myDistChart.get(0));
+        chart = new google.visualization.LineChart(myLineChart.get(0));
         //console.log(data_list[0]);
         //console.log(JSON.stringify(data_list[0]));
         chart.draw(table0, options);
