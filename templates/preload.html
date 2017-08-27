@@ -369,6 +369,8 @@ function drawTimeCompareChart() {
         return;
     }
     ddataurl = "/d2?rank=120001&event=1013&event=1016";
+    ddataurl2 = "/d2?" + $("#dataurlv2", currentPage).text();
+    console.log("ddataurl2 is ", ddataurl2);
 
     var core = function (data) {
         //plot_label = [eventName1, eventName2, eventName3, eventName4];
@@ -392,7 +394,7 @@ function drawTimeCompareChart() {
         //console.log(JSON.stringify(data_list[0]));
         chart.draw(table0, options);
     };
-    $.getJSON(ddataurl, "", core);
+    $.getJSON(ddataurl2, "", core);
 }
 
 // FIXME

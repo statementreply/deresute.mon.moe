@@ -76,6 +76,7 @@ type tmplVar struct {
 	EventTitle         string
 	Timestamp          string
 	DURL               string
+	DURL2              string
 	AChart             int
 	PrefillEvent       string
 	PrefillRank        string

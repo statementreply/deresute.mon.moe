@@ -311,6 +311,7 @@ func (r *RankServer) getTmplVar(w http.ResponseWriter, req *http.Request) *tmplV
 		result.PrefillAChart = " checked"
 	}
 	result.DURL = r.generateDURL(&result.qchartParam)
+	result.DURL2 = req.URL.RawQuery
 	// for debug
 	//r.currentEvent = result.event
 	if r.currentEvent != nil {
