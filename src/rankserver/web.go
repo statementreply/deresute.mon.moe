@@ -521,6 +521,19 @@ func (r *RankServer) distCompareHandler(w http.ResponseWriter, req *http.Request
 	}
 }
 
+func (r *RankServer) timeCompareHandler(w http.ResponseWriter, req *http.Request) {
+	r.init_req(w, req)
+	r.CheckData()
+	req.ParseForm()
+	tmplVar := r.getTmplVar(w, req)
+	tmplVar.TwitterCardURL = template.HTML("https://" + r.hostname + "/twc?ctype=myDistChart&arg=time_compare&event=1022")
+
+	err := rsTmpl.ExecuteTemplate(w, "time_compare.html", tmplVar)
+	if err != nil {
+		r.logger.Println("html/template", err)
+	}
+}
+
 func (r *RankServer) logHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.UpdateTimestamp()

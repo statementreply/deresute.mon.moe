@@ -1,0 +1,9 @@
+{{template "preload.html" .}}
+<body>
+    <div data-role="page" data-dom-cache="false">
+{{template "qchart_info.html" .}}
+{{template "navbar.html"}}
+<div class="ui-body" id="myLineChart">loading...</div>
+    </div>
+</body>
+{{template "postload.html"}}
