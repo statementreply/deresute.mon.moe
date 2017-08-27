@@ -99,7 +99,7 @@ func (r *RankServer) dataHandlerV2(w http.ResponseWriter, req *http.Request) {
 		eventBorder := r.fetchEventBorder(event, rankingType, rank)
 		result[eventName] = eventBorder
 	}
-	fmt.Println("len of dataV2 is", len(result))
+	//fmt.Println("len of dataV2 is", len(result))
 	b, err := json.Marshal(result)
 	if err != nil {
 		// report err
