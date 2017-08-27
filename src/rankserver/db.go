@@ -16,7 +16,7 @@ package rankserver
 
 import (
 	"database/sql"
-	"fmt"
+	//"fmt"
 	//sqlite3 "github.com/mattn/go-sqlite3"
 	"resource_mgr"
 	//"log"
@@ -238,7 +238,7 @@ func (r *RankServer) fetchDataBorderV2(timestamp_start, timestamp_end string, ra
 	return blist
 }
 
-func (r *RankServer) fetchEventBorder(event *resource_mgr.EventDetail, rankingType int, rank int) [][2]string {
+func (r *RankServer) fetchEventBorder(event *resource_mgr.EventDetail, rankingType int, rank int) [][2]int {
 	//detail := r.resourceMgr.FindEventById(event)
 	eventStart0 := ts.TruncateToDay(event.EventStart())
 	eventStart := ts.TimeToTimestamp(event.EventStart())
@@ -247,16 +247,17 @@ func (r *RankServer) fetchEventBorder(event *resource_mgr.EventDetail, rankingTy
 	// normalize
 	//eventBorderNormalized := make(map[string]int)
 	//var eventBorderNormalized []struct{string;int}
-	var eventBorderNormalized [][2]string
+	var eventBorderNormalized [][2]int
 	for _, kv := range eventBorder {
 		k := kv.string
 		v := kv.int
 		//var k1 
-		k1 := ts.TimestampToTime(k).Sub(eventStart0) / time.Second
-		k2 := fmt.Sprintf("%d", k1)
-		v2 := fmt.Sprintf("%d", v)
+		k1 := int( ts.TimestampToTime(k).Sub(eventStart0) / time.Second )
+		//k2 := fmt.Sprintf("%d", k1)
+		//v2 := fmt.Sprintf("%d", v)
 		//fmt.Println(k2, v)
-		eventBorderNormalized = append(eventBorderNormalized, [2]string{k2,v2})
+		//eventBorderNormalized = append(eventBorderNormalized, [2]string{k2,v2})
+		eventBorderNormalized = append(eventBorderNormalized, [2]int{k1,v})
 	}
 	return eventBorderNormalized
 }

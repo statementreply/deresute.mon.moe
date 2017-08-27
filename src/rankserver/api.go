@@ -75,7 +75,7 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 func (r *RankServer) dataHandlerV2(w http.ResponseWriter, req *http.Request) {
 	rankingType := 0
 	//delta := INTERVAL
-	result := make(map[string][][2]string)
+	result := make(map[string][][2]int)
 
 	r.init_req(w, req)
 	r.CheckData()
