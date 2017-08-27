@@ -199,6 +199,7 @@ func (r *RankServer) setHandleFunc() {
 	http.HandleFunc("/res_ver", r.res_verHandler)
 	http.HandleFunc("/latest_data", r.latestDataHandler)
 	http.HandleFunc("/d", r.dataHandler)
+	http.HandleFunc("/d2", r.dataHandlerV2)
 	http.HandleFunc("/d_dist", r.distDataHandler)
 	http.HandleFunc("/d_dist_compare", r.distCompareDataHandler)
 	http.HandleFunc("/d_event", r.eventDataHandler)

@@ -16,8 +16,9 @@ package rankserver
 
 import (
 	"database/sql"
+	"fmt"
 	//sqlite3 "github.com/mattn/go-sqlite3"
-	//"resource_mgr"
+	"resource_mgr"
 	//"log"
 	"sort"
 	"time"
@@ -197,7 +198,19 @@ func (r *RankServer) fetchDataSlice(timestamp string) []map[int]int {
 
 // tag: database
 func (r *RankServer) fetchDataBorder(timestamp_start, timestamp_end string, rankingType int, rank int) map[string]int {
-	border := map[string]int{}
+	blist := r.fetchDataBorderV2(timestamp_start, timestamp_end, rankingType, rank)
+	border := make(map[string]int)
+	for _, v := range blist {
+		border[v.string] = v.int
+	}
+	return border
+}
+
+
+
+func (r *RankServer) fetchDataBorderV2(timestamp_start, timestamp_end string, rankingType int, rank int) []struct{ string; int } {
+	//border := map[string]int{}
+	var blist []struct{ string; int }
 	//timestamp_start := ts.TimeToTimestamp(event.EventStart())
 	//timestamp_end := ts.TimeToTimestamp(event.ResultEnd())
 	rows, err := r.db.Query("SELECT timestamp, score FROM rank WHERE type == $1 AND rank == $2 AND timestamp BETWEEN $3 AND $4;", rankingType+1, rank, timestamp_start, timestamp_end)
@@ -214,12 +227,36 @@ func (r *RankServer) fetchDataBorder(timestamp_start, timestamp_end string, rank
 			r.logger.Println("sql error", err)
 			return nil
 		}
-		border[timestamp] = score
+		//border[timestamp] = score
+		blist = append(blist, struct{ string; int }{timestamp, score})
 	}
 	err = rows.Err()
 	if err != nil {
 		r.logger.Println("sql error", err)
 		return nil
 	}
-	return border
+	return blist
+}
+
+func (r *RankServer) fetchEventBorder(event *resource_mgr.EventDetail, rankingType int, rank int) [][2]string {
+	//detail := r.resourceMgr.FindEventById(event)
+	eventStart0 := ts.TruncateToDay(event.EventStart())
+	eventStart := ts.TimeToTimestamp(event.EventStart())
+	eventEnd := ts.TimeToTimestamp(event.EventEnd())
+	eventBorder := r.fetchDataBorderV2(eventStart, eventEnd, rankingType, rank)
+	// normalize
+	//eventBorderNormalized := make(map[string]int)
+	//var eventBorderNormalized []struct{string;int}
+	var eventBorderNormalized [][2]string
+	for _, kv := range eventBorder {
+		k := kv.string
+		v := kv.int
+		//var k1 
+		k1 := ts.TimestampToTime(k).Sub(eventStart0) / time.Second
+		k2 := fmt.Sprintf("%d", k1)
+		v2 := fmt.Sprintf("%d", v)
+		//fmt.Println(k2, v)
+		eventBorderNormalized = append(eventBorderNormalized, [2]string{k2,v2})
+	}
+	return eventBorderNormalized
 }

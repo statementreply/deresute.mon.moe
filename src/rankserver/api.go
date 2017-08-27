@@ -32,6 +32,7 @@ func (r *RankServer) latestDataHandler(w http.ResponseWriter, req *http.Request)
 	fmt.Fprint(w, r.latestData())
 }
 
+// for "/d"
 func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	r.CheckData()
@@ -63,6 +64,49 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 		r.jsonData(rankingType, list_rank, r.getSpeed_i, event, delta),
 		"]\n",
 	)
+}
+
+// for "/d2" version 2 data
+// time change for events
+// multiple events
+// single rank
+// event name
+// time startday=0
+func (r *RankServer) dataHandlerV2(w http.ResponseWriter, req *http.Request) {
+	rankingType := 0
+	//delta := INTERVAL
+	result := make(map[string][][2]string)
+
+	r.init_req(w, req)
+	r.CheckData()
+	req.ParseForm()
+	list_event := r.parseParam_events(req)
+	var rank int
+	{
+		list_rank := r.parseParam_rank(req)
+		if len(list_rank) >= 1 {
+			rank = list_rank[0]
+		} else {
+			// error message?
+			//return
+			rank = 120001
+		}
+	}
+	for _, event := range list_event {
+		//fmt.Fprint(w, "[\n", r.jsonData(rankingType, []int{rank}, r.fetchData_i, event, delta), "]\n")
+		//eventName, eventBorder := r.fetchEventBorder(event, rankingType, rank)
+		eventName := event.ShortName()
+		eventBorder := r.fetchEventBorder(event, rankingType, rank)
+		result[eventName] = eventBorder
+	}
+	fmt.Println("len of dataV2 is", len(result))
+	b, err := json.Marshal(result)
+	if err != nil {
+		// report err
+		return
+	}
+	//fmt.Fprintf(w, "123\n")
+	w.Write(b)
 }
 
 func (r *RankServer) getDensity(timestamp string) []map[int]float32 {

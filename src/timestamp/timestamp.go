@@ -81,6 +81,7 @@ func FormatDate(t time.Time) string {
 
 // for datafetcher
 func RoundTimestamp(in time.Time) time.Time {
+	// find the closest 15k+2 min before 'in'
 	s := in.Unix()
 	// FIXME: time step hardcode
 	rounded := ((s-120)/900)*900 + 120
@@ -99,4 +100,8 @@ func IsWholeHour(timestamp string) bool {
 
 func GetLocalTimestamp() string {
 	return TimeToTimestamp(RoundTimestamp(time.Now()))
+}
+
+func TruncateToDay(in time.Time) time.Time {
+	return in.Add( -9 * time.Hour ).Truncate( 24 * time.Hour ).Add( 9 * time.Hour )
 }
