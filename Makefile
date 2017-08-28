@@ -1,5 +1,5 @@
-MAIN := rankserver dfticker twitter_ticker compress_db
-EXTRA := pcapdump dumpbody unlz4 res get_profile test1 ticker df \
+MAIN := rankserver df dfticker twitter_ticker compress_db
+EXTRA := pcapdump dumpbody unlz4 res get_profile test1 ticker \
 	get_manifest get_master db_import_csv
 all: ${MAIN}
 extra: ${EXTRA}
