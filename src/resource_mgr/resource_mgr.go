@@ -315,7 +315,7 @@ func (r *ResourceMgr) ParseEvent() {
 			ParseTime(notice_start), ParseTime(event_start), ParseTime(second_half_start), ParseTime(event_end), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end),
 			limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count, master_plus_support, ""}
 		if e.typ == 3 || e.typ == 5 {
-			e.music_name = r.FindMedleyTitleV2(e)
+			e.music_name = r.FindMedleyTitle(e, db)
 			//log.Println("find groove music name", e.music_name)
 		}
 		// deduplicate
@@ -355,7 +355,7 @@ func (r *ResourceMgr) FindEventById(id int) *EventDetail {
 // INPUT: EventDetail struct
 // OUTPUT: a string of music title, or "" if not found
 // BUG/FIXME: sort is bad...
-func (r *ResourceMgr) FindMedleyTitle(e *EventDetail) string {
+func (r *ResourceMgr) FindMedleyTitle(e *EventDetail, db *sql.DB) string {
 	var id int
 	id = e.Id()
 	var typ int
@@ -367,13 +367,7 @@ func (r *ResourceMgr) FindMedleyTitle(e *EventDetail) string {
 	var title string
 
 	var row *sql.Row
-	master := r.LoadMaster()
-	db, err := sql.Open("sqlite3", "file:" + master + "?mode=ro")
-	if err != nil {
-		log.Println("open masterdb", err)
-		return ""
-	}
-	defer db.Close()
+	var err error
 
 	// FIXME sanity check id is in range 1000-10000?
 
