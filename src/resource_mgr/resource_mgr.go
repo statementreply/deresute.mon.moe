@@ -315,7 +315,7 @@ func (r *ResourceMgr) ParseEvent() {
 			ParseTime(notice_start), ParseTime(event_start), ParseTime(second_half_start), ParseTime(event_end), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end),
 			limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count, master_plus_support, ""}
 		if e.typ == 3 || e.typ == 5 {
-			e.music_name = r.FindMedleyTitle(e, db)
+			e.music_name = r.FindMedleyTitleV2(e, db)
 			//log.Println("find groove music name", e.music_name)
 		}
 		// deduplicate
@@ -439,7 +439,7 @@ Map02:
 	return title
 }
 
-func (r *ResourceMgr) FindMedleyTitleV2(e *EventDetail) string {
+func (r *ResourceMgr) FindMedleyTitleV2(e *EventDetail, db *sql.DB) string {
 	var id int
 	id = e.Id()
 	var typ int
@@ -451,13 +451,6 @@ func (r *ResourceMgr) FindMedleyTitleV2(e *EventDetail) string {
 	var title string
 
 	var row *sql.Row
-	master := r.LoadMaster()
-	db, err := sql.Open("sqlite3", "file:" + master + "?mode=ro")
-	if err != nil {
-		log.Println("open masterdb", err)
-		return ""
-	}
-	defer db.Close()
 
 	// FIXME sanity check id is in range 1000-10000?
 
@@ -470,7 +463,7 @@ func (r *ResourceMgr) FindMedleyTitleV2(e *EventDetail) string {
 	} else {
 		return ""
 	}
-	err = row.Scan(&story_id, &category_id, &title)
+	err := row.Scan(&story_id, &category_id, &title)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Println("err NOROWS scan joined query")
