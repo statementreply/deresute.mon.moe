@@ -20,6 +20,14 @@ fetch: dfticker
 	# protect against crash
 	time ./dfticker; while sleep 120; do time ./dfticker; done
 
+# run between ResultStart and ResultEnd
+# bug: keep parameter same for re-runs
+TIME0 := $(shell date '+%s')
+afterfetch: df
+	# $(TIME0)
+	-echo df at $(TIME0)
+	while true; do time ./df $(TIME0); echo df at $(TIME0); sleep 60; done
+
 twitter: twitter_ticker
 	./twitter_ticker
 
