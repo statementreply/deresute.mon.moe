@@ -315,7 +315,7 @@ func (r *ResourceMgr) ParseEvent() {
 			ParseTime(notice_start), ParseTime(event_start), ParseTime(second_half_start), ParseTime(event_end), ParseTime(calc_start), ParseTime(result_start), ParseTime(result_end),
 			limit_flag, bg_type, bg_id, login_bonus_type, login_bonus_count, master_plus_support, ""}
 		if e.typ == 3 || e.typ == 5 {
-			e.music_name = r.FindMedleyTitle(e)
+			e.music_name = r.FindMedleyTitleV2(e)
 			//log.Println("find groove music name", e.music_name)
 		}
 		// deduplicate
@@ -352,6 +352,8 @@ func (r *ResourceMgr) FindEventById(id int) *EventDetail {
 }
 
 // medley event id to music title
+// INPUT: EventDetail struct
+// OUTPUT: a string of music title, or "" if not found
 // BUG/FIXME: sort is bad...
 func (r *ResourceMgr) FindMedleyTitle(e *EventDetail) string {
 	var id int
@@ -440,5 +442,48 @@ Map02:
 	}
 
 	log.Println("[INFO]", "event_id", id, "story_id", story_id, "category_id", category_id, "title", title)
+	return title
+}
+
+func (r *ResourceMgr) FindMedleyTitleV2(e *EventDetail) string {
+	var id int
+	id = e.Id()
+	var typ int
+	typ = e.Type()
+
+	var story_id int
+	story_id = -1
+	var category_id int
+	var title string
+
+	var row *sql.Row
+	master := r.LoadMaster()
+	db, err := sql.Open("sqlite3", "file:" + master + "?mode=ro")
+	if err != nil {
+		log.Println("open masterdb", err)
+		return ""
+	}
+	defer db.Close()
+
+	// FIXME sanity check id is in range 1000-10000?
+
+	if typ == 3 {
+		row = db.QueryRow("SELECT medley_story_detail.id, story_detail.category_id, story_category.title FROM medley_story_detail INNER JOIN story_detail ON medley_story_detail.id = story_detail.id INNER JOIN story_category ON story_category.id = story_detail.category_id WHERE event_id=$1;", id)
+	} else if typ == 5 {
+		row = db.QueryRow("SELECT tour_story_detail.id, story_detail.category_id, story_category.title FROM tour_story_detail INNER JOIN story_detail ON tour_story_detail.id = story_detail.id INNER JOIN story_category ON story_category.id = story_detail.category_id WHERE event_id=$1;", id)
+	} else if typ == 1 {
+		row = db.QueryRow("SELECT atapon_story_detail.id, story_detail.category_id, story_category.title FROM atapon_story_detail INNER JOIN story_detail ON atapon_story_detail.id = story_detail.id INNER JOIN story_category ON story_category.id = story_detail.category_id WHERE event_id=$1;", id)
+	} else {
+		return ""
+	}
+	err = row.Scan(&story_id, &category_id, &title)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Println("err NOROWS scan joined query")
+		}
+		return ""
+	}
+
+	log.Println("[INFO]v2", "event_id", id, "story_id", story_id, "category_id", category_id, "title", title)
 	return title
 }
