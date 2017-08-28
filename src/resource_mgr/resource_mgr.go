@@ -154,7 +154,7 @@ func (r *ResourceMgr) LoadManifest() string {
 
 func (r *ResourceMgr) ParseResource(hash string) string {
 	manifest := r.LoadManifest()
-	db, err := sql.Open("sqlite3", manifest)
+	db, err := sql.Open("sqlite3", "file:" + manifest + "?mode=ro")
 	if err != nil {
 		log.Println("x1", err)
 		return ""
@@ -175,9 +175,9 @@ func (r *ResourceMgr) ParseResource(hash string) string {
 }
 
 func (r *ResourceMgr) LoadMaster() string {
-	dest := r.LoadManifest()
+	manifest := r.LoadManifest()
 	//log.Println("to open", dest)
-	db, err := sql.Open("sqlite3", dest)
+	db, err := sql.Open("sqlite3", "file:" + manifest + "?mode=ro")
 	if err != nil {
 		log.Println("x1", err)
 		return ""
@@ -212,9 +212,9 @@ func (r *ResourceMgr) LoadMaster() string {
 }
 
 func (r *ResourceMgr) LoadMusic() {
-	dest := r.LoadManifest()
+	manifest := r.LoadManifest()
 	//log.Println("to open", dest)
-	db, err := sql.Open("sqlite3", dest)
+	db, err := sql.Open("sqlite3", "file:" + manifest + "?mode=ro")
 	if err != nil {
 		log.Fatal("x1", err)
 	}
@@ -238,7 +238,7 @@ func (r *ResourceMgr) LoadMusic() {
 }
 
 func (r *ResourceMgr) ParseMusic(fileName string) {
-	db, err := sql.Open("sqlite3", fileName)
+	db, err := sql.Open("sqlite3", "file:" + fileName + "?mode=ro")
 	if err != nil {
 		log.Fatal("x1", err)
 	}
@@ -282,7 +282,7 @@ func (r *ResourceMgr) ParseMusic(fileName string) {
 func (r *ResourceMgr) ParseEvent() {
 	master := r.LoadMaster()
 	//log.Println("master db is", master)
-	db, err := sql.Open("sqlite3", master)
+	db, err := sql.Open("sqlite3", "file:" + master + "?mode=ro")
 	if err != nil {
 		log.Println("open masterdb", err)
 		return
@@ -366,7 +366,7 @@ func (r *ResourceMgr) FindMedleyTitle(e *EventDetail) string {
 
 	var row *sql.Row
 	master := r.LoadMaster()
-	db, err := sql.Open("sqlite3", master)
+	db, err := sql.Open("sqlite3", "file:" + master + "?mode=ro")
 	if err != nil {
 		log.Println("open masterdb", err)
 		return ""
