@@ -261,3 +261,51 @@ func (r *RankServer) fetchEventBorder(event *resource_mgr.EventDetail, rankingTy
 	}
 	return eventBorderNormalized
 }
+
+// tag: database
+func (r *RankServer) fetchDataDist(timestamp string, rankingType int) [][2]int {
+	var result [][2]int
+
+	rows, err := r.db.Query("SELECT rank, score FROM rank WHERE timestamp == $1 AND type == $2;", timestamp, rankingType + 1)
+	if err != nil {
+		r.logger.Println("sql error", err)
+		return nil
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var rank int
+		var score int
+		err = rows.Scan(&rank, &score)
+		if err != nil {
+			r.logger.Println("sql error", err)
+			return nil
+		}
+		result = append(result, [2]int{rank, score})
+	}
+	err = rows.Err()
+	if err != nil {
+		r.logger.Println("sql error", err)
+		return nil
+	}
+	return result
+}
+
+func (r *RankServer) fetchEventDist(event *resource_mgr.EventDetail, rankingType int) [][2]int {
+	resultStart := ts.TimeToTimestamp(event.ResultStart())
+	resultEnd := ts.TimeToTimestamp(event.ResultEnd())
+	// TODO: use extra.db to override
+	resultDb := r.db
+	row := resultDb.QueryRow("SELECT timestamp FROM timestamp WHERE timestamp BETWEEN $1 AND $2;", resultStart, resultEnd)
+	var eventTs string
+	err := row.Scan(&eventTs)
+	r.logger.Println("fetchEventDist", event.Name(), resultStart, resultEnd)
+	if err == sql.ErrNoRows {
+		r.logger.Println("ErrNorows")
+		return [][2]int{}
+	} else if err != nil {
+		r.logger.Println("sql error", err)
+		return [][2]int{}
+	}
+	r.logger.Println("fetchEventDist", event.Name(), resultStart, resultEnd, eventTs)
+	return r.fetchDataDist(eventTs, rankingType)
+}

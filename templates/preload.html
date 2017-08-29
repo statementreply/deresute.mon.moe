@@ -78,6 +78,18 @@ google.charts.load('current', {packages: ['corechart', 'annotationchart', 'calen
 google.charts.setOnLoadCallback(drawChart);
 google.charts.setOnLoadCallback(pageChange);
 function drawChart() {
+    // originally: depending on the presence of certain ids for divs
+    // FIXME: redirect to dist_compare based on url
+    if (document.documentURI.indexOf("dist_compare") > 0) {
+        //drawDistCompareChart();
+        drawTimeCompareChart(2);
+        return;
+    }
+    // FIXME: redirect to time_compare based on url
+    if (document.documentURI.indexOf("time_compare") > 0) {
+        drawTimeCompareChart(1);
+        return;
+    }
     drawLineChart();
     drawDistChart();
     drawEventChart();
@@ -150,11 +162,6 @@ function drawLineChart() {
     }
 
     if (($("#myLineChart", currentPage).length == 0) && ($("#mySpeedChart", currentPage).length == 0)) {
-        return;
-    }
-    // FIXME: redirect to time_compare based on url
-    if (document.documentURI.indexOf("time_compare") > 0) {
-        drawTimeCompareChart();
         return;
     }
     myLineChart = $("#myLineChart", currentPage);
@@ -281,12 +288,6 @@ function drawDistChart() {
     if (myDistChart.length == 0) {
         return;
     }
-    // originally: depending on the presence of certain ids for divs
-    // FIXME: redirect to dist_compare based on url
-    if (document.documentURI.indexOf("dist_compare") > 0) {
-        drawDistCompareChart();
-        return;
-    }
     ddataurl = "/d_dist?t=" + timestamp;
     $.getJSON(ddataurl, "", function (data) {
         var data_list = [];
@@ -325,7 +326,9 @@ function drawDistChart() {
     })
 }
 
-function drawTimeCompareChart() {
+// mode == 1 pt-vs-time (normalized event-start)
+// mode == 2 pt-vs-rank (event result)
+function drawTimeCompareChart(mode) {
     var myUri = document.documentURI;
     setAspectRatio();
     currentPage = $("body").pagecontainer("getActivePage");
@@ -369,8 +372,24 @@ function drawTimeCompareChart() {
         return;
     }
     ddataurl = "/d2?rank=120001&event=1013&event=1016";
-    ddataurl2 = "/d2?" + $("#dataurlv2", currentPage).text();
+    dataUrlBase = "/d2?"
+    if (mode == 2) {
+        dataUrlBase = "/d2_dist?"
+    }
+    ddataurl2 = dataUrlBase + $("#dataurlv2", currentPage).text();
     console.log("ddataurl2 is ", ddataurl2);
+    if (mode == 2) {
+        options.vAxis.logScale = true;
+        options.vAxis.viewWindow = {min: 8000};
+        options.hAxis.title = 'rank';
+        options.hAxis.minValue = 0.92;
+        options.hAxis.viewWindow = {max: 320000};
+        options.hAxis.gridlines = {count: 10};
+    }
+    if (myUri.indexOf("hlog") > 0) {
+        console.log("set hlog");
+        options.hAxis.logScale = true;
+    }
 
     var core = function (data) {
         //plot_label = [eventName1, eventName2, eventName3, eventName4];

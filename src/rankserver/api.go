@@ -68,12 +68,12 @@ func (r *RankServer) dataHandler(w http.ResponseWriter, req *http.Request) {
 
 // for "/d2" version 2 data
 // time change for events
+// Parameters: event(>=1) type(=1) rank(=1)
 // multiple events
 // single rank
 // event name
 // time startday=0
 func (r *RankServer) dataHandlerV2(w http.ResponseWriter, req *http.Request) {
-	rankingType := 0
 	//delta := INTERVAL
 	result := make(map[string][][2]int)
 
@@ -81,6 +81,7 @@ func (r *RankServer) dataHandlerV2(w http.ResponseWriter, req *http.Request) {
 	r.CheckData()
 	req.ParseForm()
 	list_event := r.parseParam_events(req)
+	rankingType := r.parseParam_type(req)
 	var rank int
 	{
 		list_rank := r.parseParam_rank(req)
@@ -106,6 +107,31 @@ func (r *RankServer) dataHandlerV2(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	//fmt.Fprintf(w, "123\n")
+	w.Write(b)
+}
+
+// Parameters: event(>=1) type(=1)
+func (r *RankServer) distDataHandlerV2(w http.ResponseWriter, req *http.Request) {
+	result := make(map[string][][2]int)
+	r.init_req(w, req)
+	r.CheckData()
+	req.ParseForm()
+	list_event := r.parseParam_events(req)
+	rankingType := r.parseParam_type(req)
+	//print(list_event)
+	//print(rankingType)
+	for _, event := range list_event {
+		eventName := event.ShortName()
+		// event final distribution
+		// get one timestamp in [ResultStart, ResultEnd]
+		// get slice
+		eventDist := r.fetchEventDist(event, rankingType)
+		result[eventName] = eventDist
+	}
+	b, err := json.Marshal(result)
+	if err != nil {
+		return
+	}
 	w.Write(b)
 }
 
