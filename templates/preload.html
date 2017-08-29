@@ -359,8 +359,8 @@ function drawTimeCompareChart(mode) {
         chartArea: {width: '100%', height: '65%'},
         legend: {position: 'top', alignment: 'center'},
     };
-    options.lineWidth = 0;
-    options.pointSize = 2;
+    //options.lineWidth = 0;
+    //options.pointSize = 2;
 
     console.log("myUri");
     console.log(myUri);
@@ -370,13 +370,12 @@ function drawTimeCompareChart(mode) {
         console.log("FATAL ERROR");
         return;
     }
-    ddataurl = "/d2?rank=120001&event=1013&event=1016";
+    //ddataurl = "/d2?rank=120001&event=1013&event=1016";
     dataUrlBase = "/d2?"
     if (mode == 2) {
         dataUrlBase = "/d2_dist?"
     }
     queryPart = $("#dataurlv2", currentPage).text()
-    console.log("ddataurl2 is ", ddataurl2);
     if (mode == 2) {
         options.vAxis.logScale = true;
         options.vAxis.viewWindow = {min: 8000};
@@ -389,6 +388,7 @@ function drawTimeCompareChart(mode) {
         }
     }
     ddataurl2 = dataUrlBase + queryPart;
+    console.log("ddataurl2 is ", ddataurl2);
     if (myUri.indexOf("hlog") > 0) {
         console.log("set hlog");
         options.hAxis.logScale = true;
