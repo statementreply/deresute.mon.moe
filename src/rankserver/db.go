@@ -242,7 +242,7 @@ func (r *RankServer) fetchEventBorder(event *resource_mgr.EventDetail, rankingTy
 	//detail := r.resourceMgr.FindEventById(event)
 	eventStart0 := ts.TruncateToDay(event.EventStart())
 	eventStart := ts.TimeToTimestamp(event.EventStart())
-	eventEnd := ts.TimeToTimestamp(event.EventEnd())
+	eventEnd := ts.TimeToTimestamp(event.ResultEnd())
 	eventBorder := r.fetchDataBorderV2(eventStart, eventEnd, rankingType, rank)
 	// normalize
 	//eventBorderNormalized := make(map[string]int)
