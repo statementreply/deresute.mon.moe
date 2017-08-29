@@ -404,7 +404,14 @@ function drawTimeCompareChart(mode) {
             var table1 = new google.visualization.DataTable();
             table1.addColumn('number', 'Time');
             table1.addColumn('number', eventName);
-            table1.addRows(data[eventName]);
+            // raw data: data[eventName]
+            cookedData = data[eventName];
+            if (mode == 1) {
+                cookedData = data[eventName].map(function(p) {
+                    return [p[0]/86400, p[1]];
+                })
+            }
+            table1.addRows(cookedData);
 
             // FIXME: null events?
             if (isFirst != 1) {
