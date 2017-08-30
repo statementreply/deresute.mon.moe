@@ -386,6 +386,8 @@ function drawTimeCompareChart(mode) {
         if (queryPart == "hlog") {
             queryPart = "hlog&event=1013&event=3013&event=1016&event=1017"
         }
+        options.lineWidth = 0;
+        options.pointSize = 2;
     }
     ddataurl2 = dataUrlBase + queryPart;
     console.log("ddataurl2 is ", ddataurl2);
