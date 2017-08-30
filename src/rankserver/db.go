@@ -297,7 +297,7 @@ func (r *RankServer) fetchEventDist(event *resource_mgr.EventDetail, rankingType
 	//resultDb := r.db
 	// too heavy load (1MBytes per event)
 	// []*sql.DB{r.extraDb, r.db}
-	for _, resultDb := range []*sql.DB{r.extraDb, r.db} {
+	for _, resultDb := range []*sql.DB{r.db} {
 		row := resultDb.QueryRow("SELECT timestamp FROM timestamp WHERE timestamp BETWEEN $1 AND $2;", resultStart, resultEnd)
 		var eventTs string
 		err := row.Scan(&eventTs)
