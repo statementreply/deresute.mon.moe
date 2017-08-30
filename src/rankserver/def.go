@@ -122,6 +122,7 @@ type RankServer struct {
 	// sql
 	rankDB      string
 	db          *sql.DB
+	extraDb		*sql.DB
 	logger      *log.Logger
 	log_fh      *os.File
 	keyFile     string

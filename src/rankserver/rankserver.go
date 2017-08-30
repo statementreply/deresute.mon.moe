@@ -45,6 +45,7 @@ var wg sync.WaitGroup
 
 var BASE string = path.Dir(os.Args[0])
 var RANK_DB string = BASE + "/data/rank.db"
+var RANK_EXTRA_DB string = BASE + "/data/extra.db"
 var RESOURCE_CACHE_DIR string = BASE + "/data/resourcesbeta/"
 
 // 15min update interval
@@ -78,6 +79,10 @@ func MakeRankServer() *RankServer {
 	r.db, err = sql.Open("sqlite3", "file:"+r.rankDB+"?mode=ro")
 	if err != nil {
 		r.logger.Fatalln("sql error open file", err)
+	}
+	r.extraDb, err = sql.Open("sqlite3", "file:" + RANK_EXTRA_DB + "?mode=ro")
+	if err != nil {
+		r.logger.Fatalln("sql extra error open file", err)
 	}
 	//r.setCacheSize()
 
@@ -384,6 +389,7 @@ func (r *RankServer) stop() {
 	}
 	wg.Wait()
 	r.db.Close()
+	r.extraDb.Close()
 }
 
 func (r *RankServer) latestData() string {
