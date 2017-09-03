@@ -23,7 +23,8 @@ import (
 
 func main() {
 	var body []byte
-	msg_iv := os.Args[1]
+	msg_iv := apiclient.Unlolfuscate(os.Args[1])
+	fmt.Println("msg_iv is", msg_iv, len(msg_iv))
 	if len(os.Args) >= 3 {
 		fmt.Println(os.Args)
 		body, _ = ioutil.ReadFile(os.Args[2])
