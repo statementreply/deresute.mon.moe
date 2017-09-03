@@ -33,6 +33,7 @@ import (
 	"unicode/utf8"
 )
 
+// FIXME: no https yet?
 var URLBASE = "http://storage.game.starlight-stage.jp/"
 
 var ErrNotOK = errors.New("not ok")

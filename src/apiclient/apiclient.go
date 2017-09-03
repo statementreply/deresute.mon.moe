@@ -39,6 +39,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// FIXME: android client starts to use https
 const BASE string = "http://game.starlight-stage.jp"
 
 var ErrSession = errors.New("session error, (need to restart session)")
