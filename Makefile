@@ -13,7 +13,7 @@ fmt:
 	go fmt apiclient resource_mgr datafetcher rankserver rijndael_wrapper timestamp stoppableListener
 
 server: rankserver
-	cpulimit -l 25 -- ./rankserver
+	cpulimit -l 35 -- ./rankserver
 
 fetch: dfticker
 	#./dfticker
