@@ -115,12 +115,13 @@ func MakeRankServer() *RankServer {
 				NextProtos: []string{"h2", "http/1.1"},
 			},
 		}
-		r.plainServer = &http.Server{Addr: ":4001", Handler: http.NewServeMux()}
-		r.plainServer.Handler.(*http.ServeMux).HandleFunc("/", r.redirectHandler)
+		//r.plainServer = &http.Server{Addr: ":4001", Handler: http.NewServeMux()}
+		//r.plainServer.Handler.(*http.ServeMux).HandleFunc("/", r.redirectHandler)
 	} else {
-		r.logger.Print("use http plaintext")
-		r.plainServer = &http.Server{Addr: ":4001"}
+		//r.logger.Print("use http plaintext")
 	}
+	// use internal plain http server
+	r.plainServer = &http.Server{Addr: ":4001"}
 	r.setHandleFunc()
 
 	// stoppable listener prepare
