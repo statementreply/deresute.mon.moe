@@ -32,7 +32,7 @@ const (
 )
 
 type EventDetail struct {
-	// content of table event_data
+	// Columns of table event_data (incomplete)
 	id, typ                                   int
 	name                                      string
 	notice_start                              time.Time
@@ -58,6 +58,10 @@ func (e *EventDetail) ShortName() string {
 	if e.typ == 3 || e.typ == 5 {
 		return e.MusicName()
 	}
+	// Usually names like "LIVE Groove Vocal Burst" is too long to fit in a tweet,
+	// so a shortened form is preferred.
+	// Update: now the name of the event song is used instead in tweets, so this
+	// branch should be unreachable.
 	if grooveFilter.MatchString(e.name) {
 		return "LIVE Groove"
 	} else {
@@ -196,12 +200,14 @@ func FindLatestEvent(eventList []*EventDetail) *EventDetail {
 	return nil
 }
 
+// An interface implementation for sort.Sort to work on []*EventDetail
 type EventDetailList []*EventDetail
 
 func (l EventDetailList) Len() int {
 	return len(l)
 }
 
+// Sort according to EventStart(), assuming no events share the same start date.
 func (l EventDetailList) Less(i, j int) bool {
 	return l[i].EventStart().Before(l[j].EventStart())
 }
@@ -249,13 +255,15 @@ func (eventList *EventDetailList) Overwrite(e_new *EventDetail) {
 // => story_category "id -> title"
 // title
 
-// for live groove and live parade: title of the song
+// Use a single SQL query with JOIN on 3 tables, see resource_mgr.go
+
+// For live groove and live parade: title of the song.
 func (e *EventDetail) MusicName() string {
 	if e.typ != 3 && e.typ != 5 {
 		return e.name
 	}
-	// special case live groove without story
 
+	// Special cases for early live groove events without story commu.
 	if e.id == 3001 {
 		return "夢色ハーモニー"
 	}
@@ -272,6 +280,8 @@ func (e *EventDetail) MusicName() string {
 	}
 }
 
+// For live groove and live parade events, return a name containing both
+// event type and song name.
 func (e *EventDetail) LongName() string {
 	long := e.name
 	if e.typ == 3 || e.typ == 5 {
