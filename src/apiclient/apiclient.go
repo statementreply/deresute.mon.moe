@@ -257,7 +257,7 @@ func (client *ApiClient) LoadCheck() {
 		log.Print(check)
 		return
 	}
-	log.Println("debug load_check", check)
+	log.Println("[INFO] debug load_check", check)
 	// interface conversion / type assertion
 	data_headers, ok := check["data_headers"].(map[interface{}]interface{})
 	if !ok {

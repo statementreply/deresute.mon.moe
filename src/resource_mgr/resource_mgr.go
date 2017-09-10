@@ -472,6 +472,6 @@ func (r *ResourceMgr) FindMedleyTitleV2(e *EventDetail, db *sql.DB) string {
 		return ""
 	}
 
-	log.Println("[INFO]v2", "event_id", id, "story_id", story_id, "category_id", category_id, "title", title)
+	log.Println("[INFO]", "event_id", id, "story_id", story_id, "category_id", category_id, "title", title)
 	return title
 }

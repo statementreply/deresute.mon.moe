@@ -46,7 +46,7 @@ type DataFetcher struct {
 }
 
 func NewDataFetcher(client *apiclient.ApiClient, key_point [][2]int, rank_db, resource_cache_dir string) *DataFetcher {
-	log.Println("NewDataFetcher()")
+	//log.Println("NewDataFetcher()")
 	df := new(DataFetcher)
 
 	df.Client = client

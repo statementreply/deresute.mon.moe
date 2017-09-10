@@ -72,7 +72,7 @@ func main() {
 		}
 	}()
 
-	log.Println("local-timestamp", ts.GetLocalTimestamp())
+	log.Println("[INFO] local-timestamp", ts.GetLocalTimestamp())
 	// A list of [2]int{rankingType, rank}
 	// rank must be 10k+1 (the first of a page)
 	key_point := [][2]int{
