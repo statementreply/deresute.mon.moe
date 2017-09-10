@@ -91,7 +91,7 @@ func (r *RankServer) CheckData() {
 		((r.currentEvent == nil) && (time.Now().Sub(r.lastCheck) >= 10*time.Minute)) ||
 		// if currentEvent is defined but expired, then immediately
 		((r.currentEvent != nil) && !r.currentEvent.InPeriod(time.Now())) {
-		r.logger.Println("recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
+		r.logger.Println("[INFO] recheck res_ver, lastcheck:", r.lastCheck, "latest_time:", latest_time)
 		r.lastCheck = time.Now()
 		// try to restart session (session expires after certain time)
 		r.client.Reset_sid()
@@ -100,13 +100,13 @@ func (r *RankServer) CheckData() {
 		rv := r.client.Get_res_ver()
 		if rv != old_rv {
 			r.resourceMgr.Set_res_ver(rv)
-			r.logger.Println("new res_ver:", rv)
+			r.logger.Println("[INFO] new res_ver:", rv)
 			r.resourceMgr.ParseEvent()
 		}
 		// FIXME: depends on current time, update even if res_ver doesn't change
 		r.currentEvent = r.resourceMgr.FindCurrentEvent()
 		r.latestEvent = r.resourceMgr.FindLatestEvent()
-		r.logger.Println("currentEvent", r.currentEvent)
+		r.logger.Println("[INFO] currentEvent", r.currentEvent)
 	}
 }
 

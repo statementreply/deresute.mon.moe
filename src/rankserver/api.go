@@ -416,7 +416,7 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 			title = r.currentEvent.ShortName() + " " + timestamp_str + param.title_suffix + "\n"
 		}
 	} else {
-		r.logger.Println("no event")
+		//r.logger.Println("[INFO] no event")
 		fmt.Fprint(w, "EMPTY")
 		return
 	}
