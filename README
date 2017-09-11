@@ -40,13 +40,12 @@ To run a full service
 - make twitter
 
 TODO
-- [done] event datetime filter based on sqlite3
-- [pydone] translate python/perl to go? (perl Net::Twitter remains)
-- dfticker mem leak?
-- dfticker save less?
-- [done] concurrent map rw?: now moved to sqlite
-- error message tags: sql/database locked, ...
-- manual restart rankserver needed for app_ver update
+- time_compare/dist_compare: a better UI for event selection (multiple choice)
+- export less data points to avoid high load in browsers
+- sqlite: locked database occurs frequency under high web load
+- use a Go library to replace Net-Twitter?
+- unify logging
+- avoid manual restarts for app_ver updates
 - twitter card adaptable to different pages
 - df/dfticker: collect more data for log-graph dist_compare
 
