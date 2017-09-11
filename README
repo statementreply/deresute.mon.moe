@@ -40,7 +40,9 @@ To run a full service
 - make twitter
 
 TODO
-- time_compare/dist_compare: a better UI for event selection (multiple choice)
+- time_compare/dist_compare: a UI for event selection (multiple choice)
+- fix inefficient javascript code
+- better web UI
 - export less data points to avoid high load in browsers
 - sqlite: locked database occurs frequency under high web load
 - use a Go library to replace Net-Twitter?
