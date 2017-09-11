@@ -3,22 +3,25 @@ Main components
 - dfticker: periodic data fetcher
 - twitter_ticker: periodic twitter poster
 
-Dependency
+Dependency (license)
 - make
 - Go
+- msgpack      (Expat)         "https://github.com/ugorji/go/codec"
+- lz4          (BSD)           "https://github.com/bkaradzic/go-lz4"
+- sqlite3      (Expat)         "https://github.com/mattn/go-sqlite3"
+- yaml         (Apache)        "https://gopkg.in/yaml.v2"
+[for twitter bot]
 - Perl
-- msgpack:      "https://github.com/ugorji/go/codec"
-- lz4:          "https://github.com/bkaradzic/go-lz4"
-- sqlite3:      "https://github.com/mattn/go-sqlite3"
-- yaml:         "https://gopkg.in/yaml.v2"
-- Net::Twitter: "https://metacpan.org/release/Net-Twitter"
-- [optional] gopacket: "https://github.com/google/gopacket"
+- Net-twitter  (Artistic/GPL)  "https://metacpan.org/release/Net-Twitter"
+[for pcapdump only]
+- gopacket     (BSD)           "https://github.com/google/gopacket"
 
 Embedded libraries
-- rijndael: from "https://github.com/agl/pond.git"
-- stoppableListener: from "https://github.com/hydrogen18/stoppableListener"
-- jquery and jquery mobile
-- date.js
+- rijndael     (BSD)           "https://github.com/agl/pond.git"
+- stoppableListener (BSD)      "https://github.com/hydrogen18/stoppableListener"
+- jquery       (GPL/MIT)
+- jquery mobile (GPL/MIT)
+- date.js      (MIT)
 
 External web dependencies
 - Google charts: "https://developers.google.com/chart/"
