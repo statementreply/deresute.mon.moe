@@ -41,8 +41,9 @@ TODO
 - df/dfticker: collect more data for log-graph dist_compare
 
 Thanks to @marcan, @ApricotMoai:
-- much of the apiclient/resource_mgr framework comes from deresuteme
-  https://github.com/marcan/deresuteme.git
+- the core of apiclient/resource_mgr is translated from deresute.me,
+  from Python to Go
+  https://github.com/marcan/deresuteme
 - final result border data for 6 events from ApricotMoai
 
 

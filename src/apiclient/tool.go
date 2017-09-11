@@ -11,6 +11,11 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// Ported from the Python implementation in deresute.me
+//     <https://github.com/marcan/deresuteme>
+//     Copyright 2016-2017 Hector Martin <marcan@marcan.st>
+//     Licensed under the Apache License, Version 2.0
 
 package apiclient
 
