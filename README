@@ -6,15 +6,15 @@ Main components
 Dependency (license)
 - make
 - Go
-- msgpack      (Expat)         "https://github.com/ugorji/go/codec"
-- lz4          (BSD)           "https://github.com/bkaradzic/go-lz4"
-- sqlite3      (Expat)         "https://github.com/mattn/go-sqlite3"
-- yaml         (Apache)        "https://gopkg.in/yaml.v2"
+- go/codec     (Expat)         "https://github.com/ugorji/go"
+- go-lz4       (BSD)           "https://github.com/bkaradzic/go-lz4"
+- go-sqlite3   (Expat)         "https://github.com/mattn/go-sqlite3"
+- yaml.v2      (Apache)        "https://gopkg.in/yaml.v2"
 [for twitter bot]
 - Perl
 - Net-twitter  (Artistic/GPL)  "https://metacpan.org/release/Net-Twitter"
 [for pcapdump only]
-- gopacket     (BSD)           "https://github.com/google/gopacket"
+- GoPacket     (BSD)           "https://github.com/google/gopacket"
 
 Embedded libraries
 - rijndael     (BSD)           "https://github.com/agl/pond.git"
