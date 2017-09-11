@@ -1,7 +1,14 @@
-Main components
+Project components:
 - rankserver: web server (listens on http/4001, https/4002 by default)
-- dfticker: periodic data fetcher
-- twitter_ticker: periodic twitter poster
+- dfticker: periodic data fetcher (every 15 min)
+- twitter_ticker: periodic twitter poster (requires twitter API keys)
+- other tools (make extra): for various debugging purposes
+
+Thanks to @marcan, @ApricotMoai, and people who have provided suggestions:
+- the core of apiclient/resource_mgr is translated from deresute.me,
+  from Python to Go
+  source of deresute.me: <https://github.com/marcan/deresuteme>
+- the border data for final results in 6 events is provided by ApricotMoai
 
 Dependency (license)
 - make
@@ -42,12 +49,6 @@ TODO
 - manual restart rankserver needed for app_ver update
 - twitter card adaptable to different pages
 - df/dfticker: collect more data for log-graph dist_compare
-
-Thanks to @marcan, @ApricotMoai:
-- the core of apiclient/resource_mgr is translated from deresute.me,
-  from Python to Go
-  https://github.com/marcan/deresuteme
-- final result border data for 6 events from ApricotMoai
 
 
 Similar bots:
