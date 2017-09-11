@@ -17,11 +17,11 @@ Dependency (license)
 - GoPacket     (BSD)           "https://github.com/google/gopacket"
 
 Embedded libraries
-- rijndael     (BSD)           "https://github.com/agl/pond.git"
+- rijndael          (BSD)      "https://github.com/agl/pond.git"
 - stoppableListener (BSD)      "https://github.com/hydrogen18/stoppableListener"
-- jquery       (GPL/MIT)
-- jquery mobile (GPL/MIT)
-- date.js      (MIT)
+- jquery            (GPL/MIT)  "https://github.com/jquery/jquery"
+- jquery mobile     (GPL/MIT)  "https://github.com/jquery/jquery-mobile"
+- date.js           (MIT)      "https://github.com/datejs/Datejs"
 
 External web dependencies
 - Google charts: "https://developers.google.com/chart/"
