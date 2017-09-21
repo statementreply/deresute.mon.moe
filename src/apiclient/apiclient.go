@@ -22,6 +22,7 @@ package apiclient
 import (
 	// golang core libs
 	"crypto/md5"
+	"crypto/tls"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -45,7 +46,7 @@ import (
 )
 
 // FIXME: android client starts to use https
-const BASE string = "http://game.starlight-stage.jp"
+const BASE string = "https://game.starlight-stage.jp"
 
 var ErrSession = errors.New("session error, (need to restart session)")
 var ErrResource = errors.New("need to update res_ver")
@@ -100,6 +101,14 @@ func NewApiClient(user, viewer_id int32, udid, app_ver, res_ver string, VIEWER_I
 	//client.initialized = false
 	client.Reset_sid()
 	client.httpclient = &http.Client{Timeout: 20 * time.Second}
+
+	//client.httpclient.Transport = &http.Transport{}
+	//*(client.httpclient.Transport) = *(http.DefaultTransport)
+	client.httpclient.Transport = http.DefaultTransport
+	//*(client.httpclient.Transport).TLSNextProto = map[string]func(string, *tls.Conn){}
+	// FIXME: to disable HTTP/2 in client, assign an (non-nil) empty map
+	//        how to (shallow) copy from http.DefaultTransport
+	http.DefaultTransport.(*http.Transport).TLSNextProto = map[string]func(string, *tls.Conn)http.RoundTripper{}
 	return client
 }
 
