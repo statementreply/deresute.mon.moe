@@ -24,8 +24,6 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -64,14 +62,9 @@ func (client *ApiClient) makeRequest(path, body, plain_tmp string) *http.Request
 	// Request header ready
 
 	// Prepare Request struct
-	// req.body is ReadCloser
-	//req, err := http.NewRequest("POST", BASE+path, strings.NewReader(body))
-	req, err := http.NewRequest("POST", BASE+path, ioutil.NopCloser(strings.NewReader(body)))
+	req, err := http.NewRequest("POST", BASE+path, strings.NewReader(body))
 	if err != nil {
 		log.Fatal("http.NewRequset", err)
-	}
-	req.GetBody = func() (io.ReadCloser, error) {
-		return ioutil.NopCloser(strings.NewReader(body)), nil
 	}
 	for k := range headers {
 		req.Header.Set(k, headers[k])
