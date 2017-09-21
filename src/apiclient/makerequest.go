@@ -71,6 +71,6 @@ func (client *ApiClient) makeRequest(path, body, plain_tmp string) *http.Request
 		// not needed
 		//req.Header.Set(http.CanonicalHeaderKey(k), headers[k])
 	}
-	req.Close = true
+	//req.Close = true
 	return req
 }
