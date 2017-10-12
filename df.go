@@ -120,7 +120,7 @@ func main() {
 		}
 		discard += 1
 		//if discard % 5 != 0 {
-		if key[1] % 100 != 1 {
+		if key[1] % 50 != 1 {
 			log.Println("[INFO] skipping", key[1])
 			continue
 		}
