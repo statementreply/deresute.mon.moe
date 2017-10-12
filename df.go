@@ -126,9 +126,9 @@ func main() {
 		_, statusStr, err := df.GetCache(currentEvent, key[0],
 				datafetcher.RankToPage(key[1]), local_timestamp)
 		if (statusStr == "*") {
-			discard += 1
+			discard += 0
 		} else if (statusStr == "-") {
-			discard += 2
+			discard += 0
 		}
 		_ = statusStr
 		if err != nil {
