@@ -98,6 +98,7 @@ func main() {
 	resourceMgr := resource_mgr.NewResourceMgr(rv, RESOURCE_CACHE_DIR)
 	resourceMgr.ParseEvent()
 	currentEvent := resourceMgr.FindCurrentEvent()
+	log.Println(currentEvent)
 	//local_timestamp := ts.GetLocalTimestamp()
 	if len(os.Args) < 2 {
 		log.Fatal("need timestamp as cmdline param")
@@ -108,6 +109,10 @@ func main() {
 	defer df.CloseDb();
 
 	for _, key := range key_point {
+		if key[0] == 1 {
+			log.Println("skipping type == 1", key[1])
+			continue
+		}
 		_, statusStr, err := df.GetCache(currentEvent, key[0],
 				datafetcher.RankToPage(key[1]), local_timestamp)
 		_ = statusStr
