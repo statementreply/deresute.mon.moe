@@ -117,11 +117,11 @@ func main() {
 			log.Println("skipping type == 1", key[1])
 			continue
 		}
+		discard += 1
 		if discard % 5 != 0 {
 			log.Println("skipping", key[1])
 			continue
 		}
-		discard += 1
 		_, statusStr, err := df.GetCache(currentEvent, key[0],
 				datafetcher.RankToPage(key[1]), local_timestamp)
 		_ = statusStr
