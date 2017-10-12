@@ -98,7 +98,6 @@ func main() {
 	resourceMgr := resource_mgr.NewResourceMgr(rv, RESOURCE_CACHE_DIR)
 	resourceMgr.ParseEvent()
 	currentEvent := resourceMgr.FindCurrentEvent()
-	log.Println(currentEvent)
 	//local_timestamp := ts.GetLocalTimestamp()
 	if len(os.Args) < 2 {
 		log.Fatal("need timestamp as cmdline param")
@@ -108,29 +107,9 @@ func main() {
 	df.OpenDb();
 	defer df.CloseDb();
 
-	// local reverse
-	//for _, key := range key_point {
-	discard := 0
-	log.Println(key_point)
-	for	i := len(key_point) - 1; i >= 0; i-- {
-		key := key_point[i]
-		if key[0] == 1 {
-			//log.Println("skipping type == 1", key[1])
-			continue
-		}
-		discard += 1
-		//if discard % 5 != 0 {
-		if key[1] % 50 != 1 {
-			log.Println("[INFO] skipping", key[1])
-			continue
-		}
+	for _, key := range key_point {
 		_, statusStr, err := df.GetCache(currentEvent, key[0],
 				datafetcher.RankToPage(key[1]), local_timestamp)
-		if (statusStr == "*") {
-			discard += 0
-		} else if (statusStr == "-") {
-			discard += 0
-		}
 		_ = statusStr
 		if err != nil {
 			log.Println(err)
