@@ -111,6 +111,7 @@ func main() {
 	// local reverse
 	//for _, key := range key_point {
 	discard := 0
+	log.Println(key_point)
 	for	i := len(key_point) - 1; i >= 0; i-- {
 		key := key_point[i]
 		if key[0] == 1 {
