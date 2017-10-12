@@ -108,7 +108,10 @@ func main() {
 	df.OpenDb();
 	defer df.CloseDb();
 
-	for _, key := range key_point {
+	// local reverse
+	//for _, key := range key_point {
+	for	i := len(key_point) - 1; i >= 0; i-- {
+		key := key_point[i]
 		if key[0] == 1 {
 			log.Println("skipping type == 1", key[1])
 			continue
