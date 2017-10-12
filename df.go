@@ -115,12 +115,12 @@ func main() {
 	for	i := len(key_point) - 1; i >= 0; i-- {
 		key := key_point[i]
 		if key[0] == 1 {
-			log.Println("skipping type == 1", key[1])
+			//log.Println("skipping type == 1", key[1])
 			continue
 		}
 		discard += 1
 		if discard % 5 != 0 {
-			log.Println("skipping", key[1])
+			log.Println("[INFO] skipping", key[1])
 			continue
 		}
 		_, statusStr, err := df.GetCache(currentEvent, key[0],
