@@ -27,6 +27,9 @@ import (
 	"unicode/utf8"
 )
 
+// Temporary work-around
+const tweetMaxLength = 180
+
 func (r *RankServer) latestDataHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
 	fmt.Fprint(w, r.latestData())
@@ -461,7 +464,8 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 
 	statusLen := utf8.RuneCountInString(status)
 	statusLenFinal := statusLen
-	if statusLen > 140 {
+	// FIXME: Twitter updated character count algorithm
+	if statusLen > tweetMaxLength {
 		r.logger.Println("[WARN] twitter status limit exceeded", "<"+status+">")
 	}
 	tail1 := "\n" + "https://" + r.hostname
@@ -469,11 +473,11 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	tail2 := "\n" + fmt.Sprint("#デレステ")
 	tail2Len := utf8.RuneCountInString(tail2)
 
-	if statusLen+tail1Len <= 140 {
+	if statusLen+tail1Len <= tweetMaxLength {
 		status += tail1
 		statusLenFinal += tail1Len
 	}
-	if statusLen+tail1Len+tail2Len <= 140 {
+	if statusLen+tail1Len+tail2Len <= tweetMaxLength {
 		status += tail2
 		statusLenFinal += tail2Len
 	}
@@ -481,7 +485,7 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	r.logger.Println("[INFO] len/twitter of status", statusLenFinal, "status", "<"+strings.Replace(status, "\n", "<NL>", -1)+">")
 	//log.Println("status: <" + status + ">")
 	fmt.Fprint(w, status)
-	if statusLenFinal > 140 {
+	if statusLenFinal > tweetMaxLength {
 		r.logger.Println("[WARN] twitter status limit exceeded", "<"+status+">")
 	}
 }
