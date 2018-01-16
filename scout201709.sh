@@ -1,5 +1,5 @@
 set -x
-RES_VER=10034100
+RES_VER=10034500
 MASTER=$(./get_master $RES_VER)
 #echo $MASTER
 
@@ -26,6 +26,8 @@ GACHA_ID=30161
 # 201801 scout ticket
 GACHA_ID=30198
 
+# 201801x sr-scout ticket
+
 
 # type
 #GACHA_ID=30166 # cute
@@ -36,6 +38,7 @@ GACHA_ID=30198
 # id, rarity, name
 sqlite3 "$DB" \
  ".schema gacha_data" \
+ "SELECT id, source_guarantee, dicription FROM gacha_data ORDER BY id;" \
  "SELECT * FROM gacha_data WHERE id == $GACHA_ID;" \
  "SELECT count(*) FROM gacha_available WHERE gacha_id == $GACHA_ID;" \
  "/* all the card numbers */" \
@@ -45,4 +48,3 @@ sqlite3 "$DB" \
  "SELECT count(*) FROM gacha_available INNER JOIN card_data ON id = reward_id WHERE gacha_id = $GACHA_ID AND rarity < 9 AND rarity >= 7;" \
  "SELECT id, rarity, name FROM gacha_available INNER JOIN card_data ON id = reward_id WHERE gacha_id = $GACHA_ID AND rarity < 9 AND rarity >= 7;"
 
- #"SELECT id, source_guarantee, dicription FROM gacha_data ORDER BY id;" \
