@@ -26,9 +26,11 @@ var grooveFilter = regexp.MustCompile("LIVE Groove")
 const (
 	EventAtapon  = 1
 	EventCaravan = 2
+	// The internal name for groove is medley
 	EventGroove  = 3
 	EventParty   = 4
 	EventTour    = 5
+	EventRail    = 6
 )
 
 type EventDetail struct {
@@ -55,7 +57,7 @@ func (e *EventDetail) Name() string {
 
 func (e *EventDetail) ShortName() string {
 	// for groove/parade
-	if e.typ == 3 || e.typ == 5 {
+	if e.typ == EventGroove || e.typ == EventTour {
 		return e.MusicName()
 	}
 	// Usually names like "LIVE Groove Vocal Burst" is too long to fit in a tweet,
@@ -120,7 +122,7 @@ func (e *EventDetail) LoginBonusCount() int {
 }
 
 func (e *EventDetail) HasRanking() bool {
-	if (e.typ == 1) || (e.typ == 3) || (e.typ == 5) {
+	if (e.typ == EventAtapon) || (e.typ == EventGroove) || (e.typ == EventTour) {
 		return true
 	} else {
 		return false
@@ -259,7 +261,7 @@ func (eventList *EventDetailList) Overwrite(e_new *EventDetail) {
 
 // For live groove and live parade: title of the song.
 func (e *EventDetail) MusicName() string {
-	if e.typ != 3 && e.typ != 5 {
+	if e.typ != EventGroove && e.typ != EventTour {
 		return e.name
 	}
 
@@ -284,7 +286,7 @@ func (e *EventDetail) MusicName() string {
 // event type and song name.
 func (e *EventDetail) LongName() string {
 	long := e.name
-	if e.typ == 3 || e.typ == 5 {
+	if e.typ == EventGroove || e.typ == EventTour {
 		long += " = " + e.MusicName()
 	}
 	return long
