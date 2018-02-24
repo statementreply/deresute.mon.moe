@@ -17,6 +17,7 @@ package timestamp
 import (
 	"fmt"
 	"log"
+	"math"
 	"strconv"
 	"time"
 )
@@ -104,4 +105,24 @@ func GetLocalTimestamp() string {
 
 func TruncateToDay(in time.Time) time.Time {
 	return in.Add( -9 * time.Hour ).Truncate( 24 * time.Hour ).Add( 9 * time.Hour )
+}
+
+// japanese version
+func HumanReadableDuration(m time.Duration) string {
+	if m <= 0 {
+		return "0分"
+	} else if m < time.Hour {
+		min := m.Truncate(time.Minute).Minutes()
+		return fmt.Sprintf("%.0f分", min)
+	} else if m < 24 * time.Hour {
+		min := m.Truncate(time.Minute).Minutes()
+		hour := math.Floor(min / 60)
+		min = min - 60 * hour
+		return fmt.Sprintf("%.0f時間%.0f分", hour, min)
+	} else {
+		hour := m.Truncate(time.Hour).Hours()
+		day := math.Floor(hour / 24)
+		hour = hour - 24 * day
+		return fmt.Sprintf("%.0f日%.0f時間", day, hour)
+	}
 }

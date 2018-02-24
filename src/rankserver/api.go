@@ -413,10 +413,13 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 			timestamp_str = "【結果発表】"
 			isFinal = true
 		}
-		title = r.currentEvent.ShortName() + " " + timestamp_str + param.title_suffix + param.title_speed + "\n"
+		title = r.currentEvent.ShortName() + " " + timestamp_str
 		if isFinal {
-			// remove param.title_speed
-			title = r.currentEvent.ShortName() + " " + timestamp_str + param.title_suffix + "\n"
+			// FIXME: without param.title_speed
+			title += param.title_suffix + "\n"
+		} else {
+			title += " (残り" + ts.HumanReadableDuration(r.currentEvent.EventEnd().Sub(t)) + ")"
+			title += param.title_suffix + param.title_speed + "\n"
 		}
 	} else {
 		//r.logger.Println("[INFO] no event")
