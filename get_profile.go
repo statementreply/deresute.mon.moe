@@ -44,6 +44,9 @@ func main() {
 		friend_id, _ = strconv.Atoi(os.Args[1])
 	}
 	data := client.GetProfile(friend_id)
+
+	//data = client.GetTourRanking(2, 1)
+
 	yy, _ := yaml.Marshal(data)
 	fmt.Println(string(yy))
 	fmt.Println("app_ver:", client.GetAppVer())
