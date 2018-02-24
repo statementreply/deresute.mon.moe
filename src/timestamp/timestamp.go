@@ -112,17 +112,28 @@ func HumanReadableDuration(m time.Duration) string {
 	if m <= 0 {
 		return "0分"
 	} else if m < time.Hour {
-		min := m.Truncate(time.Minute).Minutes()
+		//min := m.Truncate(time.Minute).Minutes()
+		min := DurationTruncate(m, time.Minute).Minutes()
 		return fmt.Sprintf("%.0f分", min)
 	} else if m < 24 * time.Hour {
-		min := m.Truncate(time.Minute).Minutes()
+		//min := m.Truncate(time.Minute).Minutes()
+		min := DurationTruncate(m, time.Minute).Minutes()
 		hour := math.Floor(min / 60)
 		min = min - 60 * hour
 		return fmt.Sprintf("%.0f時間%.0f分", hour, min)
 	} else {
-		hour := m.Truncate(time.Hour).Hours()
+		//hour := m.Truncate(time.Hour).Hours()
+		hour := DurationTruncate(m, time.Hour).Hours()
 		day := math.Floor(hour / 24)
 		hour = hour - 24 * day
 		return fmt.Sprintf("%.0f日%.0f時間", day, hour)
 	}
+}
+
+// time.Duration.Truncate isn't available in 1.8
+func DurationTruncate(m time.Duration, n time.Duration) time.Duration {
+	if n <= 0 {
+		return m
+	}
+	return m - m % n
 }
