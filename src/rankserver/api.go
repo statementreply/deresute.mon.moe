@@ -28,7 +28,7 @@ import (
 )
 
 // Temporary work-around
-const tweetMaxLength = 180
+const tweetMaxLength = 210
 
 func (r *RankServer) latestDataHandler(w http.ResponseWriter, req *http.Request) {
 	r.init_req(w, req)
@@ -468,6 +468,7 @@ func (r *RankServer) twitterHandler_common(w http.ResponseWriter, req *http.Requ
 	statusLen := utf8.RuneCountInString(status)
 	statusLenFinal := statusLen
 	// FIXME: Twitter updated character count algorithm
+	//		  new limit == 280, and a CJK character count as 2
 	if statusLen > tweetMaxLength {
 		r.logger.Println("[WARN] twitter status limit exceeded", "<"+status+">")
 	}
