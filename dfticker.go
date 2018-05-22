@@ -86,9 +86,10 @@ func main() {
 		[2]int{1, 5001},    // emblem-2
 		[2]int{1, 50001},   // emblem-3 tier 4-old
 		[2]int{1, 100001},  // tier 5-old
-		[2]int{1, 300001},  // tier 6
-		[2]int{1, 500001},  // tier 7 emblem-4
-		[2]int{1, 1000001}, // tier 8
+		[2]int{1, 200001},  // tier 6
+		[2]int{1, 300001},  // tier 7
+		[2]int{1, 500001},  // tier 8 emblem-4
+		[2]int{1, 1000001}, // tier 9
 	}
 	// FIXME: get highscores at 15k+4 min
 	// workaround: schedule them after the 50th keypoint
